@@ -11,10 +11,10 @@ namespace TASMod.Patches
         public override void Patch(Harmony harmony)
         {
             harmony.Patch(
-               original: AccessTools.Method(typeof(Guid), "NewGuid"),
-               prefix: new HarmonyMethod(this.GetType(), nameof(this.Prefix)),
-               postfix: new HarmonyMethod(this.GetType(), nameof(this.Postfix))
-               );
+                original: AccessTools.Method(typeof(Guid), "NewGuid"),
+                prefix: new HarmonyMethod(this.GetType(), nameof(this.Prefix)),
+                postfix: new HarmonyMethod(this.GetType(), nameof(this.Postfix))
+            );
         }
 
         public static bool Prefix()
@@ -28,4 +28,3 @@ namespace TASMod.Patches
         }
     }
 }
-

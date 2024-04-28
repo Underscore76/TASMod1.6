@@ -1,6 +1,3 @@
-using System;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
 using StardewValley;
 using StardewValley.Tools;
 using TASMod.Inputs;

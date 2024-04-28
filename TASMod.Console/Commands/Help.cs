@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace TASMod.Console.Commands
 {
@@ -7,10 +6,8 @@ namespace TASMod.Console.Commands
     {
         public override string Name => "help";
         public override string Description => "print the help data of a function";
-        public override string[] Usage => new string[]
-        {
-            "\tuse the list command to find available functions"
-        };
+        public override string[] Usage =>
+            new string[] { "\tuse the list command to find available functions" };
 
         public override void Run(string[] tokens)
         {
@@ -113,4 +110,3 @@ namespace TASMod.Console.Commands
         }
     }
 }
-

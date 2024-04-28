@@ -1,11 +1,10 @@
-using System;
 using HarmonyLib;
 using StardewModdingAPI;
 
 namespace TASMod.Patches
 {
-	public abstract class IPatch
-	{
+    public abstract class IPatch
+    {
         public abstract string Name { get; }
         public abstract void Patch(Harmony harmony);
 
@@ -15,9 +14,9 @@ namespace TASMod.Patches
         }
 
         public static void Warn(string warning)
-		{
-			ModEntry.Console.Log(warning, LogLevel.Warn);
-		}
+        {
+            ModEntry.Console.Log(warning, LogLevel.Warn);
+        }
 
         public static void Alert(string alert)
         {

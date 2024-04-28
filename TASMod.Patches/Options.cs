@@ -1,7 +1,6 @@
-using System;
 using System.Linq;
-using StardewValley;
 using HarmonyLib;
+using StardewValley;
 using static StardewValley.Options;
 
 namespace TASMod.Patches
@@ -16,12 +15,14 @@ namespace TASMod.Patches
                 original: AccessTools.Method(typeof(Options), "setToDefaults"),
                 prefix: new HarmonyMethod(this.GetType(), nameof(this.Prefix)),
                 postfix: new HarmonyMethod(this.GetType(), nameof(this.Postfix))
-                );
+            );
         }
+
         public static bool Prefix()
         {
             return false;
         }
+
         public static void Postfix(Options __instance)
         {
             __instance.playFootstepSounds = true;
@@ -58,8 +59,12 @@ namespace TASMod.Patches
             __instance.ambientVolumeLevel = 0.25f;
             __instance.footstepVolumeLevel = 0.9f;
             __instance.soundVolumeLevel = 1f;
-            __instance.preferredResolutionX = Game1.graphics.GraphicsDevice.Adapter.SupportedDisplayModes.Last().Width;
-            __instance.preferredResolutionY = Game1.graphics.GraphicsDevice.Adapter.SupportedDisplayModes.Last().Height;
+            __instance.preferredResolutionX = Game1
+                .graphics.GraphicsDevice.Adapter.SupportedDisplayModes.Last()
+                .Width;
+            __instance.preferredResolutionY = Game1
+                .graphics.GraphicsDevice.Adapter.SupportedDisplayModes.Last()
+                .Height;
             __instance.vsyncEnabled = true;
             //GameRunner.instance.OnWindowSizeChange(null, null);
             __instance.snappyMenus = true;
@@ -81,7 +86,7 @@ namespace TASMod.Patches
             harmony.Patch(
                 original: AccessTools.Method(typeof(Options), "LoadDefaultOptions"),
                 postfix: new HarmonyMethod(this.GetType(), nameof(this.Postfix))
-                );
+            );
         }
 
         public static void Postfix(ref Options __instance)

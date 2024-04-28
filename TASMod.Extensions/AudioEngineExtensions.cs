@@ -1,11 +1,8 @@
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using Microsoft.Xna.Framework.Audio;
 using StardewValley;
-using StardewValley.Audio;
 using StardewValley.BellsAndWhistles;
-using System.Reflection;
 using StardewValley.GameData;
 
 namespace TASMod.Extensions
@@ -20,7 +17,9 @@ namespace TASMod.Extensions
             }
             engine.GetStopwatch().Reset();
 
-            var dict = (Dictionary<MusicContext, KeyValuePair<string, bool>>)Reflector.GetValue(Game1.game1, "_instanceRequestedMusicTracks");
+            var dict =
+                (Dictionary<MusicContext, KeyValuePair<string, bool>>)
+                    Reflector.GetValue(Game1.game1, "_instanceRequestedMusicTracks");
             dict.Clear();
             AmbientLocationSounds.onLocationLeave();
             Utility.killAllStaticLoopingSoundCues();
@@ -30,10 +29,10 @@ namespace TASMod.Extensions
         {
             return (Stopwatch)Reflector.GetValue(engine, "_stopwatch");
         }
+
         public static void SetStopwatch(this AudioEngine engine, Stopwatch stopwatch)
         {
             Reflector.SetValue(engine, "_stopwatch", stopwatch);
         }
     }
 }
-

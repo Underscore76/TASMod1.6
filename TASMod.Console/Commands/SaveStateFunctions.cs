@@ -1,6 +1,4 @@
-﻿using System;
-using System.Windows.Input;
-using TASMod.Recording;
+﻿using TASMod.Recording;
 using TASMod.System;
 
 namespace TASMod.Console.Commands
@@ -90,7 +88,11 @@ namespace TASMod.Console.Commands
                     // previous frame doesn't match, need to reset into it
                     Controller.State = state;
                     Controller.Reset(fastAdvance: true);
-                    Write("Inc changed on frame {0}, resetting back ({1} frames))", i, Controller.State.Count);
+                    Write(
+                        "Inc changed on frame {0}, resetting back ({1} frames))",
+                        i,
+                        Controller.State.Count
+                    );
                     return;
                 }
             }
@@ -105,7 +107,8 @@ namespace TASMod.Console.Commands
     public class SaveSaveState : IConsoleCommand
     {
         public override string Name => "save";
-        public override string Description => $"write current save state to {Controller.State.Prefix}";
+        public override string Description =>
+            $"write current save state to {Controller.State.Prefix}";
 
         public override void Run(string[] tokens)
         {
@@ -160,4 +163,3 @@ namespace TASMod.Console.Commands
         }
     }
 }
-

@@ -1,9 +1,9 @@
 using System;
-using HarmonyLib;
 using System.Collections.Generic;
 using System.Reflection.Emit;
-using TASMod.System;
+using HarmonyLib;
 using StardewValley;
+using TASMod.System;
 
 namespace TASMod.Patches
 {
@@ -19,15 +19,21 @@ namespace TASMod.Patches
             harmony.Patch(
                 original: AccessTools.Property(typeof(DateTime), nameof(DateTime.Now)).GetMethod,
                 transpiler: new HarmonyMethod(this.GetType(), nameof(this.Transpiler))
-                );
+            );
         }
+
         public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instr)
         {
-            return new CodeInstruction[] {
-                new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(DateTime_Now), nameof(NowOverride))),
+            return new CodeInstruction[]
+            {
+                new CodeInstruction(
+                    OpCodes.Call,
+                    AccessTools.Method(typeof(DateTime_Now), nameof(NowOverride))
+                ),
                 new CodeInstruction(OpCodes.Ret)
-                };
+            };
         }
+
         public static DateTime NowOverride()
         {
             return TASDateTime.Now;
@@ -43,19 +49,24 @@ namespace TASMod.Patches
             harmony.Patch(
                 original: AccessTools.Property(typeof(DateTime), nameof(DateTime.UtcNow)).GetMethod,
                 transpiler: new HarmonyMethod(this.GetType(), nameof(this.Transpiler))
-                );
+            );
         }
+
         public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instr)
         {
-            return new CodeInstruction[] {
-                new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(DateTime_UtcNow), nameof(UtcNowOverride))),
+            return new CodeInstruction[]
+            {
+                new CodeInstruction(
+                    OpCodes.Call,
+                    AccessTools.Method(typeof(DateTime_UtcNow), nameof(UtcNowOverride))
+                ),
                 new CodeInstruction(OpCodes.Ret)
-                };
+            };
         }
+
         public static DateTime UtcNowOverride()
         {
             return TASDateTime.UtcNow;
         }
     }
 }
-

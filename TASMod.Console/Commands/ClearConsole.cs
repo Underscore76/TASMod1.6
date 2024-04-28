@@ -1,5 +1,3 @@
-using System;
-
 namespace TASMod.Console.Commands
 {
     public class ClearConsole : IConsoleCommand
@@ -13,4 +11,3 @@ namespace TASMod.Console.Commands
         }
     }
 }
-

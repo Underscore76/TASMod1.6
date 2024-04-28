@@ -1,10 +1,9 @@
-﻿using System;
-using Microsoft.Xna.Framework.Input;
+﻿using Microsoft.Xna.Framework.Input;
 
 namespace TASMod.Inputs
 {
-	public class TASMouseState
-	{
+    public class TASMouseState
+    {
         public int MouseX;
         public int MouseY;
         public int ScrollWheel = 0;
@@ -15,6 +14,7 @@ namespace TASMod.Inputs
         public bool XButton2Clicked = false;
 
         public TASMouseState() { }
+
         public TASMouseState(int mouseX, int mouseY, bool leftClick, bool rightClick)
         {
             MouseX = mouseX;
@@ -22,9 +22,15 @@ namespace TASMod.Inputs
             LeftMouseClicked = leftClick;
             RightMouseClicked = rightClick;
         }
-        public TASMouseState(TASMouseState o) : this(o.MouseX, o.MouseY, o.LeftMouseClicked, o.RightMouseClicked) { }
-        public TASMouseState(MouseState o) : this(o.X, o.Y, FromButtonState(o.LeftButton), FromButtonState(o.RightButton)) { }
-        public TASMouseState(TASMouseState o, bool leftClick, bool rightClick) : this(o)
+
+        public TASMouseState(TASMouseState o)
+            : this(o.MouseX, o.MouseY, o.LeftMouseClicked, o.RightMouseClicked) { }
+
+        public TASMouseState(MouseState o)
+            : this(o.X, o.Y, FromButtonState(o.LeftButton), FromButtonState(o.RightButton)) { }
+
+        public TASMouseState(TASMouseState o, bool leftClick, bool rightClick)
+            : this(o)
         {
             LeftMouseClicked = leftClick;
             RightMouseClicked = rightClick;
@@ -32,14 +38,18 @@ namespace TASMod.Inputs
 
         public MouseState GetMouseState()
         {
-            return new MouseState(MouseX, MouseY, ScrollWheel,
+            return new MouseState(
+                MouseX,
+                MouseY,
+                ScrollWheel,
                 ToButtonState(LeftMouseClicked),
                 ToButtonState(MiddleMouseClicked),
                 ToButtonState(RightMouseClicked),
                 ToButtonState(XButton1Clicked),
                 ToButtonState(XButton2Clicked)
-                );
+            );
         }
+
         private static ButtonState ToButtonState(bool state)
         {
             return state ? ButtonState.Pressed : ButtonState.Released;
@@ -72,4 +82,3 @@ namespace TASMod.Inputs
         }
     }
 }
-

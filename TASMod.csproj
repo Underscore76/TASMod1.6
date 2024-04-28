@@ -1,45 +1,40 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="NLua" Version="1.7.2" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="Pathoschild.Stardew.ModBuildConfig" Version="4.1.1" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Remove="Decompile\**" />
-    <Compile Remove="Decompile\**" />
-    <EmbeddedResource Remove="Decompile\**" />
-    <!-- <None Remove="Decompile\**" /> -->
-  </ItemGroup>
-  
   <PropertyGroup>
-		<EnableHarmony>true</EnableHarmony>
-		<BundleExtraAssemblies>ThirdParty</BundleExtraAssemblies>
-		<EnableModZip>true</EnableModZip>
-		<IgnoreModFilePatterns>runtimes</IgnoreModFilePatterns>
+    <EnableHarmony>true</EnableHarmony>
+    <BundleExtraAssemblies>ThirdParty</BundleExtraAssemblies>
+    <EnableModZip>true</EnableModZip>
+    <IgnoreModFilePatterns>runtimes</IgnoreModFilePatterns>
   </PropertyGroup>
-
   <ItemGroup>
-    <None Include="_libs\liblua54.dylib" />
+    <PackageReference Include="NLua" Version="1.7.2"/>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3"/>
+    <PackageReference Include="Pathoschild.Stardew.ModBuildConfig" Version="4.1.1"/>
+    <PackageReference Include="DynamicExpresso.Core" Version="2.16.1"/>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Remove="Decompile\**"/>
+    <Compile Remove="Decompile\**"/>
+    <EmbeddedResource Remove="Decompile\**"/>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="_libs\liblua54.dylib"/>
+    <None Include="_libs\lua54.dll"/>
+    <None Include="_libs\liblua54.so"/>
     <ContentWithTargetPath Include="_libs\liblua54.dylib">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        <TargetPath>liblua54.dylib</TargetPath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>liblua54.dylib</TargetPath>
     </ContentWithTargetPath>
-    <None Include="_libs\lua54.dll" />
     <ContentWithTargetPath Include="_libs\lua54.dll">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        <TargetPath>lua54.dll</TargetPath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>lua54.dll</TargetPath>
     </ContentWithTargetPath>
-    <None Include="_libs\liblua54.so" />
     <ContentWithTargetPath Include="_libs\liblua54.so">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        <TargetPath>liblua54.so</TargetPath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>liblua54.so</TargetPath>
     </ContentWithTargetPath>
   </ItemGroup>
 </Project>

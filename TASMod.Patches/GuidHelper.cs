@@ -1,8 +1,7 @@
 ﻿using System;
 using HarmonyLib;
-using StardewValley.Util;
-
 using TASMod.System;
+
 namespace TASMod.Patches
 {
     public class GuidHelper_NewGuid : IPatch
@@ -14,7 +13,7 @@ namespace TASMod.Patches
             harmony.Patch(
                 original: AccessTools.Method("StardewValley.Util.GuidHelper:NewGuid"),
                 postfix: new HarmonyMethod(this.GetType(), nameof(this.Postfix))
-                );
+            );
         }
 
         public static void Postfix(ref Guid __result)
@@ -24,4 +23,3 @@ namespace TASMod.Patches
         }
     }
 }
-

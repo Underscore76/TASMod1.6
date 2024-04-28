@@ -6,14 +6,10 @@ using System.Reflection;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using StardewModdingAPI;
 using StardewValley;
-using StardewValley.Locations;
 using TASMod.Console.Commands;
 using TASMod.Inputs;
 using TASMod.Monogame.Framework;
-using TASMod.Overlays;
-using TASMod.System;
 
 namespace TASMod.Console
 {

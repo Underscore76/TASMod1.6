@@ -1,10 +1,9 @@
-using System;
 using Microsoft.Xna.Framework.Input;
 
 namespace TASMod.Inputs
 {
-	public class TASGamePadState
-	{
+    public class TASGamePadState
+    {
         public GamePadButtons mButtons;
         public GamePadDPad mDPad;
         public GamePadThumbSticks mThumbSticks;
@@ -17,6 +16,7 @@ namespace TASMod.Inputs
             mThumbSticks = new GamePadThumbSticks();
             mTriggers = new GamePadTriggers();
         }
+
         public GamePadState GetGamePadState()
         {
             return new GamePadState(mThumbSticks, mTriggers, mButtons, mDPad);
@@ -31,10 +31,10 @@ namespace TASMod.Inputs
         {
             mButtons = new GamePadButtons((Buttons)mButtons.GetHashCode() | button);
         }
+
         public void RemoveButton(Buttons button)
         {
             mButtons = new GamePadButtons((Buttons)mButtons.GetHashCode() & ~button);
         }
     }
 }
-

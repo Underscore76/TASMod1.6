@@ -16,13 +16,21 @@ namespace TASMod.Patches
         public override void Patch(Harmony harmony)
         {
             harmony.Patch(
-                original: AccessTools.Method(typeof(Path), BaseKey.Split(".")[1], new Type[] { typeof(string), typeof(string) }),
+                original: AccessTools.Method(
+                    typeof(Path),
+                    BaseKey.Split(".")[1],
+                    new Type[] { typeof(string), typeof(string) }
+                ),
                 prefix: new HarmonyMethod(this.GetType(), nameof(this.Prefix))
-                );
+            );
             harmony.Patch(
-                original: AccessTools.Method(typeof(Path), BaseKey.Split(".")[1], new Type[] { typeof(string[]) }),
+                original: AccessTools.Method(
+                    typeof(Path),
+                    BaseKey.Split(".")[1],
+                    new Type[] { typeof(string[]) }
+                ),
                 prefix: new HarmonyMethod(this.GetType(), nameof(this.PrefixN))
-                );
+            );
         }
 
         public static bool Prefix(ref string path1, ref string path2)
@@ -40,11 +48,13 @@ namespace TASMod.Patches
             }
             return true;
         }
+
         public static bool PrefixN(ref string[] paths)
         {
             List<string> res = new(paths);
             // (Environment.GetFolderPath (Environment.SpecialFolder.ApplicationData), "StardewValley", "Saves", file, file);
-            if (res.Count != 5) return true;
+            if (res.Count != 5)
+                return true;
             if (res[1] == "StardewValley" && res[2] == "Saves")
             {
                 res.RemoveRange(0, 3);

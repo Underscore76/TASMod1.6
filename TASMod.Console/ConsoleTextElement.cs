@@ -1,4 +1,3 @@
-using System;
 using Microsoft.Xna.Framework;
 
 namespace TASMod.Console
@@ -17,6 +16,7 @@ namespace TASMod.Console
             Visible = visible;
             Color = Color.White;
         }
+
         public ConsoleTextElement(string text, bool entry, Color color, bool visible = true)
         {
             Text = text;
@@ -26,4 +26,3 @@ namespace TASMod.Console
         }
     }
 }
-

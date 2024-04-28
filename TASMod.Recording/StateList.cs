@@ -1,11 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace TASMod.Recording
 {
     public class StateList : List<FrameState>
     {
-        public void Pop() { RemoveAt(Count - 1); }
+        public void Pop()
+        {
+            RemoveAt(Count - 1);
+        }
+
         public void Reset(int lastFrame = -1)
         {
             if (lastFrame == -1 || lastFrame > Count)
@@ -37,4 +40,3 @@ namespace TASMod.Recording
         }
     }
 }
-

@@ -1,11 +1,9 @@
 ﻿using System;
+using System.Diagnostics;
+using System.IO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using StardewValley;
-using System.Diagnostics;
-using System.IO;
-using TASMod.Extensions;
-using TASMod.System;
 
 namespace TASMod.Recording
 {
@@ -14,20 +12,30 @@ namespace TASMod.Recording
     {
         [JsonProperty]
         public string FarmerName = "abc";
+
         [JsonProperty]
         public string FarmName = "abc";
+
         [JsonProperty]
         public string FavoriteThing = "abc";
+
         [JsonProperty]
         public string Prefix = "tmp";
+
         [JsonProperty, JsonConverter(typeof(StringEnumConverter))]
-        public LocalizedContentManager.LanguageCode Language = LocalizedContentManager.LanguageCode.en;
+        public LocalizedContentManager.LanguageCode Language = LocalizedContentManager
+            .LanguageCode
+            .en;
+
         [JsonProperty]
         public int Seed = 0;
+
         [JsonProperty]
         public StateList FrameStates = new StateList();
+
         [JsonProperty]
         public ulong ReRecords = 0;
+
         [JsonProperty]
         public int XActSeed = 0;
 
@@ -36,7 +44,13 @@ namespace TASMod.Recording
             StoreGameDetails();
         }
 
-        public SaveState(string farmerName, string farmName, string favoriteThing, int seed, LocalizedContentManager.LanguageCode lang)
+        public SaveState(
+            string farmerName,
+            string farmName,
+            string favoriteThing,
+            int seed,
+            LocalizedContentManager.LanguageCode lang
+        )
         {
             LocalizedContentManager.CurrentLanguageCode = lang;
             StoreGameDetails();
@@ -47,32 +61,35 @@ namespace TASMod.Recording
             Prefix = string.Format("{0}_{1}", farmerName, seed);
         }
 
-        public SaveState(StateList states) : base()
+        public SaveState(StateList states)
+            : base()
         {
             FrameStates.AddRange(states);
         }
 
         public override string ToString()
         {
-            return string.Format("FarmerName:{0}|FarmName:{1}|FavoriteThing:{2}|Prefix:{3}|#Frames:{4}", FarmerName, FarmName, FavoriteThing, Prefix, Count);
+            return string.Format(
+                "FarmerName:{0}|FarmName:{1}|FavoriteThing:{2}|Prefix:{3}|#Frames:{4}",
+                FarmerName,
+                FarmName,
+                FavoriteThing,
+                Prefix,
+                Count
+            );
         }
 
         public string FilePath
         {
-            get
-            {
-                return Path.Combine(Constants.SaveStatePath, Prefix + ".json");
-            }
+            get { return Path.Combine(Constants.SaveStatePath, Prefix + ".json"); }
         }
 
         [JsonProperty]
         public int Count
         {
-            get
-            {
-                return FrameStates.Count;
-            }
+            get { return FrameStates.Count; }
         }
+
         public void StoreGameDetails()
         {
             Language = LocalizedContentManager.CurrentLanguageCode;
@@ -108,7 +125,10 @@ namespace TASMod.Recording
             SaveState state = null;
             if (File.Exists(filePath))
             {
-                ModEntry.Console.Log($"Called load on {filePath}", StardewModdingAPI.LogLevel.Alert);
+                ModEntry.Console.Log(
+                    $"Called load on {filePath}",
+                    StardewModdingAPI.LogLevel.Alert
+                );
                 try
                 {
                     using (StreamReader file = File.OpenText(filePath))
@@ -120,7 +140,10 @@ namespace TASMod.Recording
                 }
                 catch (Exception e)
                 {
-                    ModEntry.Console.Log($"Failed to load file {e}", StardewModdingAPI.LogLevel.Alert);
+                    ModEntry.Console.Log(
+                        $"Failed to load file {e}",
+                        StardewModdingAPI.LogLevel.Alert
+                    );
                     return state;
                 }
                 if (restore)
@@ -159,4 +182,3 @@ namespace TASMod.Recording
         }
     }
 }
-

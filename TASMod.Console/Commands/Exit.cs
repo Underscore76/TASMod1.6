@@ -1,5 +1,4 @@
-﻿using System;
-using StardewValley;
+﻿using StardewValley;
 
 namespace TASMod.Console.Commands
 {
@@ -15,4 +14,3 @@ namespace TASMod.Console.Commands
         }
     }
 }
-

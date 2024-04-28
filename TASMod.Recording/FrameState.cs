@@ -35,6 +35,7 @@ namespace TASMod.Recording
             {
                 return (obj is RandomState) && this == (RandomState)obj;
             }
+
             public override int GetHashCode()
             {
                 return base.GetHashCode();
@@ -45,32 +46,66 @@ namespace TASMod.Recording
                 return $"seed: {seed}, index:{index}";
             }
         }
+
         public static Keys[] ValidKeys =
         {
             // Inventory
-            Keys.D1, Keys.D2, Keys.D3, Keys.D4, Keys.D5, Keys.D6, Keys.D7, Keys.D8, Keys.D9, Keys.D0, Keys.OemMinus, Keys.OemPlus,
+            Keys.D1,
+            Keys.D2,
+            Keys.D3,
+            Keys.D4,
+            Keys.D5,
+            Keys.D6,
+            Keys.D7,
+            Keys.D8,
+            Keys.D9,
+            Keys.D0,
+            Keys.OemMinus,
+            Keys.OemPlus,
             // Movement
-            Keys.W, Keys.A, Keys.S, Keys.D,
+            Keys.W,
+            Keys.A,
+            Keys.S,
+            Keys.D,
             // Actions
-            Keys.C, Keys.F, Keys.Y, Keys.X, Keys.N,
+            Keys.C,
+            Keys.F,
+            Keys.Y,
+            Keys.X,
+            Keys.N,
             // Menus
-            Keys.Escape, Keys.E, Keys.I, Keys.M, Keys.J,
+            Keys.Escape,
+            Keys.E,
+            Keys.I,
+            Keys.M,
+            Keys.J,
             // Escape Keys
-            Keys.RightShift, Keys.R, Keys.Delete,
+            Keys.RightShift,
+            Keys.R,
+            Keys.Delete,
             // Misc
-            Keys.LeftShift, Keys.Tab, Keys.LeftControl
+            Keys.LeftShift,
+            Keys.Tab,
+            Keys.LeftControl
         };
 
         [JsonProperty]
         public RandomState randomState;
+
         [JsonProperty]
         public TASKeyboardState keyboardState;
+
         [JsonProperty]
         public TASMouseState mouseState;
         public string comments;
+
         [JsonProperty]
         public string injectText;
-        public string InjectText { get => injectText; set => injectText = value; }
+        public string InjectText
+        {
+            get => injectText;
+            set => injectText = value;
+        }
 
         public FrameState()
         {
@@ -95,7 +130,12 @@ namespace TASMod.Recording
             injectText = o.injectText;
         }
 
-        public FrameState(KeyboardState kstate, MouseState mstate, string comm = "", string inject = "")
+        public FrameState(
+            KeyboardState kstate,
+            MouseState mstate,
+            string comm = "",
+            string inject = ""
+        )
         {
             randomState = new RandomState(Game1.random);
             keyboardState = new TASKeyboardState(kstate);
@@ -109,10 +149,12 @@ namespace TASMod.Recording
         {
             return !string.IsNullOrEmpty(injectText);
         }
+
         public void SetInjectText(string text)
         {
             injectText = text;
         }
+
         public void ClearInjectText()
         {
             injectText = "";
@@ -158,4 +200,3 @@ namespace TASMod.Recording
         }
     }
 }
-

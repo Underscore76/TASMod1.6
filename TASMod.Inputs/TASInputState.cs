@@ -1,7 +1,7 @@
-using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
-using System.Collections.Generic;
+
 namespace TASMod.Inputs
 {
     public class TASInputState
@@ -135,7 +135,12 @@ namespace TASMod.Inputs
             else
                 AddKeys(state.GetPressedKeys());
         }
-        public static void SetKeyboard(KeyboardState state, HashSet<Keys> addedKeys, HashSet<Keys> rejectedKeys)
+
+        public static void SetKeyboard(
+            KeyboardState state,
+            HashSet<Keys> addedKeys,
+            HashSet<Keys> rejectedKeys
+        )
         {
             ClearKeys();
             if (addedKeys != null && addedKeys.Count > 0)
@@ -157,4 +162,3 @@ namespace TASMod.Inputs
         }
     }
 }
-

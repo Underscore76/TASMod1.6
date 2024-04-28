@@ -1,6 +1,6 @@
-using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
+using Microsoft.Xna.Framework.Input;
 
 namespace TASMod.Inputs
 {
@@ -58,17 +58,20 @@ namespace TASMod.Inputs
 
         public static bool LeftMouseClicked()
         {
-            return oldMouseState.LeftButton == ButtonState.Released && mouseState.LeftButton == ButtonState.Pressed;
+            return oldMouseState.LeftButton == ButtonState.Released
+                && mouseState.LeftButton == ButtonState.Pressed;
         }
+
         public static bool RightMouseClicked()
         {
-            return oldMouseState.RightButton == ButtonState.Released && mouseState.RightButton == ButtonState.Pressed;
+            return oldMouseState.RightButton == ButtonState.Released
+                && mouseState.RightButton == ButtonState.Pressed;
         }
 
         public static IEnumerable<Keys> GetTriggeredKeys()
         {
             List<Keys> keys = new List<Keys>();
-            foreach(var key in keyboardState.GetPressedKeys())
+            foreach (var key in keyboardState.GetPressedKeys())
             {
                 if (oldKeyboardState.IsKeyUp(key))
                 {

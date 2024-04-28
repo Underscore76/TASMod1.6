@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.IO;
-using Newtonsoft.Json.Linq;
+using System.Linq;
 using TASMod.Recording;
 
 namespace TASMod.Console.Commands
@@ -11,12 +10,13 @@ namespace TASMod.Console.Commands
     {
         public override string Name => "ls";
         public override string Description => "list save state files";
-        public override string[] Usage => new string[]
-        {
-            $"\t\"{Name} <file> [...]\" to list save state files",
-            "\tMultiple file names can be searched, as well as wildcards * and ?",
-            "\tAn automatic * wildcard is appended unless you explicitly use the .json extension"
-        };
+        public override string[] Usage =>
+            new string[]
+            {
+                $"\t\"{Name} <file> [...]\" to list save state files",
+                "\tMultiple file names can be searched, as well as wildcards * and ?",
+                "\tAn automatic * wildcard is appended unless you explicitly use the .json extension"
+            };
 
         public List<string> GetFilePaths(string[] tokens)
         {
@@ -39,7 +39,9 @@ namespace TASMod.Console.Commands
             List<string> results = new List<string>(
                 files
                     .ToArray()
-                    .Select((s) => s.Replace(Constants.SaveStatePath + Path.VolumeSeparatorChar, ""))
+                    .Select(
+                        (s) => s.Replace(Constants.SaveStatePath + Path.VolumeSeparatorChar, "")
+                    )
             );
             results.Sort();
             return results;
@@ -61,7 +63,9 @@ namespace TASMod.Console.Commands
                 token += "*.json";
             try
             {
-                results = new List<string>(Directory.GetFiles(Constants.SaveStatePath, token)).ToArray();
+                results = new List<string>(
+                    Directory.GetFiles(Constants.SaveStatePath, token)
+                ).ToArray();
             }
             catch (DirectoryNotFoundException)
             {
@@ -71,16 +75,16 @@ namespace TASMod.Console.Commands
         }
     }
 
-
     public class CopySaveStates : IConsoleCommand
     {
         public override string Name => "cp";
         public override string Description => "copy file to new name";
-        public override string[] Usage => new string[]
-        {
-            $"\t\"{Name} <src> <dst> \" to copy src file to dst",
-            "\t.json extension is automatically appended if not provided"
-        };
+        public override string[] Usage =>
+            new string[]
+            {
+                $"\t\"{Name} <src> <dst> \" to copy src file to dst",
+                "\t.json extension is automatically appended if not provided"
+            };
 
         public override void Run(string[] tokens)
         {
@@ -110,12 +114,13 @@ namespace TASMod.Console.Commands
     {
         public override string Name => "rm";
         public override string Description => "remove save state files";
-        public override string[] Usage => new string[]
-        {
-            $"\t\"{Name} <file> [...]\" to remove 1 or more files",
-            "\tMultiple file names can be passed, as well as wildcards * and ?",
-            "\t.json extension is automatically appended if not provided"
-        };
+        public override string[] Usage =>
+            new string[]
+            {
+                $"\t\"{Name} <file> [...]\" to remove 1 or more files",
+                "\tMultiple file names can be passed, as well as wildcards * and ?",
+                "\t.json extension is automatically appended if not provided"
+            };
 
         public override void Run(string[] tokens)
         {
@@ -163,12 +168,12 @@ namespace TASMod.Console.Commands
     {
         public override string Name => "mv";
         public override string Description => "rename a file";
-        public override string[] Usage => new string[]
-        {
-            $"\t\"{Name} <src> <dst>\" to rename src file to dst",
-            "\t.json extension is automatically appended if not provided"
-        };
-
+        public override string[] Usage =>
+            new string[]
+            {
+                $"\t\"{Name} <src> <dst>\" to rename src file to dst",
+                "\t.json extension is automatically appended if not provided"
+            };
 
         public override void Run(string[] tokens)
         {
@@ -199,4 +204,3 @@ namespace TASMod.Console.Commands
         }
     }
 }
-

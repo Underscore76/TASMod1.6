@@ -1,6 +1,4 @@
-using System;
 using System.Linq;
-using System.Windows.Input;
 
 namespace TASMod.Console.Commands
 {
@@ -10,15 +8,16 @@ namespace TASMod.Console.Commands
 
         public override string Description => "custom aliases for command strings";
 
-        public override string[] Usage => new string[]
-        {
-            "Calling an alias string in the console will run the associated command string.",
-            "Alias string must not contain spaces.",
-            $"\"{Name} set <name>=<command>\" -  set a new alias",
-            $"\"{Name} get\" - get all aliases",
-            $"\"{Name} get name\" - get a specific alias",
-            $"Example: \"{Name} set pxp=player xp\" will call \"player xp\" when you enter \"pxp\"",
-        };
+        public override string[] Usage =>
+            new string[]
+            {
+                "Calling an alias string in the console will run the associated command string.",
+                "Alias string must not contain spaces.",
+                $"\"{Name} set <name>=<command>\" -  set a new alias",
+                $"\"{Name} get\" - get all aliases",
+                $"\"{Name} get name\" - get a specific alias",
+                $"Example: \"{Name} set pxp=player xp\" will call \"player xp\" when you enter \"pxp\"",
+            };
 
         public override void Run(string[] tokens)
         {

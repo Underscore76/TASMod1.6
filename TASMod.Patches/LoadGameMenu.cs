@@ -1,11 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using HarmonyLib;
-using StardewValley;
 using StardewValley.Menus;
 
 namespace TASMod.Patches
@@ -18,9 +15,13 @@ namespace TASMod.Patches
         public override void Patch(Harmony harmony)
         {
             harmony.Patch(
-                original: AccessTools.Method(typeof(LoadGameMenu), BaseKey.Split(".")[1], new Type[] { typeof(string) }),
+                original: AccessTools.Method(
+                    typeof(LoadGameMenu),
+                    BaseKey.Split(".")[1],
+                    new Type[] { typeof(string) }
+                ),
                 transpiler: new HarmonyMethod(this.GetType(), nameof(this.Transpiler))
-                );
+            );
         }
 
         public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instr)
@@ -29,9 +30,16 @@ namespace TASMod.Patches
             // ideally this could've just been a prefix/postfix on Program.GetSavesFolder
             foreach (var i in instr)
             {
-                if (i.opcode == OpCodes.Call && i.operand is MethodInfo m && m.Name == "GetSavesFolder")
+                if (
+                    i.opcode == OpCodes.Call
+                    && i.operand is MethodInfo m
+                    && m.Name == "GetSavesFolder"
+                )
                 {
-                    yield return new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(LoadGameMenu_FindSaveGames), nameof(Override)));
+                    yield return new CodeInstruction(
+                        OpCodes.Call,
+                        AccessTools.Method(typeof(LoadGameMenu_FindSaveGames), nameof(Override))
+                    );
                     continue;
                 }
                 yield return i;

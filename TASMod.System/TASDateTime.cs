@@ -6,7 +6,7 @@ namespace TASMod.System
     using StardewValley;
 
     public static class TASDateTime
-	{
+    {
         public static ulong CurrentFrame;
         public static ulong FrameOffset { get; set; }
         public static TimeSpan FrameTimeSpan = new TimeSpan(166667);
@@ -26,10 +26,7 @@ namespace TASMod.System
 
         public static ulong uniqueIdForThisGame
         {
-            get
-            {
-                return (ulong)FrameOffset / 60;
-            }
+            get { return (ulong)FrameOffset / 60; }
         }
 
         public static void Reset()
@@ -40,10 +37,7 @@ namespace TASMod.System
 
         public static DateTime Epoch
         {
-            get
-            {
-                return new DateTime(2012, 6, 22);
-            }
+            get { return new DateTime(2012, 6, 22); }
         }
 
         public static DateTime EpochNow
@@ -58,18 +52,12 @@ namespace TASMod.System
 
         public static DateTime Now
         {
-            get
-            {
-                return new DateTime(Ticks);
-            }
+            get { return new DateTime(Ticks); }
         }
 
         public static DateTime UtcNow
         {
-            get
-            {
-                return new DateTime(Ticks);
-            }
+            get { return new DateTime(Ticks); }
         }
 
         public static long Ticks
@@ -94,34 +82,22 @@ namespace TASMod.System
 
         public static TimeSpan TimeOfDay
         {
-            get
-            {
-                return Now.TimeOfDay;
-            }
+            get { return Now.TimeOfDay; }
         }
 
         public static int Seconds
         {
-            get
-            {
-                return (int)TimeOfDay.TotalSeconds;
-            }
+            get { return (int)TimeOfDay.TotalSeconds; }
         }
 
         public static int Milliseconds
         {
-            get
-            {
-                return (int)TimeOfDay.TotalMilliseconds;
-            }
+            get { return (int)TimeOfDay.TotalMilliseconds; }
         }
 
         public static int FramesToNextSecond
         {
-            get
-            {
-                return (int)(60 - (CurrentFrame % 60));
-            }
+            get { return (int)(60 - (CurrentFrame % 60)); }
         }
     }
 }

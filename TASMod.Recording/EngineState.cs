@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 
 namespace TASMod.Recording
@@ -40,4 +39,3 @@ namespace TASMod.Recording
         }
     }
 }
-

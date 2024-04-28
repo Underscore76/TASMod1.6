@@ -1,9 +1,6 @@
 using System;
 using System.Reflection;
-using System.Runtime.CompilerServices;
-using HarmonyLib;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewValley;
 using TASMod.Monogame.Framework;

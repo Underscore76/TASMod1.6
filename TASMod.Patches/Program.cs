@@ -2,10 +2,6 @@
 // Games will save/load into this folder instead of using your actual save files.
 // The hope is that this will allow you to use your actual save files while TASing and avoid corruption.
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Reflection;
-using System.Reflection.Emit;
 using HarmonyLib;
 using StardewValley;
 
@@ -22,12 +18,15 @@ namespace TASMod.Patches
                 original: AccessTools.Method("StardewValley.Program:GetLocalAppDataFolder"),
                 prefix: new HarmonyMethod(this.GetType(), nameof(this.Prefix)),
                 postfix: new HarmonyMethod(this.GetType(), nameof(this.PostfixBase))
-                );
+            );
             harmony.Patch(
-                original: AccessTools.Method("StardewValley.Program:GetLocalAppDataFolder", new Type[] { typeof(string), typeof(bool) }),
+                original: AccessTools.Method(
+                    "StardewValley.Program:GetLocalAppDataFolder",
+                    new Type[] { typeof(string), typeof(bool) }
+                ),
                 prefix: new HarmonyMethod(this.GetType(), nameof(this.Prefix)),
                 postfix: new HarmonyMethod(this.GetType(), nameof(this.Postfix))
-                );
+            );
         }
 
         public static bool Prefix()
@@ -62,7 +61,9 @@ namespace TASMod.Patches
                     __result = Constants.ExportsPath;
                     return;
                 default:
-                    throw new NotImplementedException($"Subfolder {subfolder} not implemented in {BaseKey}");
+                    throw new NotImplementedException(
+                        $"Subfolder {subfolder} not implemented in {BaseKey}"
+                    );
             }
         }
     }
@@ -78,13 +79,17 @@ namespace TASMod.Patches
                 original: AccessTools.Method(typeof(Program), BaseKey.Split(".")[1]),
                 prefix: new HarmonyMethod(this.GetType(), nameof(this.Prefix)),
                 postfix: new HarmonyMethod(this.GetType(), nameof(this.PostfixBase))
-                );
+            );
 
             harmony.Patch(
-                original: AccessTools.Method(typeof(Program), BaseKey.Split(".")[1], new Type[] { typeof(string), typeof(bool) }),
+                original: AccessTools.Method(
+                    typeof(Program),
+                    BaseKey.Split(".")[1],
+                    new Type[] { typeof(string), typeof(bool) }
+                ),
                 prefix: new HarmonyMethod(this.GetType(), nameof(this.Prefix)),
                 postfix: new HarmonyMethod(this.GetType(), nameof(this.Postfix))
-                );
+            );
         }
 
         public static bool Prefix()
@@ -122,7 +127,9 @@ namespace TASMod.Patches
                     __result = Constants.BasePath;
                     return;
                 default:
-                    throw new NotImplementedException($"Subfolder {subfolder} not implemented in {BaseKey}");
+                    throw new NotImplementedException(
+                        $"Subfolder {subfolder} not implemented in {BaseKey}"
+                    );
             }
         }
     }
@@ -138,7 +145,7 @@ namespace TASMod.Patches
                 original: AccessTools.Method(typeof(Program), BaseKey.Split(".")[1]),
                 prefix: new HarmonyMethod(this.GetType(), nameof(this.Prefix)),
                 postfix: new HarmonyMethod(this.GetType(), nameof(this.Postfix))
-                );
+            );
         }
 
         public static bool Prefix()

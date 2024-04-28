@@ -7,8 +7,11 @@ namespace TASMod.Inputs
 {
     public class TASKeyboardState : HashSet<Keys>
     {
-        public TASKeyboardState() : base() { }
-        public TASKeyboardState(IEnumerable<Keys> keys) : base()
+        public TASKeyboardState()
+            : base() { }
+
+        public TASKeyboardState(IEnumerable<Keys> keys)
+            : base()
         {
             foreach (var key in keys)
             {
@@ -16,9 +19,11 @@ namespace TASMod.Inputs
             }
         }
 
-        public TASKeyboardState(KeyboardState state) : this(state.GetPressedKeys()) { }
+        public TASKeyboardState(KeyboardState state)
+            : this(state.GetPressedKeys()) { }
 
-        public TASKeyboardState(string key) : base()
+        public TASKeyboardState(string key)
+            : base()
         {
             if (key != "")
             {
@@ -26,7 +31,8 @@ namespace TASMod.Inputs
             }
         }
 
-        public TASKeyboardState(string[] keys) : base()
+        public TASKeyboardState(string[] keys)
+            : base()
         {
             foreach (var key in keys)
             {

@@ -1,10 +1,4 @@
-using System;
-using System.Threading;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using StardewModdingAPI;
-using StardewValley;
-using TASMod;
 
 namespace TASMod.Extensions
 {

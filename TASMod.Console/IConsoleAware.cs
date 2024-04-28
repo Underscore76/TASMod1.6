@@ -52,6 +52,37 @@ namespace TASMod.Console
             }
         }
 
+        public void WriteAsEntry(string line)
+        {
+            if (line == "")
+            {
+                Console.PushEntry(line);
+                return;
+            }
+            foreach (
+                var field in line.Split(
+                    new char[] { '\r', '\n' },
+                    StringSplitOptions.RemoveEmptyEntries
+                )
+            )
+            {
+                Console.PushEntry(field);
+            }
+        }
+
+        public void WriteAsEntry(string format, params object[] args)
+        {
+            WriteAsEntry(string.Format(format, args));
+        }
+
+        public void WriteAsEntry(string[] lines)
+        {
+            foreach (var line in lines)
+            {
+                WriteAsEntry(line);
+            }
+        }
+
         public void Trace(string trace)
         {
             Console.Trace(trace);

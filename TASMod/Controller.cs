@@ -189,6 +189,7 @@ namespace TASMod
             TASInputState.Reset();
             TASDateTime.Reset();
             RandomExtensions.Reset();
+            State.ReRecords++;
             // IsPaused = false;
         }
 

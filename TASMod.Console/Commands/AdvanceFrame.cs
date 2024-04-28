@@ -1,6 +1,3 @@
-using System;
-using TASMod.Inputs;
-using TASMod.Overlays;
 using TASMod.Recording;
 
 namespace TASMod.Console.Commands

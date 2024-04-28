@@ -1,14 +1,15 @@
 using System;
-using StardewValley;
-using StardewValley.Menus;
 using System.Collections.Generic;
 using System.Reflection;
+using StardewValley;
+using StardewValley.Menus;
 
 namespace TASMod.Inputs
 {
     public class TextBoxInput
     {
-        public static Dictionary<string, List<FieldInfo>> TextBoxes = new Dictionary<string, List<FieldInfo>>();
+        public static Dictionary<string, List<FieldInfo>> TextBoxes =
+            new Dictionary<string, List<FieldInfo>>();
 
         public static bool SelectAndWrite<T>(T obj, string name, string text)
         {
@@ -36,7 +37,8 @@ namespace TASMod.Inputs
 
         public static TextBox GetSelected()
         {
-            if (Game1.activeClickableMenu == null) return null;
+            if (Game1.activeClickableMenu == null)
+                return null;
             TextBox box = (TextBox)Game1.keyboardDispatcher.Subscriber;
 
             return box != null && box.Selected ? box : null;
@@ -72,4 +74,3 @@ namespace TASMod.Inputs
         }
     }
 }
-

@@ -7,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using TASMod.Patches;
 
 namespace TASMod.Extensions
 {
