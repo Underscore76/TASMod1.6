@@ -1,0 +1,10 @@
+{
+    "Name": "TASMod",
+    "Author": "Underscore76",
+    "Version": "0.0.1-sdvalpha.20240222",
+    "Description": "tasmod",
+    "UniqueID": "underscore.tasmod",
+    "EntryDll": "TASMod.dll",
+    "MinimumApiVersion": "4.0.0",
+    "UpdateKeys": [ ]
+  }
