@@ -7,6 +7,7 @@ using StardewValley;
 using TASMod.Console;
 using TASMod.Extensions;
 using TASMod.Inputs;
+using TASMod.Monogame.Framework;
 
 namespace TASMod.Overlays
 {

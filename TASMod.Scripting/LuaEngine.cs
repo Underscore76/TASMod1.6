@@ -49,6 +49,7 @@ namespace TASMod.Scripting
             LuaState.DoString("import ('TASMod.Overlays')");
             LuaState.DoString("import ('TASMod.Inputs')");
             LuaState.DoString("import ('TASMod.Patches')");
+            LuaState.DoString("import ('TASMod.System')");
         }
 
         public static void LoadAllFiles()

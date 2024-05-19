@@ -10,6 +10,7 @@ using StardewValley;
 using TASMod.Console;
 using TASMod.Extensions;
 using TASMod.Inputs;
+using TASMod.Minigames;
 using TASMod.Recording;
 using TASMod.System;
 
@@ -264,6 +265,32 @@ namespace TASMod.Scripting
             double rate = 60 / fps;
             int ticks = (int)(166667 * rate);
             _targetElapsedTime = TimeSpan.FromTicks(ticks);
+        }
+
+        public void StartMinecart()
+        {
+            Game1.currentMinigame = new SMineCart(
+                whichTheme: SMineCart.brownArea,
+                mode: SMineCart.infiniteMode,
+                GetGame1Random(),
+                TASDateTime.CurrentFrame
+            );
+        }
+
+        public SMineCart GetMinecart()
+        {
+            SMineCart cart = ((SMineCart)Game1.currentMinigame).Clone();
+            cart.StartFrame = TASDateTime.CurrentFrame;
+            cart.CurrentFrame = TASDateTime.CurrentFrame;
+            return cart;
+        }
+
+        public void SetMinecart(SMineCart cart)
+        {
+            SMineCart current = cart.Clone();
+            TASDateTime.CurrentFrame = cart.CurrentFrame;
+            current.CurrentFrame = cart.CurrentFrame;
+            Game1.currentMinigame = current;
         }
     }
 }

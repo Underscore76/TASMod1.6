@@ -5,26 +5,30 @@ namespace TASMod.System
 {
     public class TASStopWatch : Stopwatch
     {
-        public bool InUpdate { get; set; }
         public TimeSpan CurrentTimeSpan = new TimeSpan();
         public new TimeSpan Elapsed
         {
-            get
-            {
-                if (InUpdate)
-                    return TASDateTime.CurrentGameTime.TotalGameTime;
-                return CurrentTimeSpan;
-            }
+            get { return CurrentTimeSpan; }
+        }
+
+        public new long ElapsedMilliseconds
+        {
+            get { return CurrentTimeSpan.Ticks / TimeSpan.TicksPerMillisecond; }
         }
 
         public void Advance(TimeSpan span)
         {
-            CurrentTimeSpan = TASDateTime.CurrentGameTime.TotalGameTime + span;
+            CurrentTimeSpan += span;
         }
 
         public new void Reset()
         {
             CurrentTimeSpan = new TimeSpan();
+        }
+
+        public TASStopWatch Clone()
+        {
+            return new TASStopWatch { CurrentTimeSpan = CurrentTimeSpan };
         }
     }
 }
