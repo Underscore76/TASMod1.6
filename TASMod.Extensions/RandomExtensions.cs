@@ -14,7 +14,6 @@ namespace TASMod.Extensions
     {
         public static int SharedSeed = 0;
         public static Random SharedRandom;
-        public static bool UseSharedRandom = true;
         public static Dictionary<int, List<string>> StackTraces;
 
         public const string ImplName = "_impl";
@@ -132,6 +131,9 @@ namespace TASMod.Extensions
         public static object GetImpl(this Random random) =>
             ImplInfo.GetValueDirect(__makeref(random))!;
 
+        public static void SetImpl(this Random random, object impl) =>
+            ImplInfo.SetValueDirect(__makeref(random), impl);
+
         public static object GetCompatPrng(object impl) =>
             PrngInfo.GetValueDirect(__makeref(impl))!;
 
@@ -148,21 +150,16 @@ namespace TASMod.Extensions
         // allows copying of random objects
         public static Random Copy(this Random random)
         {
-            Random other;
+            Random other = new Random(0);
             if (random.IsNet6())
             {
-                UseSharedRandom = false;
-                other = new Random();
                 CloneNet6(random, other);
-                UseSharedRandom = true;
-                return other;
             }
             else
             {
-                other = new Random(0);
                 CloneNet5(random, other);
-                return other;
             }
+            return other;
         }
 
         public static int Peek(this Random random)
@@ -179,10 +176,9 @@ namespace TASMod.Extensions
 
         private static void CloneNet5(this Random random, Random other)
         {
-            if (other.IsNet6())
-            {
-                throw new Exception("random types do not match");
-            }
+            other.SetImpl(
+                Activator.CreateInstance(Type.GetType(Net5_ImplTypeName)!, new object[] { 0 })!
+            );
 
             object otherImpl = other.GetImpl();
             TypedReference otherImplRef = __makeref(otherImpl);
@@ -201,12 +197,10 @@ namespace TASMod.Extensions
             other.set_Seed(random.get_Seed());
         }
 
-        private static void CloneNet6(this Random random, Random other)
+        static void CloneNet6(this Random random, Random other)
         {
-            if (!other.IsNet6())
-            {
-                throw new Exception("random types do not match");
-            }
+            other.SetImpl(Activator.CreateInstance(Type.GetType(Net6_ImplTypeName)!));
+
             object oldImpl = random.GetImpl();
             object newImpl = other.GetImpl();
 
@@ -315,9 +309,6 @@ namespace TASMod.Extensions
                 throw new Exception("random types do not match");
             }
 
-            if (!UseSharedRandom)
-                return;
-
             ulong s0 = 0,
                 s1 = 0,
                 s2 = 0,
@@ -333,6 +324,34 @@ namespace TASMod.Extensions
             random.set_S1(s1);
             random.set_S2(s2);
             random.set_S3(s3);
+        }
+
+        public static unsafe Random SampleNet6Random(this Random random)
+        {
+            if (random.IsNet6())
+            {
+                throw new Exception("Expecting to call on Net5 random entity");
+            }
+            var cloneRandom = random.Copy();
+            Random newRandom = new Random(0);
+            newRandom.SetImpl(Activator.CreateInstance(Type.GetType(Net6_ImplTypeName)!));
+
+            ulong s0 = 0,
+                s1 = 0,
+                s2 = 0,
+                s3 = 0;
+            while ((s0 | s1 | s2 | s3) == 0)
+            {
+                s0 = cloneRandom.Net5NextUInt64();
+                s1 = cloneRandom.Net5NextUInt64();
+                s2 = cloneRandom.Net5NextUInt64();
+                s3 = cloneRandom.Net5NextUInt64();
+            }
+            newRandom.set_S0(s0);
+            newRandom.set_S1(s1);
+            newRandom.set_S2(s2);
+            newRandom.set_S3(s3);
+            return newRandom;
         }
 
         public static ulong Net5NextUInt64(this Random random)
