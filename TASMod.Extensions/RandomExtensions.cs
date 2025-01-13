@@ -332,7 +332,6 @@ namespace TASMod.Extensions
             {
                 throw new Exception("Expecting to call on Net5 random entity");
             }
-            var cloneRandom = random.Copy();
             Random newRandom = new Random(0);
             newRandom.SetImpl(Activator.CreateInstance(Type.GetType(Net6_ImplTypeName)!));
 
@@ -342,10 +341,10 @@ namespace TASMod.Extensions
                 s3 = 0;
             while ((s0 | s1 | s2 | s3) == 0)
             {
-                s0 = cloneRandom.Net5NextUInt64();
-                s1 = cloneRandom.Net5NextUInt64();
-                s2 = cloneRandom.Net5NextUInt64();
-                s3 = cloneRandom.Net5NextUInt64();
+                s0 = random.Net5NextUInt64();
+                s1 = random.Net5NextUInt64();
+                s2 = random.Net5NextUInt64();
+                s3 = random.Net5NextUInt64();
             }
             newRandom.set_S0(s0);
             newRandom.set_S1(s1);

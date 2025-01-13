@@ -8,29 +8,44 @@ namespace TASMod
 {
     public class AutomationManager
     {
+        public static AutomationManager Instance { get; private set; }
         public bool Active { get; set; } = true;
-        public Dictionary<string, IAutomatedLogic> Automation;
-        public IEnumerable<string> Keys => Automation.Keys;
-        public IEnumerable<IAutomatedLogic> Values => Automation.Values;
+        public static Dictionary<string, IAutomatedLogic> Automation;
+        public static IEnumerable<string> Names => Automation.Keys;
+        public static IEnumerable<IAutomatedLogic> Items => Automation.Values;
+        public static IEnumerable<KeyValuePair<string, IAutomatedLogic>> Pairs => Automation;
 
-        public bool ContainsKey(string logicName) => Automation.ContainsKey(logicName);
-
-        public Dictionary<string, IAutomatedLogic>.Enumerator GetEnumerator() =>
-            Automation.GetEnumerator();
-
-        public IAutomatedLogic this[string logicName]
+        public static bool ContainsKey(string logicName) => Automation.ContainsKey(logicName);
+        public static IAutomatedLogic Get(string logicName)
         {
-            get
+            if (Automation.ContainsKey(logicName))
+                return Automation[logicName];
+            return null;
+        }
+
+        public static T Get<T>(string logicName) where T : IAutomatedLogic
+        {
+            if (Automation.ContainsKey(logicName))
+                return Automation[logicName] as T;
+            return null;
+        }
+
+        public static T Get<T>() where T : IAutomatedLogic
+        {
+            var logicName = typeof(T).Name;
+            if (Automation.ContainsKey(logicName))
+                return Automation[logicName] as T;
+            foreach (var v in Automation)
             {
-                if (Automation.ContainsKey(logicName))
-                    return Automation[logicName];
-                return null;
+                if (v.Value is T)
+                    return v.Value as T;
             }
+            return null;
         }
 
         public AutomationManager()
         {
-            Automation = new Dictionary<string, IAutomatedLogic>();
+            Automation = new Dictionary<string, IAutomatedLogic>(StringComparer.OrdinalIgnoreCase);
             foreach (
                 var v in Reflector.GetTypesInNamespace(
                     Assembly.GetExecutingAssembly(),
@@ -51,6 +66,22 @@ namespace TASMod
                     StardewModdingAPI.LogLevel.Info
                 );
             }
+        }
+
+        public bool HasUpdate()
+        {
+            if (!Active)
+            {
+                return false;
+            }
+            foreach (IAutomatedLogic logic in Automation.Values)
+            {
+                if (logic.Update(out _, out _, out _))
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         public bool Update()

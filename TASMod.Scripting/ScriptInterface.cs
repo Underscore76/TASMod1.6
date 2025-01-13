@@ -1,18 +1,27 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using Netcode;
 using NLua;
 using NLua.Exceptions;
+using StardewModdingAPI.Events;
 using StardewValley;
+using StardewValley.Locations;
+using StardewValley.Objects;
 using TASMod.Console;
 using TASMod.Extensions;
+using TASMod.Helpers;
 using TASMod.Inputs;
 using TASMod.Minigames;
 using TASMod.Recording;
+using TASMod.Simulators;
+using TASMod.Simulators.SkullCaverns;
 using TASMod.System;
+using TASMod.Views;
 
 namespace TASMod.Scripting
 {
@@ -69,9 +78,9 @@ namespace TASMod.Scripting
                 {
                     try
                     {
-                        matched = true;
                         LuaFunction func = KeyBinds[key].Item2;
                         func.Call();
+                        matched = true;
                     }
                     catch (LuaScriptException e)
                     {
@@ -167,6 +176,7 @@ namespace TASMod.Scripting
             }
             Controller.AcceptRealInput = false;
             GameRunner.instance.Step();
+            TASInputState.Active = Controller.HasUpdate();
             Controller.AcceptRealInput = true;
         }
 
@@ -262,7 +272,7 @@ namespace TASMod.Scripting
         public void SetTargetFPS(int fps)
         {
             // 60 fps => 166667
-            double rate = 60 / fps;
+            double rate = 60.0 / fps;
             int ticks = (int)(166667 * rate);
             _targetElapsedTime = TimeSpan.FromTicks(ticks);
         }
@@ -291,6 +301,245 @@ namespace TASMod.Scripting
             TASDateTime.CurrentFrame = cart.CurrentFrame;
             current.CurrentFrame = cart.CurrentFrame;
             Game1.currentMinigame = current;
+        }
+
+        // public void ReloadDay()
+        // {
+        //     if (Controller.State.LastSave != null)
+        //     {
+        //         Controller.State.LastSave.Load();
+        //     }
+        // }
+
+        public List<ClickableItems.ClickObject> GetClickableObjects()
+        {
+            return ClickableItems.GetClickObjects();
+        }
+
+        public SkullCavernsSimulator GetSkullCavernsSimulator(int unpausedRngCalls, int index)
+        {
+            return SkullCavernsSolver.Solve(unpausedRngCalls, index);
+        }
+
+        public Item TrySpawnChestFloorItem(int menuFrames, int unpausedRandomOffset, bool tryCursor)
+        {
+            // stash state
+            ICue old_cue = Game1.currentSong;
+            Random old_random = Game1.random.Copy();
+            Random sharedRandom = RandomExtensions.SharedRandom.Copy();
+
+            int LowestMineLevel = MineShaft.lowestLevelReached;
+            HashSet<int> mushroomLevelsGeneratedToday = new(MineShaft.mushroomLevelsGeneratedToday);
+
+            // run menu frames
+            int blinkTimer = Game1.player.blinkTimer;
+            bool doDrip =
+                Game1.isMusicContextActiveButNotPlaying()
+                || Game1.getMusicTrackName().Contains("Ambient");
+            for (int i = 0; i < menuFrames; i++)
+            {
+                if (i == 2 && tryCursor)
+                {
+                    Game1.random.NextDouble();
+                }
+                blinkTimer += 16;
+                if (blinkTimer > 2200 && Game1.random.NextDouble() < 0.01)
+                {
+                    blinkTimer = -150;
+                }
+                if (doDrip)
+                {
+                    Game1.random.NextDouble();
+                }
+                RandomExtensions.Update();
+            }
+
+            // run single unpaused frame
+            for (int i = 0; i < unpausedRandomOffset; i++)
+            {
+                Game1.random.NextDouble();
+            }
+            blinkTimer += 16;
+            if (blinkTimer > 2200 && Game1.random.NextDouble() < 0.01)
+            {
+                blinkTimer = -150;
+            }
+            if (doDrip)
+            {
+                Game1.random.NextDouble();
+            }
+            RandomExtensions.Update();
+
+            // build the mineshaft
+            MineShaft mineShaft = new MineShaft(CurrentLocation.MineLevel + 1);
+            Controller.Console.Warn(
+                $"\test: b:generateContents: {Game1.random.get_Index():D4} {mineShaft.mineRandom.get_Index():D4}"
+            );
+            Reflector.InvokeMethod(mineShaft, "generateContents");
+            Controller.Console.Warn(
+                $"\test: a:generateContents: {Game1.random.get_Index():D4} {mineShaft.mineRandom.get_Index():D4}"
+            );
+
+            // advance up to the add chest call
+            for (int i = 0; i < 38; i++)
+            {
+                blinkTimer += 16;
+                if (blinkTimer > 2200 && Game1.random.NextDouble() < 0.01)
+                {
+                    blinkTimer = -150;
+                }
+                if (doDrip)
+                {
+                    Game1.random.NextDouble();
+                }
+                RandomExtensions.Update();
+            }
+            bool flag = false;
+            if (Reflector.GetValue<MineShaft, NetBool>(mineShaft, "netIsTreasureRoom").Value)
+            {
+                Controller.Console.Warn(
+                    $"\test: b:addLevelChests: {Game1.random.get_Index():D4} {mineShaft.mineRandom.get_Index():D4}"
+                );
+                flag = true;
+                Reflector.InvokeMethod(mineShaft, "addLevelChests");
+                Controller.Console.Warn(
+                    $"\test: a:addLevelChests: {Game1.random.get_Index():D4} {mineShaft.mineRandom.get_Index():D4}"
+                );
+            }
+
+            // reset the state
+            Game1.currentSong = old_cue;
+            Game1.random = old_random;
+            RandomExtensions.SharedRandom = sharedRandom;
+            MineShaft.lowestLevelReached = LowestMineLevel;
+            MineShaft.mushroomLevelsGeneratedToday = mushroomLevelsGeneratedToday;
+            if (flag)
+            {
+                return (mineShaft.Objects[new Vector2(9, 9)] as Chest).Items[0];
+            }
+            return null;
+        }
+
+        public MineShaft SpawnNextMineShaftWithOffset(int offset)
+        {
+            // stash state
+            ICue old_cue = Game1.currentSong;
+            Random old_random = Game1.random.Copy();
+            Random sharedRandom = RandomExtensions.SharedRandom.Copy();
+
+            int LowestMineLevel = MineShaft.lowestLevelReached;
+            HashSet<int> mushroomLevelsGeneratedToday = new(MineShaft.mushroomLevelsGeneratedToday);
+
+            // run offset frames
+            int blinkTimer = Game1.player.blinkTimer;
+            bool doDrip =
+                Game1.isMusicContextActiveButNotPlaying()
+                || Game1.getMusicTrackName().Contains("Ambient");
+            for (int i = 0; i < offset; i++)
+            {
+                blinkTimer += 16;
+                if (blinkTimer > 2200 && Game1.random.NextDouble() < 0.01)
+                {
+                    blinkTimer = -150;
+                }
+                if (doDrip)
+                {
+                    Game1.random.NextDouble();
+                }
+            }
+
+            // build the mineshaft
+            MineShaft mineShaft = new MineShaft(CurrentLocation.MineLevel + 1);
+            Reflector.InvokeMethod(mineShaft, "generateContents");
+
+            // advance up to the add chest call
+            for (int i = 0; i < 38; i++)
+            {
+                blinkTimer += 16;
+                if (blinkTimer > 2200 && Game1.random.NextDouble() < 0.01)
+                {
+                    blinkTimer = -150;
+                }
+                if (doDrip)
+                {
+                    Game1.random.NextDouble();
+                }
+            }
+            Reflector.InvokeMethod(mineShaft, "addLevelChests");
+
+            // reset the state
+            Game1.currentSong = old_cue;
+            Game1.random = old_random;
+            RandomExtensions.SharedRandom = sharedRandom;
+            MineShaft.lowestLevelReached = LowestMineLevel;
+            MineShaft.mushroomLevelsGeneratedToday = mushroomLevelsGeneratedToday;
+            return mineShaft;
+        }
+
+        public MineShaft SpawnMineShaft(int level)
+        {
+            // stash state
+            ICue old_cue = Game1.currentSong;
+            Random old_random = Game1.random.Copy();
+            Random sharedRandom = RandomExtensions.SharedRandom.Copy();
+
+            int LowestMineLevel = MineShaft.lowestLevelReached;
+            HashSet<int> mushroomLevelsGeneratedToday = new(MineShaft.mushroomLevelsGeneratedToday);
+
+            // build the new floor
+            MineShaft mineShaft = new MineShaft(level);
+            Reflector.InvokeMethod(mineShaft, "generateContents");
+            int blinkTimer = Game1.player.blinkTimer;
+            bool doDrip =
+                Game1.isMusicContextActiveButNotPlaying()
+                || Game1.getMusicTrackName().Contains("Ambient");
+            for (int i = 0; i < 38; i++)
+            {
+                blinkTimer += 16;
+                if (blinkTimer > 2200 && Game1.random.NextDouble() < 0.01)
+                {
+                    blinkTimer = -150;
+                }
+                if (doDrip)
+                {
+                    Game1.random.NextDouble();
+                }
+            }
+            Reflector.InvokeMethod(mineShaft, "addLevelChests");
+
+            // reset the state
+            Game1.currentSong = old_cue;
+            Game1.random = old_random;
+            RandomExtensions.SharedRandom = sharedRandom;
+            MineShaft.lowestLevelReached = LowestMineLevel;
+            MineShaft.mushroomLevelsGeneratedToday = mushroomLevelsGeneratedToday;
+            return mineShaft;
+        }
+
+        public void SetView(TASView view)
+        {
+            Controller.ViewController.SetView(view);
+        }
+
+        public void NextView()
+        {
+            Controller.ViewController.NextView();
+        }
+
+        public void ResetView()
+        {
+            Controller.ViewController.Reset();
+        }
+
+        public void ViewLocation(GameLocation location)
+        {
+            Controller.ViewController.ViewLocation(location);
+        }
+
+        public List<Vector2> GetClay()
+        {
+            ClayMap clayMap = new ClayMap();
+            return clayMap.GetClayTiles();
         }
     }
 }

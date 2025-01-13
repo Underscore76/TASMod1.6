@@ -2,6 +2,9 @@ using System.Collections.Generic;
 using HarmonyLib;
 using StardewValley;
 using StardewValley.Menus;
+using TASMod.GameData;
+using TASMod.Recording;
+using TASMod.System;
 
 namespace TASMod.Patches
 {
@@ -47,6 +50,33 @@ namespace TASMod.Patches
             }
             yield return 100;
             yield break;
+        }
+    }
+
+    public class SaveGameMenu_Complete : IPatch
+    {
+        public override string Name => "SaveGameMenu.complete";
+
+        public override void Patch(Harmony harmony)
+        {
+            harmony.Patch(
+                original: AccessTools.Method(typeof(SaveGameMenu), "complete"),
+                prefix: new HarmonyMethod(GetType(), nameof(Prefix))
+            // postfix: new HarmonyMethod(this.GetType(), nameof(this.Postfix))
+            );
+        }
+
+        public static void Prefix(ref SaveGameMenu __instance)
+        {
+            // only store latest game data slice
+            if (TASDateTime.CurrentFrame == Controller.FrameCount)
+            {
+                // Controller.State.LastSave = new GameState(
+                //     TASDateTime.CurrentFrame,
+                //     Game1.activeClickableMenu is ShippingMenu
+                // );
+                Warn($"Current menu is shipping menu: {Game1.activeClickableMenu is ShippingMenu}");
+            }
         }
     }
 }

@@ -1,3 +1,4 @@
+using System.Reflection;
 using Microsoft.Xna.Framework.Input;
 
 namespace TASMod.Inputs
@@ -19,7 +20,12 @@ namespace TASMod.Inputs
 
         public GamePadState GetGamePadState()
         {
-            return new GamePadState(mThumbSticks, mTriggers, mButtons, mDPad);
+            GamePadState state = new GamePadState(mThumbSticks, mTriggers, mButtons, mDPad);
+            if (state.GetHashCode() == default(GamePadState).GetHashCode())
+            {
+                return default;
+            }
+            return state;
         }
 
         public void ToggleButton(Buttons button)

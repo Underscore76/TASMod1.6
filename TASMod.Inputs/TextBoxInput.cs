@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Reflection;
 using StardewValley;
 using StardewValley.Menus;
+using TASMod.System;
 
 namespace TASMod.Inputs
 {
     public class TextBoxInput
     {
+        public static int LastWriteFrame;
         public static Dictionary<string, List<FieldInfo>> TextBoxes =
             new Dictionary<string, List<FieldInfo>>();
 
@@ -71,6 +73,42 @@ namespace TASMod.Inputs
         {
             TextBox textBox = Reflector.GetValue<T, TextBox>(obj, name);
             return textBox.Text;
+        }
+
+        public static void Reset()
+        {
+            LastWriteFrame = 0;
+        }
+
+        public static string Text
+        {
+            get
+            {
+                if (TASDateTime.CurrentFrame == 0)
+                    return "";
+                string text = Controller.State?.FrameStates?[(int)TASDateTime.CurrentFrame - 1].injectText ?? "";
+
+                TextBox textBox = GetSelected();
+                if (textBox != null)
+                {
+                    if (textBox.Text != text)
+                    {
+                        return textBox.Text == "" ? text : textBox.Text;
+                    }
+                }
+                return text;
+            }
+            set
+            {
+                if (TASDateTime.CurrentFrame == 0 || Controller.State.FrameStates.Count == 0)
+                    return;
+                if (value != Controller.State.FrameStates[LastWriteFrame].injectText)
+                {
+                    LastWriteFrame = (int)TASDateTime.CurrentFrame - 1;
+                    Controller.State.FrameStates[LastWriteFrame].injectText = value;
+                    Write(value);
+                }
+            }
         }
     }
 }

@@ -28,6 +28,8 @@ namespace TASMod.Patches
     {
         public override string Name => "Utility.trySpawnRareObject";
 
+        public static double chanceModifier = 0.33; // Tree performToolAction
+
         public override void Patch(Harmony harmony)
         {
             harmony.Patch(
@@ -44,7 +46,11 @@ namespace TASMod.Patches
                 double a = r.NextDouble(),
                     b = r.NextDouble();
                 int i = Game1.random.get_Index();
-                for (; b > 0.000198; i++)
+
+                double luck = 1.0 + Game1.player.team.AverageDailyLuck();
+                double threshold = 0.0006 * chanceModifier;
+
+                for (; b > threshold; i++)
                 {
                     // Controller.Console.Alert($"${i:D4} cosmetic:{a} SkillBook:{b}");
                     a = b;

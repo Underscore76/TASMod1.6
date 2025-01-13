@@ -8,6 +8,7 @@ using StardewModdingAPI;
 using StardewValley;
 using TASMod.Extensions;
 using TASMod.System;
+using TASMod.Views;
 
 namespace TASMod.Patches
 {
@@ -53,12 +54,21 @@ namespace TASMod.Patches
                 TASDateTime.Update();
                 // NOTE: Allows for each frame to get new rng values to match Interop.GetRandomBytes
                 RandomExtensions.Update();
+                Controller.Draw();
             }
             else
             {
-                RedrawFrame(gameTime);
+                switch (Controller.ViewController.CurrentView)
+                {
+                    case TASView.Base:
+                        RedrawFrame(gameTime);
+                        Controller.Draw();
+                        break;
+                    default:
+                        Controller.ViewController.Draw();
+                        break;
+                }
             }
-            Controller.Draw();
             Controller.DrawLate();
             CanDraw = false;
         }
@@ -178,6 +188,7 @@ namespace TASMod.Patches
             }
             else
             {
+                Controller.ViewController.Update();
                 InvokeBase(gameTime);
             }
             CanUpdate = false;

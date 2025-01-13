@@ -17,8 +17,7 @@ function engine.halt(max_frames)
 end
 
 ---advance the game by one frame
----@param input table|nil input to advance with (defaults current frame)
---- negative frames are relative to the current frame (-1 == current frame)
+---@param input table|nil input to advance with (defaults to no input)
 function engine.advance(input)
     interface:AdvanceFrame(input)
     engine.halt()

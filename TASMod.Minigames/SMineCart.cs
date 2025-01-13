@@ -749,18 +749,20 @@ namespace TASMod.Minigames
             public override void CloneOver(BaseTrackGenerator clone)
             {
                 base.CloneOver(clone);
-                if (clone is StraightAwayGenerator straightAwayGenerator)
+                if (clone is StraightAwayGenerator o)
                 {
-                    straightAwayGenerator.straightAwayLength = straightAwayLength;
-                    straightAwayGenerator.staggerPattern = new List<int>(staggerPattern);
-                    straightAwayGenerator.minLength = minLength;
-                    straightAwayGenerator.maxLength = maxLength;
-                    straightAwayGenerator.staggerChance = staggerChance;
-                    straightAwayGenerator.minimuimDistanceBetweenStaggers =
-                        minimuimDistanceBetweenStaggers;
-                    straightAwayGenerator.currentStaggerDistance = currentStaggerDistance;
-                    straightAwayGenerator.generateCheckpoint = generateCheckpoint;
-                    straightAwayGenerator._generatedCheckpoint = _generatedCheckpoint;
+                    o.straightAwayLength = straightAwayLength;
+                    if (staggerPattern != null)
+                    {
+                        o.staggerPattern = new List<int>(staggerPattern);
+                    }
+                    o.minLength = minLength;
+                    o.maxLength = maxLength;
+                    o.staggerChance = staggerChance;
+                    o.minimuimDistanceBetweenStaggers = minimuimDistanceBetweenStaggers;
+                    o.currentStaggerDistance = currentStaggerDistance;
+                    o.generateCheckpoint = generateCheckpoint;
+                    o._generatedCheckpoint = _generatedCheckpoint;
                 }
             }
         }
@@ -1073,7 +1075,6 @@ namespace TASMod.Minigames
                     o.nextFire = nextFire;
                     o.firePeriod = firePeriod;
                     o._track = _track;
-                    o.frames = frames.DeepClone();
                     o.currentFrame = currentFrame;
                     o.frameDuration = frameDuration;
                     o.frameTimer = frameTimer;
@@ -1083,7 +1084,8 @@ namespace TASMod.Minigames
 
         public class MushroomSpring : Obstacle
         {
-            protected HashSet<MineCartCharacter> _bouncedPlayers;
+            //protected
+            public HashSet<MineCartCharacter> _bouncedPlayers;
 
             public Rectangle[] frames = new Rectangle[3]
             {
@@ -1230,7 +1232,10 @@ namespace TASMod.Minigames
 
             public override MushroomSpring Clone(SMineCart game)
             {
-                MushroomSpring clone = new MushroomSpring(game);
+                MushroomSpring clone = new MushroomSpring(game)
+                {
+                    _bouncedPlayers = new HashSet<MineCartCharacter>(),
+                };
                 CloneOver(clone);
                 return clone;
             }
@@ -1240,8 +1245,6 @@ namespace TASMod.Minigames
                 base.CloneOver(clone);
                 if (clone is MushroomSpring o)
                 {
-                    o._bouncedPlayers = new HashSet<MineCartCharacter>(_bouncedPlayers);
-                    o.frames = new List<Rectangle>(frames).ToArray();
                     o.currentFrame = currentFrame;
                     o.frameDuration = frameDuration;
                     o.frameTimer = frameTimer;
@@ -1494,7 +1497,10 @@ namespace TASMod.Minigames
                     o.minHopSize = minHopSize;
                     o.maxHopSize = maxHopSize;
                     o.releaseJumpChance = releaseJumpChance;
-                    o.staggerPattern = new List<int>(staggerPattern);
+                    if (staggerPattern != null)
+                    {
+                        o.staggerPattern = new List<int>(staggerPattern);
+                    }
                     o.trackType = trackType;
                 }
             }
@@ -1706,7 +1712,10 @@ namespace TASMod.Minigames
                     o.minHopSize = minHopSize;
                     o.maxHopSize = maxHopSize;
                     o.releaseJumpChance = releaseJumpChance;
-                    o.staggerPattern = new List<int>(staggerPattern);
+                    if (staggerPattern != null)
+                    {
+                        o.staggerPattern = new List<int>(staggerPattern);
+                    }
                     o.trackType = trackType;
                 }
             }
@@ -1910,7 +1919,10 @@ namespace TASMod.Minigames
                     o.minHopSize = minHopSize;
                     o.maxHopSize = maxHopSize;
                     o.releaseJumpChance = releaseJumpChance;
-                    o.staggerPattern = new List<int>(staggerPattern);
+                    if (staggerPattern != null)
+                    {
+                        o.staggerPattern = new List<int>(staggerPattern);
+                    }
                     o.trackType = trackType;
                 }
             }
@@ -1928,7 +1940,8 @@ namespace TASMod.Minigames
 
             public const int OBSTACLE_RANDOM = -13;
 
-            protected List<Track> _generatedTracks;
+            // protected
+            public List<Track> _generatedTracks;
 
             protected SMineCart _game;
 
@@ -2124,19 +2137,30 @@ namespace TASMod.Minigames
                 if (_generatedTracks != null)
                 {
                     clone._generatedTracks = new List<Track>();
-                    foreach (Track generatedTrack in _generatedTracks)
-                    {
-                        clone._generatedTracks.Add(generatedTrack.Clone(clone._game));
-                    }
                 }
                 if (_obstacleIndices != null)
                 {
-                    clone._obstacleIndices = new Dictionary<
-                        int,
-                        KeyValuePair<ObstacleTypes, float>
-                    >(_obstacleIndices);
+                    clone._obstacleIndices =
+                        new Dictionary<int, KeyValuePair<ObstacleTypes, float>>();
+                    foreach (
+                        KeyValuePair<
+                            int,
+                            KeyValuePair<ObstacleTypes, float>
+                        > obstacleIndex in _obstacleIndices
+                    )
+                    {
+                        clone._obstacleIndices.Add(
+                            obstacleIndex.Key,
+                            new(obstacleIndex.Value.Key, obstacleIndex.Value.Value)
+                        );
+                    }
                 }
-                clone._pickupFunction = _pickupFunction;
+                if (_pickupFunction != null)
+                {
+                    clone._pickupFunction =
+                        (Func<Track, BaseTrackGenerator, bool>)
+                            Delegate.Combine(_pickupFunction.GetInvocationList());
+                }
             }
         }
 
@@ -3363,7 +3387,8 @@ namespace TASMod.Minigames
         {
             protected float _age;
 
-            protected List<Track> _tracks;
+            // protected
+            public List<Track> _tracks;
 
             protected float _currentFallSpeed;
 
@@ -4611,15 +4636,7 @@ namespace TASMod.Minigames
                 if (clone is BalanceTrack o)
                 {
                     o.connectedTracks = new List<BalanceTrack>();
-                    for (int i = 0; i < connectedTracks.Count; i++)
-                    {
-                        o.connectedTracks.Add(connectedTracks[i].Clone(o._game));
-                    }
                     o.counterBalancedTracks = new List<BalanceTrack>();
-                    for (int j = 0; j < counterBalancedTracks.Count; j++)
-                    {
-                        o.counterBalancedTracks.Add(counterBalancedTracks[j].Clone(o._game));
-                    }
                     o.startY = startY;
                     o.moveSpeed = moveSpeed;
                 }
@@ -4907,10 +4924,10 @@ namespace TASMod.Minigames
                 base.CloneOver(clone);
                 clone.trackType = trackType;
                 clone._showSecondTile = _showSecondTile;
-                if (obstacle != null)
-                {
-                    clone.obstacle = obstacle.Clone(clone._game);
-                }
+                // if (obstacle != null)
+                // {
+                //     clone.obstacle = obstacle.Clone(clone._game);
+                // }
             }
         }
 
@@ -5857,11 +5874,13 @@ namespace TASMod.Minigames
 
         private int livesLeft;
 
-        private int distanceToTravel = -1;
+        // private
+        public int distanceToTravel = -1;
 
         private int respawnCounter;
 
-        private int currentTheme;
+        //private
+        public int currentTheme;
 
         //private
         public bool reachedFinish;
@@ -5923,7 +5942,8 @@ namespace TASMod.Minigames
 
         private MineDebris titleScreenJunimo;
 
-        private List<Entity> _entities;
+        //private
+        public List<Entity> _entities;
 
         public LevelTransition[] LEVEL_TRANSITIONS;
 
@@ -6330,6 +6350,17 @@ namespace TASMod.Minigames
             tracks.Add(track_object);
             tracks.OrderBy((Track o) => o.position.Y);
             return track;
+        }
+
+        public void LinkTrack(Track track_object)
+        {
+            int x = (int)(track_object.position.X / (float)tileSize);
+            if (!_tracks.TryGetValue(x, out var tracks))
+            {
+                tracks = (_tracks[x] = new List<Track>());
+            }
+            tracks.Add(track_object);
+            tracks.OrderBy((Track o) => o.position.Y);
         }
 
         public bool overrideFreeMouseMovement()
@@ -7158,6 +7189,7 @@ namespace TASMod.Minigames
                 speedTick(pressButton);
                 speedDraw();
                 buttonPresses.Add(pressButton);
+                JunimoKartState.Simulates++;
             }
             catch (Exception e)
             {
@@ -7177,7 +7209,7 @@ namespace TASMod.Minigames
             shouldPlaySound = false;
 
             CurrentFrame++;
-            musicSW?.Advance(TASDateTime.CurrentGameTime.ElapsedGameTime);
+            // musicSW?.Advance(TASDateTime.CurrentGameTime.ElapsedGameTime);
             UpdateInput();
 
             float delta_time = (float)TASDateTime.CurrentGameTime.ElapsedGameTime.TotalSeconds;
@@ -11347,7 +11379,10 @@ namespace TASMod.Minigames
 
         public SMineCart Clone()
         {
-            if (perfectText != null) { }
+            if (perfectText != null)
+            {
+                throw new InvalidOperationException("Cannot clone when perfectText is not null");
+            }
             SMineCart clone = new SMineCart
             {
                 StartFrame = StartFrame,
@@ -11478,81 +11513,144 @@ namespace TASMod.Minigames
             clone.titleScreenJunimo = titleScreenJunimo.Clone(clone);
             // private List<Entity> _entities;
             clone._entities = new List<Entity>();
-            List<int> obstacleTrackIndexes = new List<int>();
             foreach (Entity entity in _entities)
             {
                 Entity nextEntity = entity.Clone(clone);
-                if (entity is Track track)
+                clone._entities.Add(nextEntity);
+                if (nextEntity is Track track)
                 {
-                    if (track.obstacle != null)
-                    {
-                        obstacleTrackIndexes.Add(clone._entities.Count);
-                    }
-                    clone.AddTrack(nextEntity as Track);
+                    clone.LinkTrack(track);
                 }
-                else if (entity is Obstacle obstacle)
+            }
+            for (int i = 0; i < _entities.Count; i++)
+            {
+                Entity baseEntity = _entities[i];
+                Entity cloneEntity = clone._entities[i];
+
+                if (baseEntity is Track baseTrack)
                 {
-                    if (obstacle is NoxiousMushroom mushroom)
+                    if (baseTrack is BalanceTrack balanceTrack)
                     {
-                        // need to find track that is tied to this mushroom
-                        for (int i = 0; i < obstacleTrackIndexes.Count; i++)
+                        if (balanceTrack.connectedTracks != null)
                         {
-                            Track obstacleTrack = (Track)clone._entities[obstacleTrackIndexes[i]];
-                            if (obstacleTrack.position == mushroom._track.position)
+                            foreach (var track in balanceTrack.connectedTracks)
                             {
-                                obstacleTrack.obstacle = nextEntity as Obstacle;
-                                (nextEntity as NoxiousMushroom)._track = obstacleTrack;
-                                break;
+                                (cloneEntity as BalanceTrack).connectedTracks.Add(
+                                    clone._entities[_entities.IndexOf(track)] as BalanceTrack
+                                );
+                            }
+                        }
+                        if (balanceTrack.counterBalancedTracks != null)
+                        {
+                            foreach (var track in balanceTrack.counterBalancedTracks)
+                            {
+                                (cloneEntity as BalanceTrack).counterBalancedTracks.Add(
+                                    clone._entities[_entities.IndexOf(track)] as BalanceTrack
+                                );
                             }
                         }
                     }
-                    else if (obstacle is FallingBoulderSpawner spawner)
+                }
+                else if (baseEntity is Obstacle baseObstacle)
+                {
+                    if (baseObstacle is NoxiousMushroom baseMushroom)
                     {
-                        // need to find track that is tied to this spawner
-                        for (int i = 0; i < obstacleTrackIndexes.Count; i++)
+                        var cloneMushroom = cloneEntity as NoxiousMushroom;
+                        cloneMushroom._track =
+                            clone._entities[_entities.IndexOf(baseMushroom._track)] as Track;
+                        cloneMushroom._track.obstacle = cloneMushroom;
+                    }
+                    else if (baseObstacle is MushroomSpring baseSpring)
+                    {
+                        var cloneSpring = cloneEntity as MushroomSpring;
+                        if (baseSpring._bouncedPlayers != null)
                         {
-                            Track obstacleTrack = (Track)clone._entities[obstacleTrackIndexes[i]];
-                            if (obstacleTrack.position == spawner._track.position)
+                            foreach (var player in baseSpring._bouncedPlayers)
                             {
-                                obstacleTrack.obstacle = nextEntity as Obstacle;
-                                (nextEntity as FallingBoulderSpawner)._track = obstacleTrack;
-                                break;
+                                cloneSpring._bouncedPlayers.Add(
+                                    clone._entities[_entities.IndexOf(player)] as MineCartCharacter
+                                );
                             }
                         }
                     }
-                    clone._entities.Add(nextEntity);
+                    else if (baseObstacle is FallingBoulderSpawner baseSpawner)
+                    {
+                        var cloneSpawner = cloneEntity as FallingBoulderSpawner;
+                        cloneSpawner._track =
+                            clone._entities[_entities.IndexOf(baseSpawner._track)] as Track;
+                        cloneSpawner._track.obstacle = cloneSpawner;
+                    }
+                    else if (baseObstacle is FallingBoulder baseBoulder)
+                    {
+                        var cloneBoulder = cloneEntity as FallingBoulder;
+                        cloneBoulder._tracks = new List<Track>();
+                        foreach (var track in baseBoulder._tracks)
+                        {
+                            cloneBoulder._tracks.Add(
+                                clone._entities[_entities.IndexOf(track)] as Track
+                            );
+                        }
+                    }
                 }
-                // private MineCartCharacter player;
-                else if (entity == player)
+                else if (baseEntity == player)
                 {
-                    clone.player = (PlayerMineCartCharacter)nextEntity;
-                    clone._entities.Add(nextEntity);
+                    clone.player = cloneEntity as PlayerMineCartCharacter;
                 }
-                // private MineCartCharacter trackBuilderCharacter;
-                else if (entity == trackBuilderCharacter)
+                else if (baseEntity == trackBuilderCharacter)
                 {
-                    clone.trackBuilderCharacter = (MineCartCharacter)nextEntity;
-                    clone._entities.Add(nextEntity);
+                    clone.trackBuilderCharacter = cloneEntity as MineCartCharacter;
                 }
-                else if (entity is GoalIndicator)
+                else if (baseEntity == _goalIndicator)
                 {
-                    // protected GoalIndicator _goalIndicator;
-                    clone._goalIndicator = nextEntity as GoalIndicator;
-                    clone._entities.Add(nextEntity);
-                }
-                else
-                {
-                    clone._entities.Add(nextEntity);
+                    clone._goalIndicator = cloneEntity as GoalIndicator;
                 }
             }
 
             // protected BaseTrackGenerator _lastGenerator;
-            clone._lastGenerator = _lastGenerator?.Clone(clone);
+            if (_lastGenerator != null)
+            {
+                clone._lastGenerator = _lastGenerator.Clone(clone);
+                if (_lastGenerator._generatedTracks != null)
+                {
+                    foreach (Track track in _lastGenerator._generatedTracks)
+                    {
+                        clone._lastGenerator._generatedTracks.Add(
+                            clone._entities[_entities.IndexOf(track)] as Track
+                        );
+                    }
+                }
+            }
             // protected BaseTrackGenerator _forcedNextGenerator;
-            clone._forcedNextGenerator = _forcedNextGenerator?.Clone(clone);
+            if (_forcedNextGenerator != null)
+            {
+                clone._forcedNextGenerator = _forcedNextGenerator.Clone(clone);
+                if (_forcedNextGenerator._generatedTracks != null)
+                {
+                    foreach (Track track in _forcedNextGenerator._generatedTracks)
+                    {
+                        clone._forcedNextGenerator._generatedTracks.Add(
+                            clone._entities[_entities.IndexOf(track)] as Track
+                        );
+                    }
+                }
+            }
 
             // private BaseTrackGenerator _trackGenerator;
-            clone._trackGenerator = _trackGenerator?.Clone(clone);
+            if (_trackGenerator != null)
+            {
+                clone._trackGenerator = _trackGenerator.Clone(clone);
+                if (_trackGenerator._generatedTracks != null)
+                {
+                    // protected List<Track> _generatedTracks;
+
+                    foreach (Track track in _trackGenerator._generatedTracks)
+                    {
+                        clone._trackGenerator._generatedTracks.Add(
+                            clone._entities[_entities.IndexOf(track)] as Track
+                        );
+                    }
+                }
+            }
 
             // protected Dictionary<ObstacleTypes, List<Type>> _validObstacles;
             clone._validObstacles = new Dictionary<ObstacleTypes, List<Type>>();

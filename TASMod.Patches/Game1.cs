@@ -2,6 +2,7 @@ using System;
 using HarmonyLib;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using StardewValley;
 using TASMod.Extensions;
 using TASMod.System;
@@ -209,6 +210,63 @@ namespace TASMod.Patches
                 $"Postfix:graphics {Game1.graphics.PreferredBackBufferWidth}x{Game1.graphics.PreferredBackBufferHeight} ({Game1.graphics.GraphicsProfile})"
             );
             Trace($"Postfix:screen {Game1.game1.screen.Bounds}");
+        }
+    }
+
+    public class Game1_CheckGamepadMode : IPatch
+    {
+        public override string Name => "Game1.CheckGamepadMode";
+
+        public override void Patch(Harmony harmony)
+        {
+            harmony.Patch(
+                original: AccessTools.Method(typeof(Game1), "CheckGamepadMode"),
+                prefix: new HarmonyMethod(this.GetType(), nameof(this.Prefix)),
+                postfix: new HarmonyMethod(this.GetType(), nameof(this.Postfix))
+            );
+        }
+
+        public static bool Prefix()
+        {
+            bool _oldGamepadConnectedState = (bool)
+                Reflector.GetValue(Game1.game1, "_oldGamepadConnectedState");
+            GamePadState gamePadState = Game1.input.GetGamePadState();
+            bool flag2 =
+                Game1.isAnyGamePadButtonBeingPressed()
+                || Game1.isDPadPressed()
+                || Game1.isGamePadThumbstickInMotion()
+                || gamePadState.Triggers.Left != 0f
+                || gamePadState.Triggers.Right != 0f;
+            // Warn($"PRE: Game1.CheckGamepadMode");
+            // Warn($"   gamepadControls            {Game1.options.gamepadControls}");
+            // Warn($"   gamepadMode                {Game1.options.gamepadMode}");
+            // Warn($"   _oldGamepadConnectedState  {_oldGamepadConnectedState}");
+            // Warn($"   flag2                      {flag2}");
+            // Warn(
+            //     $"   connect diff               {_oldGamepadConnectedState} {gamePadState.IsConnected} {gamePadState.IsConnected != _oldGamepadConnectedState}"
+            // );
+            return true;
+        }
+
+        public static void Postfix()
+        {
+            bool _oldGamepadConnectedState = (bool)
+                Reflector.GetValue(Game1.game1, "_oldGamepadConnectedState");
+            GamePadState gamePadState = Game1.input.GetGamePadState();
+            bool flag2 =
+                Game1.isAnyGamePadButtonBeingPressed()
+                || Game1.isDPadPressed()
+                || Game1.isGamePadThumbstickInMotion()
+                || gamePadState.Triggers.Left != 0f
+                || gamePadState.Triggers.Right != 0f;
+            // Warn($"POST: Game1.CheckGamepadMode");
+            // Warn($"   gamepadControls            {Game1.options.gamepadControls}");
+            // Warn($"   gamepadMode                {Game1.options.gamepadMode}");
+            // Warn($"   _oldGamepadConnectedState  {_oldGamepadConnectedState}");
+            // Warn($"   flag2                      {flag2}");
+            // Warn(
+            //     $"   connect diff               {_oldGamepadConnectedState} {gamePadState.IsConnected} {gamePadState.IsConnected != _oldGamepadConnectedState}"
+            // );
         }
     }
 }

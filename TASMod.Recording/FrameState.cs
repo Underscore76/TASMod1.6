@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Microsoft.Xna.Framework.Input;
 using Newtonsoft.Json;
 using StardewValley;
@@ -86,7 +87,8 @@ namespace TASMod.Recording
             // Misc
             Keys.LeftShift,
             Keys.Tab,
-            Keys.LeftControl
+            Keys.LeftControl,
+            Keys.Enter,
         };
 
         [JsonProperty]

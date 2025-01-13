@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
 using TASMod.Extensions;
+using SysConsole = System.Console;
 
 namespace TASMod.Patches
 {
@@ -38,9 +39,16 @@ namespace TASMod.Patches
         {
             if (XactHelper_Random == null)
                 _FindXactRandom();
-            Random xactRandom = GetXactRandom();
-            Random blankRandom = new Random();
-            blankRandom.CloneOver(xactRandom);
+            try
+            {
+                Random xactRandom = GetXactRandom();
+                Random blankRandom = new Random(0);
+                xactRandom.SetImpl(blankRandom.GetImpl());
+            }
+            catch (Exception e)
+            {
+                SysConsole.WriteLine(e);
+            }
         }
 
         private static void _FindXactRandom()

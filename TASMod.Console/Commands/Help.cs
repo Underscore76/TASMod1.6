@@ -32,15 +32,15 @@ namespace TASMod.Console.Commands
                 lines.Add(string.Format("Command: {0}", token));
                 lines.AddRange(Console.Commands[token].HelpText());
             }
-            if (Controller.Overlays.ContainsKey(token))
+            if (OverlayManager.ContainsKey(token))
             {
                 lines.Add(string.Format("Overlay: {0}", token));
-                lines.AddRange(Controller.Overlays[token].HelpText());
+                lines.AddRange(OverlayManager.Get(token).HelpText());
             }
-            if (Controller.Automation.ContainsKey(token))
+            if (AutomationManager.ContainsKey(token))
             {
                 lines.Add(string.Format("Logic: {0}", token));
-                lines.AddRange(Controller.Automation[token].HelpText());
+                lines.AddRange(AutomationManager.Get(token).HelpText());
             }
 
             if (lines.Count > 0)
@@ -82,11 +82,11 @@ namespace TASMod.Console.Commands
             {
                 case "overlay":
                 case "o":
-                    ListKeys("Overlays", Controller.Overlays.Keys);
+                    ListKeys("Overlays", OverlayManager.Names);
                     break;
                 case "logic":
                 case "l":
-                    ListKeys("GameLogics", Controller.Automation.Keys);
+                    ListKeys("GameLogics", AutomationManager.Names);
                     break;
                 case "commands":
                 case "comm":

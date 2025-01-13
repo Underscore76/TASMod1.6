@@ -65,7 +65,7 @@ namespace TASMod.Patches
             __instance.preferredResolutionY = Game1
                 .graphics.GraphicsDevice.Adapter.SupportedDisplayModes.Last()
                 .Height;
-            __instance.vsyncEnabled = true;
+            __instance.vsyncEnabled = false;
             //GameRunner.instance.OnWindowSizeChange(null, null);
             __instance.snappyMenus = true;
             __instance.ipConnectionsEnabled = true;

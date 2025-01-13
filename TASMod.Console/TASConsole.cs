@@ -15,6 +15,9 @@ namespace TASMod.Console
 {
     public class TASConsole
     {
+        public readonly Color WarningColor = Color.Goldenrod;
+        public bool ShowWarnings = false;
+        public bool ShowErrors = false;
         public bool DebugMode = false;
         private TASSpriteBatch spriteBatch;
         public SpriteFont consoleFont;
@@ -193,6 +196,16 @@ namespace TASMod.Console
             {
                 if (historyLog[index].Visible)
                 {
+                    if (historyLog[index].Type == ConsoleTextElementType.Warn && !ShowWarnings)
+                    {
+                        index--;
+                        continue;
+                    }
+                    if (historyLog[index].Type == ConsoleTextElementType.Error && !ShowErrors)
+                    {
+                        index--;
+                        continue;
+                    }
                     string text = new string('.', prefix.Length - 1) + " " + historyLog[index].Text;
                     text = text.Replace("\t", new string(' ', TABSTOP));
                     spriteBatch.DrawSafeString(
@@ -412,12 +425,12 @@ namespace TASMod.Console
             historyLog.Add(new ConsoleTextElement(result, false, color: textHistoryColor));
         }
 
-        public void PushResult(string result, Color color)
+        public void PushResult(string result, ConsoleTextElementType type, Color color)
         {
             followLogUpdate = historyTail == historyLog.Count;
             if (followLogUpdate)
                 historyTail++;
-            historyLog.Add(new ConsoleTextElement(result, false, color: color));
+            historyLog.Add(new ConsoleTextElement(result, false, type: type, color: color));
         }
 
         public void ResetEntry()
@@ -621,6 +634,8 @@ namespace TASMod.Console
         {
             string pasteResult = "";
             DesktopClipboard.GetText(ref pasteResult);
+            if (pasteResult == null)
+                return;
             if (SelectStart != -1)
             {
                 SelectEnd++;
@@ -711,29 +726,29 @@ namespace TASMod.Console
 
         public void Alert(string message)
         {
-            PushResult(message, Color.Purple);
+            PushResult(message, ConsoleTextElementType.Warn, Color.Purple);
         }
 
         public void Warn(string message)
         {
-            PushResult(message, Color.Goldenrod);
+            PushResult(message, ConsoleTextElementType.Warn, Color.Goldenrod);
         }
 
         public void Trace(string message)
         {
-            PushResult(message, Color.DarkGray);
+            PushResult(message, ConsoleTextElementType.Trace, Color.DarkGray);
         }
 
         public void Error(string message)
         {
-            PushResult(message, Color.Red);
+            PushResult(message, ConsoleTextElementType.Error, Color.Red);
         }
 
         public void Debug(string message)
         {
             if (DebugMode)
             {
-                PushResult(message, Color.WhiteSmoke);
+                PushResult(message, ConsoleTextElementType.Debug, Color.WhiteSmoke);
             }
         }
     }

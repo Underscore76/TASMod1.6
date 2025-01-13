@@ -3,6 +3,7 @@ using StardewValley;
 using StardewValley.Menus;
 using TASMod.Extensions;
 using TASMod.Inputs;
+using TASMod.Overlays;
 using TASMod.Recording;
 using TASMod.System;
 
@@ -13,6 +14,11 @@ namespace TASMod
         public bool Active { get; set; } = true;
         public SaveState State { get; set; } = new SaveState();
 
+        public bool HasUpdate()
+        {
+            return Active && State.FrameStates.Count > 0 && HandleStoredInput();
+        }
+
         public bool Update()
         {
             if (!Active)
@@ -20,11 +26,9 @@ namespace TASMod
                 return false;
             }
 
-            bool didInject = HandleTextBoxEntry();
-            // ModEntry.Console.Log($"RecordingManager.Update: didInject={didInject}");
+            HandleTextBoxEntry();
             if (HandleStoredInput())
             {
-                // ModEntry.Console.Log("RecordingManager.Update: HandleStoredInput");
                 FrameState state = PullFrame();
                 if (
                     Game1.random.get_Index() != state.randomState.index
@@ -43,15 +47,6 @@ namespace TASMod
                 }
                 return true;
             }
-            if (didInject)
-            {
-                // ModEntry.Console.Log("RecordingManager.Update: didInject");
-                TASInputState.SetKeyboard(null);
-                TASInputState.SetMouse(null);
-                PushFrame();
-                return true;
-            }
-            // ModEntry.Console.Log("RecordingManager.Update: no input");
             return false;
         }
 

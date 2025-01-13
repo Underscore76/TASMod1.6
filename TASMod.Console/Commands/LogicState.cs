@@ -23,7 +23,7 @@ namespace TASMod.Console.Commands
             if (tokens.Length == 0)
             {
                 Write(HelpText());
-                foreach (IAutomatedLogic logic in Controller.Automation.Values)
+                foreach (IAutomatedLogic logic in AutomationManager.Items)
                 {
                     Write("{0}: {1}", logic.Name, logic.Active);
                 }
@@ -46,7 +46,7 @@ namespace TASMod.Console.Commands
             List<string> rem;
             if (tokens.Length == 2 && tokens[1] == "all")
             {
-                rem = new List<string>(Controller.Automation.Keys);
+                rem = new List<string>(AutomationManager.Names);
                 Write(string.Join("\r", SetLogicToStatus(type, rem)));
                 return;
             }
@@ -58,7 +58,7 @@ namespace TASMod.Console.Commands
         private List<string> GetLogicByStatus(bool active)
         {
             List<string> logics = new List<string>();
-            foreach (var kvp in Controller.Automation)
+            foreach (var kvp in AutomationManager.Pairs)
             {
                 if (kvp.Value.Active == active)
                 {
@@ -73,11 +73,11 @@ namespace TASMod.Console.Commands
             List<string> result = new List<string>();
             foreach (string logic in logics)
             {
-                if (Controller.Automation.ContainsKey(logic))
+                if (AutomationManager.ContainsKey(logic))
                 {
-                    Controller.Automation[logic].Active = active;
+                    AutomationManager.Get(logic).Active = active;
                     result.Add(
-                        string.Format("{0}: {1}", Controller.Automation[logic].Name, active)
+                        string.Format("{0}: {1}", AutomationManager.Get(logic).Name, active)
                     );
                 }
                 else

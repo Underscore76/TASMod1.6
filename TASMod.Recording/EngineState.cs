@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace TASMod.Recording
@@ -10,14 +11,14 @@ namespace TASMod.Recording
 
         public EngineState()
         {
-            Aliases = new Dictionary<string, string>(Controller.Console.Aliases);
-            OverlayState = new Dictionary<string, bool>();
-            foreach (var overlay in Controller.Overlays)
+            Aliases = new Dictionary<string, string>(Controller.Console.Aliases, StringComparer.OrdinalIgnoreCase);
+            OverlayState = new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+            foreach (var overlay in OverlayManager.Items)
             {
-                OverlayState.Add(overlay.Key, overlay.Value.Active);
+                OverlayState.Add(overlay.Name, overlay.Active);
             }
-            LogicState = new Dictionary<string, bool>();
-            foreach (var logic in Controller.Automation)
+            LogicState = new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+            foreach (var logic in AutomationManager.Pairs)
             {
                 LogicState.Add(logic.Key, logic.Value.Active);
             }
@@ -25,16 +26,16 @@ namespace TASMod.Recording
 
         public void UpdateGame()
         {
-            Controller.Console.Aliases = new Dictionary<string, string>(Aliases);
+            Controller.Console.Aliases = new Dictionary<string, string>(Aliases, StringComparer.OrdinalIgnoreCase);
             foreach (var overlay in OverlayState)
             {
-                if (Controller.Overlays.ContainsKey(overlay.Key))
-                    Controller.Overlays[overlay.Key].Active = overlay.Value;
+                if (OverlayManager.ContainsKey(overlay.Key))
+                    OverlayManager.Get(overlay.Key).Active = overlay.Value;
             }
             foreach (var logic in LogicState)
             {
-                if (Controller.Automation.ContainsKey(logic.Key))
-                    Controller.Automation[logic.Key].Active = logic.Value;
+                if (AutomationManager.ContainsKey(logic.Key))
+                    AutomationManager.Get(logic.Key).Active = logic.Value;
             }
         }
     }

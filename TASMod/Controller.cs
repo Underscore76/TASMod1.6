@@ -2,6 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using Num = System.Numerics;
+using ImGuiNET;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Newtonsoft.Json;
@@ -11,12 +14,15 @@ using StardewValley.Menus;
 using TASMod.Automation;
 using TASMod.Console;
 using TASMod.Extensions;
+using TASMod.Helpers;
 using TASMod.Inputs;
 using TASMod.Monogame.Framework;
 using TASMod.Overlays;
 using TASMod.Patches;
 using TASMod.Recording;
+using TASMod.Scripting;
 using TASMod.System;
+using TASMod.Views;
 
 namespace TASMod
 {
@@ -27,12 +33,14 @@ namespace TASMod
         public static OverlayManager Overlays = null;
         public static LaunchManager LaunchManager = null;
         public static RecordingManager Recording = null;
+        public static PathFinder PathFinder = null;
+        public static ViewController ViewController = null;
 
         public static TASMouseState LastFrameMouse() => Recording.LastFrameMouse();
 
         public static SaveState State
         {
-            get { return Recording.State; }
+            get { return Recording?.State; }
             set { Recording.State = value; }
         }
         public static ulong FrameCount => (ulong)Recording.State.Count;
@@ -54,7 +62,9 @@ namespace TASMod
             Overlays = new OverlayManager();
             LaunchManager = new LaunchManager();
             Recording = new RecordingManager();
+            PathFinder = new PathFinder();
             SpriteBatch = new TASSpriteBatch(Game1.graphics.GraphicsDevice);
+            ViewController = new ViewController();
         }
 
         public static void LateInit()
@@ -62,6 +72,11 @@ namespace TASMod
             LoadEngineState();
             OverrideStaticDefaults();
             Reset();
+        }
+
+        public static bool HasUpdate()
+        {
+            return Recording.HasUpdate() || Automation.HasUpdate();
         }
 
         public static bool Update()
@@ -72,6 +87,7 @@ namespace TASMod
 
             // update inputs and basic rendering
             RealInputState.Update();
+            // Console.Warn($"RealInputState: {RealInputState.mouseState} {Mouse.GetState()}");
             Console.Update();
             Overlays.Update();
             TASInputState.Active = false;
@@ -104,6 +120,8 @@ namespace TASMod
         {
             bool tmp = TASSpriteBatch.Active;
             TASSpriteBatch.Active = true;
+            if (Game1.spriteBatch.inBeginEndPair())
+                Game1.spriteBatch.End();
             Game1.spriteBatch.Begin(
                 SpriteSortMode.Deferred,
                 BlendState.AlphaBlend,
@@ -111,9 +129,9 @@ namespace TASMod
                 null,
                 null
             );
-            foreach (var overlay in Overlays)
+            foreach (var overlay in OverlayManager.Items)
             {
-                overlay.Value.Draw();
+                overlay.Draw();
             }
             Game1.spriteBatch.End();
             TASSpriteBatch.Active = tmp;
@@ -140,12 +158,14 @@ namespace TASMod
 
             if (Console.IsOpen)
                 return false;
+            if (ViewController.CurrentView != TASView.Base)
+                return false;
 
             bool capture = Overlays.HandleInput(RealMouse, RealKeyboard);
             if (capture)
                 return false;
 
-            if (!AcceptRealInput)
+            if (!AcceptRealInput || ImGui.GetIO().WantCaptureKeyboard)
                 return false;
 
             if (RealInputState.KeyTriggered(Keys.Q) || RealInputState.KeyTriggered(Keys.Down))
@@ -155,7 +175,7 @@ namespace TASMod
                 return true;
             }
 
-            if (RealInputState.KeyTriggered(Keys.R))
+            if (RealInputState.KeyTriggered(Keys.R) && TextBoxInput.GetSelected() == null)
             {
                 RealKeyboard.Add(Keys.R);
                 RealKeyboard.Add(Keys.RightShift);
@@ -174,7 +194,21 @@ namespace TASMod
                 Reset();
                 return false;
             }
-
+            if (RealInputState.KeyTriggered(Keys.OemCloseBrackets))
+            {
+                Reset(true);
+                return false;
+            }
+            if (ScriptInterface._instance != null)
+            {
+                if (ScriptInterface._instance.ReceiveKeys(RealInputState.GetTriggeredKeys()))
+                {
+                    // clear any remaining state and force things to reset back to normal flow
+                    TASInputState.Active = false;
+                }
+                return false;
+            }
+            TASInputState.Active = false;
             return false;
         }
 
@@ -189,8 +223,30 @@ namespace TASMod
             TASInputState.Reset();
             TASDateTime.Reset();
             RandomExtensions.Reset();
+            TextBoxInput.Reset();
             State.ReRecords++;
             // IsPaused = false;
+        }
+
+        public static Dictionary<string, object> GetStaticDefaults()
+        {
+            // override the LocalMultiplayer.StaticDefaults for uniqueId for this Game
+            FieldInfo defaultsField = typeof(LocalMultiplayer).GetField(
+                "staticDefaults",
+                BindingFlags.Static | BindingFlags.NonPublic
+            );
+            var defaults = (List<object>)defaultsField.GetValue(null);
+            FieldInfo fieldsField = typeof(LocalMultiplayer).GetField(
+                "staticFields",
+                BindingFlags.Static | BindingFlags.NonPublic
+            );
+            var fields = (List<FieldInfo>)fieldsField.GetValue(null);
+            Dictionary<string, object> result = new();
+            for (int i = 0; i < fields.Count; i++)
+            {
+                result[fields[i].Name] = defaults[i];
+            }
+            return result;
         }
 
         public static void OverrideStaticDefaults()
@@ -225,6 +281,10 @@ namespace TASMod
                     // TODO: Does this do anything? it's going to copy the reference to the same RNG object anyways
                     defaults[i] = new Random(0);
                     Game1.recentMultiplayerRandom = new Random(0);
+                }
+                if (fields[i].Name == "input")
+                {
+                    Console.Warn($"{defaults[i].GetType()}");
                 }
             }
             //ModEntry.Console.Log($"number of statics: {defaults.Count}");

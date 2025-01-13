@@ -16,6 +16,7 @@ namespace TASMod.Overlays
         private static int ViewportWidth => Game1.graphics.GraphicsDevice.Viewport.Width;
         private static int ViewportHeight => Game1.graphics.GraphicsDevice.Viewport.Height;
         public bool Active = true;
+        public float Priority { get; set; } = 0;
         private static Rectangle? _outlineRect;
         private static Rectangle? OutlineRect
         {
@@ -712,6 +713,44 @@ namespace TASMod.Overlays
             {
                 ModEntry.Console.Log(message, level);
             }
+        }
+
+        public enum Quadrant
+        {
+            TOP_LEFT = 0,
+            TOP_RIGHT,
+            BOTTOM_LEFT,
+            BOTTOM_RIGHT
+        }
+
+        public void DrawTileQuadrant(
+            SpriteBatch spriteBatch,
+            Vector2 tile,
+            Color color,
+            Quadrant quadrant,
+            float fraction = 1f
+        )
+        {
+            Rectangle rect = Game1.GlobalToLocal(Game1.viewport, TileToRect(tile));
+            rect.Width /= 2;
+            rect.Height /= 2;
+            switch (quadrant)
+            {
+                case Quadrant.TOP_LEFT:
+                    break;
+                case Quadrant.TOP_RIGHT:
+                    rect.X += rect.Width;
+                    break;
+                case Quadrant.BOTTOM_LEFT:
+                    rect.Y += rect.Height;
+                    break;
+                case Quadrant.BOTTOM_RIGHT:
+                    rect.X += rect.Width;
+                    rect.Y += rect.Height;
+                    break;
+            }
+            rect.Height = (int)(rect.Height * fraction);
+            spriteBatch.Draw(Game1.staminaRect, rect, color);
         }
     }
 }

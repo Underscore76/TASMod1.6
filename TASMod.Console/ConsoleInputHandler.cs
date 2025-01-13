@@ -1,6 +1,8 @@
 using System.Collections.Generic;
+using ImGuiNET;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using StardewValley;
 
 namespace TASMod.Console
 {
@@ -39,6 +41,10 @@ namespace TASMod.Console
             // Controller.Console.Debug(
             //     $"Event_TextInput: {e.Character}:{e.Key} {char.IsControl(e.Character)}"
             // );
+            if (ImGui.GetIO().WantCaptureKeyboard)
+            {
+                return;
+            }
             if (char.IsControl(e.Character))
             {
                 Console.ReceiveCommandInput(e.Character);
@@ -59,6 +65,10 @@ namespace TASMod.Console
             else
             {
                 specialKeys[e.Key] = true;
+            }
+            if (ImGui.GetIO().WantCaptureKeyboard)
+            {
+                return;
             }
 
             switch (e.Key)

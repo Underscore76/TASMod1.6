@@ -4,21 +4,13 @@ using System.IO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using StardewValley;
+using TASMod.GameData;
 
 namespace TASMod.Recording
 {
     [JsonObject(MemberSerialization.OptIn)]
     public class SaveState
     {
-        [JsonProperty]
-        public string FarmerName = "abc";
-
-        [JsonProperty]
-        public string FarmName = "abc";
-
-        [JsonProperty]
-        public string FavoriteThing = "abc";
-
         [JsonProperty]
         public string Prefix = "tmp";
 
@@ -39,26 +31,19 @@ namespace TASMod.Recording
         [JsonProperty]
         public int XActSeed = 0;
 
+        // public GameState LastSave;
+
         public SaveState()
         {
             StoreGameDetails();
         }
 
-        public SaveState(
-            string farmerName,
-            string farmName,
-            string favoriteThing,
-            int seed,
-            LocalizedContentManager.LanguageCode lang
-        )
+        public SaveState(int seed, LocalizedContentManager.LanguageCode lang)
         {
             LocalizedContentManager.CurrentLanguageCode = lang;
             StoreGameDetails();
-            FarmerName = farmerName;
-            FarmName = farmName;
-            FavoriteThing = favoriteThing;
             Seed = seed;
-            Prefix = string.Format("{0}_{1}", farmerName, seed);
+            Prefix = string.Format("tmp_{0}", seed);
         }
 
         public SaveState(StateList states)
@@ -69,14 +54,7 @@ namespace TASMod.Recording
 
         public override string ToString()
         {
-            return string.Format(
-                "FarmerName:{0}|FarmName:{1}|FavoriteThing:{2}|Prefix:{3}|#Frames:{4}",
-                FarmerName,
-                FarmName,
-                FavoriteThing,
-                Prefix,
-                Count
-            );
+            return string.Format("Prefix:{0}|#Frames:{1}", Prefix, Count);
         }
 
         public string FilePath

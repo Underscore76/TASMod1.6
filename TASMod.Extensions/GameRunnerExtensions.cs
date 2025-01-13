@@ -5,6 +5,7 @@ using StardewModdingAPI;
 using StardewValley;
 using TASMod.Monogame.Framework;
 using TASMod.System;
+using TASMod.Views;
 
 namespace TASMod.Extensions
 {
@@ -12,6 +13,7 @@ namespace TASMod.Extensions
     {
         public static void Reset(this GameRunner runner)
         {
+            Controller.ViewController.Reset();
             var input = Game1.input;
             var multiplayer = ModEntry
                 .Reflection.GetField<Multiplayer>(typeof(Game1), "multiplayer")

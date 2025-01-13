@@ -50,6 +50,11 @@ namespace TASMod.Scripting
             LuaState.DoString("import ('TASMod.Inputs')");
             LuaState.DoString("import ('TASMod.Patches')");
             LuaState.DoString("import ('TASMod.System')");
+            LuaState.DoString("import ('TASMod.Minigames')");
+            LuaState.DoString("import ('TASMod.Simulators')");
+            LuaState.DoString("import ('TASMod.Views')");
+            LuaState.DoString("import ('TASMod.Scripting')");
+            LuaState.DoString("import ('TASMod.Simulators.SkullCaverns')");
         }
 
         public static void LoadAllFiles()
@@ -142,7 +147,8 @@ namespace TASMod.Scripting
             }
             catch (LuaScriptException e)
             {
-                return FormatError(e.Message, e.InnerException);
+                ModEntry.Console.Log(e.Message, StardewModdingAPI.LogLevel.Warn);
+                return FormatError(e.Message, e.InnerException?.InnerException ?? e.InnerException);
             }
             catch (TypeInitializationException e)
             {
