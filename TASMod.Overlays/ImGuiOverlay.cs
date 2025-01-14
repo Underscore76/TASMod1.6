@@ -1,6 +1,6 @@
 using Num = System.Numerics;
 using ImGuiNET;
-using ImGuiNET.TASMod;
+using TASMod.ImGuiNET;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewValley;

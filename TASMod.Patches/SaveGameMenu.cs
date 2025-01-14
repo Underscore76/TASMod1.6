@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using HarmonyLib;
 using StardewValley;
 using StardewValley.Menus;
-using TASMod.GameData;
+// using TASMod.GameData;
 using TASMod.Recording;
 using TASMod.System;
 

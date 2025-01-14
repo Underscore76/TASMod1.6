@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework;
 using StardewValley;
 using StardewValley.Menus;
 using StardewValley.Pathfinding;
-using TASMod.GameData;
+// using TASMod.GameData;
 using TASMod.Recording;
 using TASMod.System;
 

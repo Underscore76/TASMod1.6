@@ -4,7 +4,7 @@ using System.IO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using StardewValley;
-using TASMod.GameData;
+// using TASMod.GameData;
 
 namespace TASMod.Recording
 {

@@ -10,8 +10,9 @@ using System.Runtime.InteropServices;
 using TASMod;
 using TASMod.Console;
 using TASMod.Inputs;
+using Num = System.Numerics;
 
-namespace ImGuiNET.TASMod
+namespace TASMod.ImGuiNET
 {
     /// <summary>
     /// ImGui renderer for use with XNA-likes (FNA & MonoGame)
@@ -250,8 +251,8 @@ namespace ImGuiNET.TASMod
                 }
             }
 
-            io.DisplaySize = new System.Numerics.Vector2(_graphicsDevice.PresentationParameters.BackBufferWidth, _graphicsDevice.PresentationParameters.BackBufferHeight);
-            io.DisplayFramebufferScale = new System.Numerics.Vector2(1f, 1f);
+            io.DisplaySize = new Num.Vector2(_graphicsDevice.PresentationParameters.BackBufferWidth, _graphicsDevice.PresentationParameters.BackBufferHeight);
+            io.DisplayFramebufferScale = new Num.Vector2(1f, 1f);
         }
 
         private bool TryMapKeys(Keys key, out ImGuiKey imguikey)
