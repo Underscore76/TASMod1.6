@@ -35,19 +35,22 @@ namespace TASMod.Overlays
                     2 * appliedMagneticRadius,
                     2 * appliedMagneticRadius
                 );
+                if (debris.itemId.Value == null)
+                    continue;
+                string name = DropInfo.ObjectName(debris.itemId.Value.Substring(3));
+                if (name == "unknown")
+                    continue;
                 if (playerInRange(vec, Game1.player))
                 {
-                    DrawRectOutline(spriteBatch, rect, Color.Green);
+                    DrawRectOutline(spriteBatch, rect, Color.Green, 2);
                 }
                 else
                 {
-                    DrawRectOutline(spriteBatch, rect, Color.Red);
+                    DrawRectOutline(spriteBatch, rect, Color.Purple, 2);
                 }
-                if (debris.itemId.Value == null)
-                    continue;
                 DrawTextGlobal(
                         spriteBatch,
-                        DropInfo.ObjectName(debris.itemId.Value.Substring(3)),
+                        name,
                         vec,
                         Color.White,
                         Color.Black, 1

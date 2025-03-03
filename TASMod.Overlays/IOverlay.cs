@@ -445,13 +445,13 @@ namespace TASMod.Overlays
             DrawLineLocal(spriteBatch, playerCoord, tileCoord, color, thickness);
         }
 
-        public void DrawRectOutline(SpriteBatch spriteBatch, Rectangle rect, Color color)
+        public void DrawRectOutline(SpriteBatch spriteBatch, Rectangle rect, Color color, int thickness = 1)
         {
             Rectangle localRect = TransformToLocal(rect);
-            DrawLineLocal(spriteBatch, new Vector2(localRect.Left, localRect.Top), new Vector2(localRect.Right, localRect.Top), color);
-            DrawLineLocal(spriteBatch, new Vector2(localRect.Left, localRect.Bottom), new Vector2(localRect.Right, localRect.Bottom), color);
-            DrawLineLocal(spriteBatch, new Vector2(localRect.Left, localRect.Top), new Vector2(localRect.Left, localRect.Bottom), color);
-            DrawLineLocal(spriteBatch, new Vector2(localRect.Right, localRect.Top), new Vector2(localRect.Right, localRect.Bottom), color);
+            DrawLineLocal(spriteBatch, new Vector2(localRect.Left, localRect.Top), new Vector2(localRect.Right, localRect.Top), color, thickness);
+            DrawLineLocal(spriteBatch, new Vector2(localRect.Left, localRect.Bottom), new Vector2(localRect.Right, localRect.Bottom), color, thickness);
+            DrawLineLocal(spriteBatch, new Vector2(localRect.Left, localRect.Top), new Vector2(localRect.Left, localRect.Bottom), color, thickness);
+            DrawLineLocal(spriteBatch, new Vector2(localRect.Right, localRect.Top), new Vector2(localRect.Right, localRect.Bottom), color, thickness);
         }
 
         public void DrawRectGlobal(SpriteBatch spriteBatch, Rectangle rect, Color color)
