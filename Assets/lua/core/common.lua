@@ -43,6 +43,18 @@ function bfreset(frame)
     engine.blocking_fast_reset(frame)
 end
 
+---blocking load of a file
+---@param file string
+function load(file)
+    engine.blocking_load(file)
+end
+
+---blocking fast load of a file
+---@param file string
+function bfload(file)
+    engine.blocking_fast_load(file)
+end
+
 ---returns the current game frame
 ---@return number current frame number
 function current_frame()

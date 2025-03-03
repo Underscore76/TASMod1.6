@@ -170,6 +170,36 @@ namespace TASMod.ImGuiNET
 
         #region Setup & Update
 
+        // NOTE: OSX clipboard requires a custom implementation because it will not copy values from the desktop in the same way as Windows.
+        // const char* (*GetClipboardTextFn)(void* user_data);
+        public unsafe delegate byte* GetClipboardTextFn(void* imguiContext);
+        public GetClipboardTextFn GetClipboardText;
+        public unsafe byte* GetClipboardTextImpl(void* imguiContext)
+        {
+            string text = "";
+            if (DesktopClipboard.IsAvailable)
+            {
+                DesktopClipboard.GetText(ref text);
+            }
+            if (Controller.Console != null)
+            {
+                Controller.Console.Trace($"copy event: {text}");
+            }
+            return (byte*)Marshal.StringToHGlobalAnsi(text);
+        }
+
+        // void        (*SetClipboardTextFn)(void* user_data, const char* text);
+        public unsafe delegate void SetClipboardTextFn(void* imguiContext, byte* text);
+        public SetClipboardTextFn SetClipboardText;
+        public unsafe void SetClipboardTextImpl(void* imguiContext, byte* text)
+        {
+            string value = Marshal.PtrToStringAnsi((IntPtr)text);
+            if (Controller.Console != null)
+            {
+                Controller.Console.Trace($"paste event: {value}");
+            }
+            DesktopClipboard.SetText(value);
+        }
         /// <summary>
         /// Setup key input event handler.
         /// </summary>
@@ -181,13 +211,19 @@ namespace TASMod.ImGuiNET
             _game.Window.TextInput += (s, a) =>
             {
                 if (a.Character == '\t') return;
-                if (Controller.Console != null)
-                {
-                    Controller.Console.Trace($"Event_TextInput: {a.Character}:{a.Key} {char.IsControl(a.Character)}");
-                }
                 io.AddInputCharacter(a.Character);
             };
-
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            {
+                io.ConfigMacOSXBehaviors = true;
+                unsafe
+                {
+                    GetClipboardText = new GetClipboardTextFn(GetClipboardTextImpl);
+                    ImGui.GetPlatformIO().Platform_GetClipboardTextFn = Marshal.GetFunctionPointerForDelegate(GetClipboardText);
+                    SetClipboardText = new SetClipboardTextFn(SetClipboardTextImpl);
+                    ImGui.GetPlatformIO().Platform_SetClipboardTextFn = Marshal.GetFunctionPointerForDelegate(SetClipboardText);
+                }
+            }
             ///////////////////////////////////////////
 
             // FNA-specific ///////////////////////////
@@ -228,8 +264,8 @@ namespace TASMod.ImGuiNET
 
             var io = ImGui.GetIO();
 
-            var mouse = RealInputState.mouseState;
-            var keyboard = RealInputState.keyboardState;
+            var mouse = Mouse.GetState();
+            var keyboard = Keyboard.GetState();
             io.AddMousePosEvent(mouse.X, mouse.Y);
             io.AddMouseButtonEvent(0, mouse.LeftButton == ButtonState.Pressed);
             io.AddMouseButtonEvent(1, mouse.RightButton == ButtonState.Pressed);
@@ -247,6 +283,14 @@ namespace TASMod.ImGuiNET
             {
                 if (TryMapKeys(key, out ImGuiKey imguikey))
                 {
+                    if (imguikey.Equals(ImGuiKey.LeftCtrl))
+                    {
+                        io.AddKeyEvent(ImGuiKey.ModCtrl, keyboard.IsKeyDown(key));
+                    }
+                    if (imguikey.Equals(ImGuiKey.LeftSuper))
+                    {
+                        io.AddKeyEvent(ImGuiKey.ModSuper, keyboard.IsKeyDown(key));
+                    }
                     io.AddKeyEvent(imguikey, keyboard.IsKeyDown(key));
                 }
             }
@@ -297,7 +341,8 @@ namespace TASMod.ImGuiNET
                 Keys.NumLock => ImGuiKey.NumLock,
                 Keys.Scroll => ImGuiKey.ScrollLock,
                 Keys.LeftShift => ImGuiKey.ModShift,
-                Keys.LeftControl or Keys.LeftWindows => ImGuiKey.ModCtrl,
+                Keys.LeftControl => ImGuiKey.LeftCtrl,
+                Keys.LeftWindows => ImGuiKey.LeftSuper,
                 Keys.LeftAlt => ImGuiKey.ModAlt,
                 Keys.OemSemicolon => ImGuiKey.Semicolon,
                 Keys.OemPlus => ImGuiKey.Equal,
@@ -314,7 +359,6 @@ namespace TASMod.ImGuiNET
                 Keys.BrowserForward => ImGuiKey.AppForward,
                 _ => ImGuiKey.None,
             };
-
             return imguikey != ImGuiKey.None;
         }
 

@@ -15,7 +15,14 @@ namespace TASMod.Helpers
     {
         public static string ObjectName(string index)
         {
-            return Game1.objectData[index].DisplayName;
+            try
+            {
+                return Game1.objectData[index].Name;
+            }
+            catch (Exception e)
+            {
+                return "unknown";
+            }
         }
     }
 }

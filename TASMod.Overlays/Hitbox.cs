@@ -35,7 +35,7 @@ namespace TASMod.Overlays
                     else
                         DrawRectGlobal(spriteBatch, current.GetBoundingBox(), MonsterColor, LineColor);
                 }
-                if (!Game1.player.temporarilyInvincible)
+                if (!Game1.player.temporarilyInvincible && Game1.player.CanMove)
                     DrawRectGlobal(spriteBatch, PlayerInfo.BoundingBox, PlayerColor, LineColor);
                 else
                     DrawRectGlobal(spriteBatch, PlayerInfo.BoundingBox, PlayerInvincibleColor, LineColor);

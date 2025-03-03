@@ -42,7 +42,7 @@ namespace TASMod.Patches
             try
             {
                 Random xactRandom = GetXactRandom();
-                Random blankRandom = new Random(0);
+                Random blankRandom = new Random(Controller.State.XActSeed);
                 xactRandom.SetImpl(blankRandom.GetImpl());
             }
             catch (Exception e)

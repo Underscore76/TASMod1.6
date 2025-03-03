@@ -241,6 +241,26 @@ namespace TASMod.Overlays
             }
         }
 
+        public void DrawTextGlobal(
+            SpriteBatch spriteBatch,
+            string text,
+            Vector2 global,
+            Color textColor,
+            Color backgroundColor,
+            float fontScale = 1
+        )
+        {
+            Vector2 local = TransformToLocal(global);
+            DrawText(
+                spriteBatch,
+                text,
+                local,
+                textColor,
+                backgroundColor,
+                fontScale * Game1.options.zoomLevel
+            );
+        }
+
         public void DrawTextAtTile(
             SpriteBatch spriteBatch,
             string text,
@@ -425,6 +445,15 @@ namespace TASMod.Overlays
             DrawLineLocal(spriteBatch, playerCoord, tileCoord, color, thickness);
         }
 
+        public void DrawRectOutline(SpriteBatch spriteBatch, Rectangle rect, Color color)
+        {
+            Rectangle localRect = TransformToLocal(rect);
+            DrawLineLocal(spriteBatch, new Vector2(localRect.Left, localRect.Top), new Vector2(localRect.Right, localRect.Top), color);
+            DrawLineLocal(spriteBatch, new Vector2(localRect.Left, localRect.Bottom), new Vector2(localRect.Right, localRect.Bottom), color);
+            DrawLineLocal(spriteBatch, new Vector2(localRect.Left, localRect.Top), new Vector2(localRect.Left, localRect.Bottom), color);
+            DrawLineLocal(spriteBatch, new Vector2(localRect.Right, localRect.Top), new Vector2(localRect.Right, localRect.Bottom), color);
+        }
+
         public void DrawRectGlobal(SpriteBatch spriteBatch, Rectangle rect, Color color)
         {
             Rectangle localRect = TransformToLocal(rect);
@@ -593,6 +622,20 @@ namespace TASMod.Overlays
                 SpriteEffects.None,
                 1f
             );
+        }
+
+        public float FitTextInTile(string text, float minScale = 1, float maxScale = 2, float stepSize = 0.1f)
+        {
+            float fontScale = maxScale;
+            while (fontScale > minScale)
+            {
+                float localFontScale = fontScale * Game1.options.zoomLevel;
+                Vector2 textSize = MeasureString(text, localFontScale);
+                if (textSize.X < Game1.tileSize)
+                    return fontScale;
+                fontScale -= stepSize;
+            }
+            return minScale;
         }
 
         public void DrawCenteredTextInTile(

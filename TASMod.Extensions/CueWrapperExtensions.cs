@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Microsoft.Xna.Framework.Audio;
 using StardewValley;
+using StardewValley.SpecialOrders.Rewards;
 using TASMod.System;
 
 namespace TASMod.Extensions

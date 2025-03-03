@@ -63,7 +63,9 @@ namespace TASMod.Extensions
             // TODO: force an initialization of the rng. Our Frame 0 RNG isn't the same for some reason
             // I assume it's cause we are getting a garbo'd random that is unassigned
             // it's getting the actual game seed time
-            Game1.random = new Random(0);
+            Game1.random = new Random(Controller.State == null ? 0 : Controller.State.Frame0RandomSeed);
+            for (int i = 0; i < Controller.State?.Frame0RandomIndex; i++)
+                Game1.random.Next();
             ModEntry.Console.Log("Instance_Initialize", LogLevel.Trace);
             runner.gameInstances[0].Instance_Initialize();
 

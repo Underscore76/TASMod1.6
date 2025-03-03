@@ -8,32 +8,35 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace TASMod.Overlays
 {
-    public class HighlightState
+    public class TileTextElement
     {
+        public string Text;
         public Vector2 Tile;
         public Color BgColor;
 
-        public HighlightState(Vector2 tile)
+        public TileTextElement(Vector2 tile, string text)
         {
             Tile = tile;
             BgColor = new Color(128, 0, 128, 196);
+            Text = text;
         }
 
-        public HighlightState(Vector2 tile, Color col)
+        public TileTextElement(Vector2 tile, Color col, string text)
         {
             Tile = tile;
             BgColor = col;
+            Text = text;
         }
     }
 
-    public class TileHighlight : IOverlay
+    public class TileText : IOverlay
     {
-        public override string Name => "TileHighlight";
-        public static List<HighlightState> States = new List<HighlightState>();
+        public override string Name => "TileText";
+        public static List<TileTextElement> States = new List<TileTextElement>();
         public static HashSet<Vector2> Tiles = new HashSet<Vector2>();
         public static bool DrawOrder = false;
         public Color HighlightColor = new Color(128, 0, 128, 196);
-        public override string Description => "highlight set tiles";
+        public override string Description => "draw text on tiles";
 
         public override void ActiveDraw(SpriteBatch spriteBatch)
         {
@@ -42,27 +45,38 @@ namespace TASMod.Overlays
                 DrawFilledTile(spriteBatch, States[i].Tile, States[i].BgColor);
                 if (DrawOrder)
                 {
+                    float scale = FitTextInTile(States[i].Text);
+
                     DrawCenteredTextInTile(
                         spriteBatch,
                         States[i].Tile,
-                        (i + 1).ToString(),
+                        States[i].Text,
                         Color.White,
-                        2
+                        scale
                     );
                 }
             }
         }
 
-        public static void Add(Vector2 tile)
+        public static void Add(Vector2 tile, string text)
         {
             if (Tiles.Contains(tile))
+            {
+                for (int i = 0; i < States.Count; ++i)
+                {
+                    if (States[i].Tile == tile)
+                    {
+                        States[i].Text += "," + text;
+                        return;
+                    }
+                }
                 return;
-
+            }
             Tiles.Add(tile);
-            States.Add(new HighlightState(tile));
+            States.Add(new TileTextElement(tile, text));
         }
 
-        public static void Add(Vector2 tile, Color col)
+        public static void Add(Vector2 tile, Color col, string text)
         {
             if (Tiles.Contains(tile))
             {
@@ -71,6 +85,7 @@ namespace TASMod.Overlays
                     if (States[i].Tile == tile)
                     {
                         States[i].BgColor = col;
+                        States[i].Text += "," + text;
                         return;
                     }
                 }
@@ -78,7 +93,7 @@ namespace TASMod.Overlays
             }
 
             Tiles.Add(tile);
-            States.Add(new HighlightState(tile, col));
+            States.Add(new TileTextElement(tile, col, text));
         }
 
         public static bool Contains(Vector2 tile)

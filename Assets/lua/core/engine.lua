@@ -63,4 +63,16 @@ function engine.blocking_fast_reset(frame)
     interface:BlockFastResetGame(frame)
 end
 
+---blocking load of a file
+---@param file string file to load
+function engine.blocking_load(file)
+    interface:BlockLoad(file)
+end
+
+---blocking load of a file
+---@param file string file to load
+function engine.blocking_fast_load(file)
+    interface:BlockFastLoad(file)
+end
+
 return engine

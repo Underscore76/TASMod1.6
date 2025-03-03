@@ -1,52 +1,21 @@
+using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using Netcode;
+using StardewValley;
+using StardewValley.Extensions;
+using StardewValley.Network;
 using TASMod.Inputs;
 
-namespace TASMod.Simulators
+namespace TASMod.Simulators.Fishing
 {
-    public class SFarmerTeam
-    {
-        public void Update() { }
-    }
-
-    public class SFarmer
-    {
-        public ulong millisecondsPlayed;
-        public SFarmerTeam team;
-    }
-
-    public class SMultiplayer
-    {
-        public void UpdateEarly() { }
-
-        public void UpdateLate() { }
-    }
-
-    public class SScreenFade
-    {
-        public void UpdateGlobalFade() { }
-    }
-
-    public class SGameLocation
-    {
-        public void Update() { }
-    }
-
-    public class SClickableMenu
-    {
-        public void Update(GameTime gameTime) { }
-    }
-
-    public class SAudioEngine
-    {
-        public void Update() { }
-    }
-
     public class SGame
     {
         public int gameModeTicks;
         public GameTime gameTime;
         public GameTime currentGameTime;
+        public int gameTimeInterval;
         public float _cursorUpdateElapsedSec;
         public bool _cursorSpeedDirty;
         public int FarmAnimal_NumPathfindingThisTick;
@@ -54,13 +23,20 @@ namespace TASMod.Simulators
         public float pauseTime;
         public bool freezeControls;
 
+        public NetRoot<NetWorldState> netWorldState;
+        public Random random;
         public SFarmer player;
         public SMultiplayer multiplayer;
         public SGameLocation currentLocation;
+        public List<SGameLocation> locations;
         public SClickableMenu activeClickableMenu;
         public bool globalFade;
         public SScreenFade screenFade;
         public SAudioEngine audioEngine;
+        public xTile.Dimensions.Rectangle viewport;
+        public Vector2 previousViewportPosition;
+        public RainDrop[] rainDrops;
+        public List<SWeatherDebris> debrisWeather;
 
         public byte _gameMode;
         public byte gameMode
@@ -91,19 +67,104 @@ namespace TASMod.Simulators
 
         public void updateMusic() { }
 
-        public void updateRaindropPosition() { }
+        public bool IsRainingHere(SGameLocation location = null)
+        {
+            if (location == null)
+            {
+                location = currentLocation;
+            }
+            if (location != null && netWorldState.Value != null)
+            {
+                return location.IsRainingHere();
+            }
+            return false;
+        }
+        public void updateDebrisWeatherForMovement(List<SWeatherDebris> debrisWeather) { }
+        public void updateRaindropPosition()
+        {
+            if (IsRainingHere())
+            {
+                int xOffset = viewport.X - (int)previousViewportPosition.X;
+                int yOffset = viewport.Y - (int)previousViewportPosition.Y;
+                for (int i = 0; i < rainDrops.Length; i++)
+                {
+                    rainDrops[i].position.X -= (float)xOffset * 1f;
+                    rainDrops[i].position.Y -= (float)yOffset * 1f;
+                    if (rainDrops[i].position.Y > (float)(viewport.Height + 64))
+                    {
+                        rainDrops[i].position.Y = -64f;
+                    }
+                    else if (rainDrops[i].position.X < -64f)
+                    {
+                        rainDrops[i].position.X = viewport.Width;
+                    }
+                    else if (rainDrops[i].position.Y < -64f)
+                    {
+                        rainDrops[i].position.Y = viewport.Height;
+                    }
+                    else if (rainDrops[i].position.X > (float)(viewport.Width + 64))
+                    {
+                        rainDrops[i].position.X = -64f;
+                    }
+                }
+            }
+            else
+            {
+                updateDebrisWeatherForMovement(debrisWeather);
+            }
+        }
 
         public void updateActiveMenu(GameTime gameTime) { }
 
-        public void updatePause(GameTime gameTime) { }
+        public void updatePause(GameTime gameTime)
+        {
+            pauseTime -= gameTime.ElapsedGameTime.Milliseconds;
+            if (player.isCrafting && random.NextDouble() < 0.007)
+            {
+                // player sound crafting;
+            }
+            if (!(pauseTime <= 0f))
+            {
+                return;
+            }
+        }
 
         public void UpdateControlInput(GameTime gameTime) { }
 
         public void UpdateGameClock(GameTime gameTime) { }
 
-        public void UpdateCharacters(GameTime gameTime) { }
+        public void UpdateCharacters(GameTime gameTime)
+        {
+            player.Update(gameTime, currentLocation, random);
+        }
 
-        public void UpdateLocations(GameTime gameTime) { }
+        public void UpdateLocations(GameTime gameTime)
+        {
+            foreach (var location in locations)
+            {
+                _UpdateLocation(location, gameTime);
+            }
+        }
+        public void _UpdateLocation(SGameLocation location, GameTime gameTime)
+        {
+            if (player.currentLocation == location)
+            {
+                location.UpdateWhenCurrentLocation(gameTime, random);
+            }
+            location.updateEvenIfFarmerIsntHere(gameTime, random);
+        }
+        public SGameLocation getLocationFromName(string name)
+        {
+            foreach (var location in locations)
+            {
+                if (location.Name.EqualsIgnoreCase(name))
+                {
+                    return location;
+                }
+            }
+            return null;
+        }
+
 
         public void UpdateViewPort(bool overrideFreeze, Vector2 center) { }
 
@@ -130,14 +191,14 @@ namespace TASMod.Simulators
             // skipping display setting save
             // skipping keyboard dispatch
             // skipping loading mode
-            if (gameMode == 3)
-            {
-                multiplayer.UpdateEarly();
-                if (player?.team != null)
-                {
-                    player.team.Update();
-                }
-            }
+            // if (gameMode == 3)
+            // {
+            //     multiplayer.UpdateEarly();
+            //     if (player?.team != null)
+            //     {
+            //         player.team.Update();
+            //     }
+            // }
 
             currentGameTime = gameTime;
             if (gameMode != 11)

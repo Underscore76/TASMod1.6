@@ -42,6 +42,10 @@ namespace TASMod.Overlays
             {
                 data.Add("FadeToBlack");
             }
+            if (!Game1.player.CanMove)
+            {
+                data.Add("PlayerCanMove: false");
+            }
             if (CurrentLocation.mineRandom != null && CurrentLocation.MineLevel > 120)
             {
                 data.Add(

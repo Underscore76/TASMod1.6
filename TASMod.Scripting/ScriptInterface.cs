@@ -125,10 +125,10 @@ namespace TASMod.Scripting
 
         public void WaitPrefix()
         {
-            // uses the same logic as https://github.com/MonoGame/MonoGame/blob/develop/MonoGame.Framework/Game.cs#L58
-            // idea is to force a sleep until the next tick should fire
-            // not super accurate but from testing reaches pretty close to 60fps
-            PrefixTicks:
+        // uses the same logic as https://github.com/MonoGame/MonoGame/blob/develop/MonoGame.Framework/Game.cs#L58
+        // idea is to force a sleep until the next tick should fire
+        // not super accurate but from testing reaches pretty close to 60fps
+        PrefixTicks:
             var currentTicks = _gameTimer.Elapsed.Ticks;
             _accumulatedElapsedTime += TimeSpan.FromTicks(currentTicks - _previousTicks);
             _previousTicks = currentTicks;
@@ -245,6 +245,29 @@ namespace TASMod.Scripting
         public void BlockFastResetGame(int frame)
         {
             Controller.State.Reset(frame);
+            GameRunner.instance.BlockingFastReset();
+        }
+
+        public void BlockLoad(string prefix)
+        {
+            SaveState state = SaveState.Load(prefix);
+            if (state == null)
+            {
+                Controller.Console.Warn($"\tInput file \"{prefix}\" not found");
+                return;
+            }
+            Controller.State = state;
+            GameRunner.instance.BlockingReset();
+        }
+        public void BlockFastLoad(string prefix)
+        {
+            SaveState state = SaveState.Load(prefix);
+            if (state == null)
+            {
+                Controller.Console.Warn($"\tInput file \"{prefix}\" not found");
+                return;
+            }
+            Controller.State = state;
             GameRunner.instance.BlockingFastReset();
         }
 
@@ -540,6 +563,11 @@ namespace TASMod.Scripting
         {
             ClayMap clayMap = new ClayMap();
             return clayMap.GetClayTiles();
+        }
+
+        public void Kill()
+        {
+            Process.GetCurrentProcess().Kill();
         }
     }
 }

@@ -9,6 +9,7 @@ namespace TASMod.Scripting
     public class LuaEngine
     {
         public static Lua LuaState = null;
+        public static bool HasBooted = false;
 
         public static void Init()
         {
@@ -158,6 +159,15 @@ namespace TASMod.Scripting
             {
                 return FormatError(e.Message, e.InnerException);
             }
+        }
+
+        public static void Boot()
+        {
+            if (HasBooted)
+                return;
+
+            RunString("require('boot')");
+            HasBooted = true;
         }
 
         public static string FormatError(string message, Exception innerException)

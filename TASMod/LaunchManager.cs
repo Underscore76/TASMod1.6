@@ -1,3 +1,5 @@
+using TASMod.Scripting;
+
 namespace TASMod
 {
     public enum LaunchState
@@ -6,6 +8,7 @@ namespace TASMod
         Launched,
         WindowInitialized,
         Loaded,
+        LuaBoot,
         Finalized
     }
 
@@ -28,7 +31,15 @@ namespace TASMod
                     return true;
                 case LaunchState.Loaded:
                     Controller.Reset();
+                    LaunchState = LaunchState.LuaBoot;
+                    return false;
+                case LaunchState.LuaBoot:
                     LaunchState = LaunchState.Finalized;
+                    if (LuaEngine.LuaState == null)
+                    {
+                        LuaEngine.Reload();
+                    }
+                    LuaEngine.Boot();
                     return false;
                 case LaunchState.Finalized:
                 default:

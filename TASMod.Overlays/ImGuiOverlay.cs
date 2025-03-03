@@ -34,55 +34,59 @@ namespace TASMod.Overlays
             // ImGui.GetClipboardText = DesktopClipboard.GetText;
             Priority = 100;
         }
+        public override void ActiveUpdate()
+        {
+        }
 
         public void BuildLayout()
         {
-            ImGui.Begin("My First Tool");
-            if (ImGui.ColorEdit4("Color", ref MouseColor))
+            ImGui.Begin("Engine");
+            if (ImGui.CollapsingHeader("Overlays"))
             {
-                var mouse = OverlayManager.Get<Mouse>();
-                if (mouse != null)
-                    mouse.MouseColor = MouseColor.ToColor();
-            }
-            if (TextBoxInput.GetSelected() != null)
-            {
-                // var helper = OverlayManager.Get<TextBoxHelper>();
-                string text = TextBoxInput.Text;
-                ImGui.InputText("Text Entry", ref text, 100);
-                TextBoxInput.Text = text;
-            }
-            else
-            {
-                TextBoxInput.Text = "";
-                // OverlayManager.Get<TextBoxHelper>().Text = "";
-            }
-            unsafe
-            {
-                // we need a custom handler for copy and paste that lets us use the clipboard
-                // and pull the selection start/end
-                ImGuiInputTextCallback callback = (data) =>
+                foreach (var overlay in OverlayManager.Overlays.Values)
                 {
-                    Console.Trace($"{data->SelectionStart} {data->SelectionEnd} {data->CursorPos}");
-                    return 0;
-                };
-                if (ImGui.InputText("Random Value", ref RandomValue, 100, ImGuiInputTextFlags.CallbackAlways, callback))
-                {
-                    Console.Trace("Random Value: " + RandomValue);
-                }
-                else if (ImGui.IsItemActive())
-                {
-                    ImGui.BeginTooltip();
-                    ImGui.Text("Enter a random value");
-                    ImGui.EndTooltip();
-                }
-                else if (ImGui.IsItemHovered())
-                {
-                    ImGui.BeginTooltip();
-                    ImGui.Text("Enter a random value");
-                    ImGui.EndTooltip();
+                    if (overlay is ImGuiOverlay) continue;
+                    ImGui.Checkbox(overlay.Name, ref overlay.Active);
                 }
             }
-            ImGui.InputTextMultiline("Multiline", ref RandomValue, 1000, new Num.Vector2(200, 100));
+            if (ImGui.CollapsingHeader("Logic"))
+            {
+                foreach (var logic in AutomationManager.Automation.Values)
+                {
+                    ImGui.Checkbox(logic.Name, ref logic.Active);
+                }
+            }
+            if (ImGui.CollapsingHeader("State Info"))
+            {
+                ImGui.Text($"State Name: {Controller.State.Prefix}");
+                ImGui.Text($"Frame: {TASDateTime.CurrentFrame}");
+                ImGui.SeparatorText("Last Frame Input");
+                if (Controller.State.FrameStates.Count > 0)
+                {
+                    ImGui.Text("Left Click: " + Controller.LastFrameMouse().LeftMouseClicked);
+                    ImGui.Text("Right Click: " + Controller.LastFrameMouse().RightMouseClicked);
+                    ImGui.Text($"Mouse Position: {Controller.LastFrameMouse().MouseX},{Controller.LastFrameMouse().MouseY}");
+                    string keys = string.Join(",", Controller.State.FrameStates.Last().keyboardState);
+                    ImGui.Text("Keyboard: " + keys);
+                }
+            }
+            // if (ImGui.ColorEdit4("Color", ref MouseColor))
+            // {
+            //     var mouse = OverlayManager.Get<Mouse>();
+            //     if (mouse != null)
+            //         mouse.MouseColor = MouseColor.ToColor();
+            // }
+            // if (TextBoxInput.GetSelected() != null)
+            // {
+            //     // var helper = OverlayManager.Get<TextBoxHelper>();
+            //     string text = TextBoxInput.Text;
+            //     ImGui.InputTextMultiline("Multiline", ref text, 100000, new Num.Vector2(200, 100));
+            //     TextBoxInput.Text = text;
+            // }
+            // else
+            // {
+            //     TextBoxInput.Text = "";
+            // }
             ImGui.End();
         }
 
@@ -90,7 +94,7 @@ namespace TASMod.Overlays
         {
             GuiRenderer.BeforeLayout(TASDateTime.CurrentGameTime);
             BuildLayout();
-
+            // ImGui.ShowDemoWindow();
             if (imguiTarget == null || imguiTarget.Width != Game1.graphics.PreferredBackBufferWidth || imguiTarget.Height != Game1.graphics.PreferredBackBufferHeight)
             {
                 imguiTarget?.Dispose();

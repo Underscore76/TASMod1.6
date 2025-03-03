@@ -217,7 +217,10 @@ namespace TASMod
             ModEntry.Console.Log("Calling reset", LogLevel.Error);
             FastAdvance = fastAdvance;
             ResetGame = true;
-            Game1.audioEngine.Engine.Reset();
+            if (Game1.audioEngine.Engine != null)
+            {
+                Game1.audioEngine.Engine.Reset();
+            }
             GameRunner_Update.Reset();
             GameRunner_Draw.Reset();
             TASInputState.Reset();
@@ -273,8 +276,16 @@ namespace TASMod
                 if (fields[i].Name == "random")
                 {
                     // TODO: Does this do anything? it's going to copy the reference to the same RNG object anyways
-                    defaults[i] = new Random(0);
-                    Game1.random = new Random(0);
+                    ModEntry.Console.LogOnce($"Random set on default: {State} {State.Frame0RandomSeed}", LogLevel.Warn);
+                    int seed = State == null ? 0 : State.Frame0RandomSeed;
+                    int index = State == null ? 0 : State.Frame0RandomIndex;
+                    Random r = new Random(seed);
+                    for (int j = 0; j < index; j++)
+                    {
+                        r.Next();
+                    }
+                    defaults[i] = r.Copy();
+                    Game1.random = r;
                 }
                 if (fields[i].Name == "recentMultiplayerRandom")
                 {

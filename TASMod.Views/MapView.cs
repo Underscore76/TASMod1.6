@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -37,14 +38,18 @@ namespace TASMod.Views
         public TileHighlight Highlights;
         public MinesLadder MinesLadder;
         public MinesRocks MinesRocks;
+        public List<IOverlay> MapOverlays;
 
         public MapView()
         {
-            GridOverlay = new();
-            Mouse = new();
-            Highlights = new();
-            MinesLadder = new();
-            MinesRocks = new();
+            MapOverlays = new()
+            {
+                (GridOverlay = new()),
+                (MinesLadder = new()),
+                (MinesRocks = new()),
+                (Highlights = new()),
+                (Mouse = new()),
+            };
 
             ScreenRect = new Rectangle(
                 0,
@@ -84,11 +89,10 @@ namespace TASMod.Views
                     ScreenRect,
                     Color.White
                 );
-                GridOverlay.Draw();
-                MinesLadder.Draw();
-                MinesRocks.Draw();
-                Highlights.Draw();
-                Mouse.Draw();
+                foreach (var ov in MapOverlays)
+                {
+                    ov.Draw();
+                }
             }
             if (!inBeginEndPair)
             {
@@ -352,10 +356,10 @@ namespace TASMod.Views
             // crabpot tiles
             // draw tool
             // draw farm buildings
-            if (currentLocation.Name.Equals("Farm"))
-            {
-                Reflector.InvokeMethod(Game1.game1, "drawFarmBuildings");
-            }
+            // if (currentLocation.Name.Equals("Farm"))
+            // {
+            //     Reflector.InvokeMethod(Game1.game1, "drawFarmBuildings");
+            // }
             // front
             mapDisplayDevice.BeginScene(spriteBatch);
             currentLocation

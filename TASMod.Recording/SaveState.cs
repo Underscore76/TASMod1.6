@@ -31,6 +31,12 @@ namespace TASMod.Recording
         [JsonProperty]
         public int XActSeed = 0;
 
+        [JsonProperty]
+        public int Frame0RandomSeed = 0;
+
+        [JsonProperty]
+        public int Frame0RandomIndex = 0;
+
         // public GameState LastSave;
 
         public SaveState()
