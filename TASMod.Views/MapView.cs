@@ -19,6 +19,7 @@ namespace TASMod.Views
 {
     public class MapView : IView
     {
+        public static MapView Instance;
         public GameLocation stashedLocation;
         public xTile.Dimensions.Rectangle OldViewport;
         public xTile.Dimensions.Rectangle CurrentViewport;
@@ -42,6 +43,7 @@ namespace TASMod.Views
 
         public MapView()
         {
+            Instance = this;
             MapOverlays = new()
             {
                 (GridOverlay = new()),

@@ -68,12 +68,17 @@ namespace TASMod.Recording
             Keys.A,
             Keys.S,
             Keys.D,
+            Keys.Up,
+            Keys.Right,
+            Keys.Down,
+            Keys.Left,
             // Actions
             Keys.C,
             Keys.F,
             Keys.Y,
             Keys.X,
             Keys.N,
+            Keys.Space,
             // Menus
             Keys.Escape,
             Keys.E,

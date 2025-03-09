@@ -11,6 +11,7 @@ using TASMod.Console;
 using System;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using StardewValley.Minigames;
 
 namespace TASMod.Overlays
 {
@@ -68,6 +69,15 @@ namespace TASMod.Overlays
                     ImGui.Text($"Mouse Position: {Controller.LastFrameMouse().MouseX},{Controller.LastFrameMouse().MouseY}");
                     string keys = string.Join(",", Controller.State.FrameStates.Last().keyboardState);
                     ImGui.Text("Keyboard: " + keys);
+                }
+            }
+
+            if (Game1.currentMinigame is AbigailGame)
+            {
+                ImGui.CollapsingHeader("AbigailGame");
+                foreach (var item in OverlayManager.Get<JotPK>().ImGuiDetails)
+                {
+                    ImGui.Text(item);
                 }
             }
             // if (ImGui.ColorEdit4("Color", ref MouseColor))

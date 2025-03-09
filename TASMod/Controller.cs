@@ -168,10 +168,10 @@ namespace TASMod
             if (!AcceptRealInput || ImGui.GetIO().WantCaptureKeyboard)
                 return false;
 
-            if (RealInputState.KeyTriggered(Keys.Q) || RealInputState.KeyTriggered(Keys.Down))
+            if (RealInputState.KeyTriggered(Keys.Q) || RealInputState.KeyTriggered(Keys.OemQuestion))
             {
                 RealKeyboard.Remove(Keys.Q);
-                RealKeyboard.Remove(Keys.Down);
+                RealKeyboard.Remove(Keys.OemQuestion);
                 return true;
             }
 
@@ -183,9 +183,9 @@ namespace TASMod
                 return true;
             }
 
-            if (RealInputState.IsKeyDown(Keys.Space))
+            if (RealInputState.IsKeyDown(Keys.OemPeriod))
             {
-                RealKeyboard.Remove(Keys.Space);
+                RealKeyboard.Remove(Keys.OemPeriod);
                 return true;
             }
 

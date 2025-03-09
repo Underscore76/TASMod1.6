@@ -13,13 +13,13 @@ namespace TASMod.Views
     {
         public TASView CurrentView = TASView.Base;
 
-        public MapView mapView;
-        public BaseView baseView;
+        public MapView MapView;
+        public BaseView BaseView;
 
         public ViewController()
         {
-            baseView = new BaseView();
-            mapView = new MapView();
+            BaseView = new BaseView();
+            MapView = new MapView();
         }
 
         public void NextView()
@@ -51,7 +51,7 @@ namespace TASMod.Views
                     // baseView.Exit();
                     break;
                 case TASView.Map:
-                    mapView.Exit();
+                    MapView.Exit();
                     break;
             }
 
@@ -63,7 +63,7 @@ namespace TASMod.Views
                     // baseView.Enter();
                     break;
                 case TASView.Map:
-                    mapView.Enter();
+                    MapView.Enter();
                     break;
             }
         }
@@ -71,7 +71,7 @@ namespace TASMod.Views
         public void ViewLocation(GameLocation location)
         {
             SetView(TASView.Map);
-            mapView.SetLocation(location);
+            MapView.SetLocation(location);
         }
 
         public void Update()
@@ -79,7 +79,7 @@ namespace TASMod.Views
             switch (CurrentView)
             {
                 case TASView.Map:
-                    mapView.Update();
+                    MapView.Update();
                     break;
                 default:
                     break;
@@ -91,7 +91,7 @@ namespace TASMod.Views
             switch (CurrentView)
             {
                 case TASView.Map:
-                    mapView.Draw();
+                    MapView.Draw();
                     break;
                 default:
                     break;
