@@ -74,10 +74,12 @@ namespace TASMod.Overlays
 
             if (Game1.currentMinigame is AbigailGame)
             {
-                ImGui.CollapsingHeader("AbigailGame");
-                foreach (var item in OverlayManager.Get<JotPK>().ImGuiDetails)
+                if (ImGui.CollapsingHeader("AbigailGame"))
                 {
-                    ImGui.Text(item);
+                    foreach (var item in OverlayManager.Get<JotPK>().ImGuiDetails)
+                    {
+                        ImGui.Text(item);
+                    }
                 }
             }
             // if (ImGui.ColorEdit4("Color", ref MouseColor))

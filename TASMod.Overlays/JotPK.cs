@@ -112,7 +112,7 @@ namespace TASMod.Overlays
                     AbigailGame.TileSize
                 );
                 DrawRectLocal(spriteBatch, rect, EnemyColor);
-                var center = monster.position.Center.ToVector2();
+                var center = AbigailGame.topLeftScreenCoordinate + monster.position.Center.ToVector2();
                 var movement = monster.acceleration;
                 var next = center + movement;
                 DrawLineLocal(spriteBatch, center, next, EnemyMovementColor, 1);
@@ -131,12 +131,26 @@ namespace TASMod.Overlays
             foreach (var bullet in game.bullets)
             {
                 var rect = new Rectangle(bullet.position.X, bullet.position.Y, 12, 12);
+                rect.Offset(
+                    (int)AbigailGame.topLeftScreenCoordinate.X,
+                    (int)AbigailGame.topLeftScreenCoordinate.Y
+                );
                 DrawRectLocal(spriteBatch, rect, Color.White);
             }
-            DrawRectLocal(spriteBatch, game.playerBoundingBox, PlayerColor);
+            {
+                var rect = game.playerBoundingBox;
+                rect.Offset(
+                    (int)AbigailGame.topLeftScreenCoordinate.X,
+                    (int)AbigailGame.topLeftScreenCoordinate.Y
+                );
+                DrawRectLocal(spriteBatch, rect, PlayerColor);
+            }
             foreach (var line in GetShotLines(game))
             {
-                DrawLineLocal(spriteBatch, line.Item1, line.Item2, PlayerBulletColor, 1);
+                DrawLineLocal(spriteBatch,
+                    AbigailGame.topLeftScreenCoordinate + line.Item1,
+                    AbigailGame.topLeftScreenCoordinate + line.Item2,
+                    PlayerBulletColor, 1);
             }
         }
     }
