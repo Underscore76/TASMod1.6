@@ -78,11 +78,18 @@ namespace TASMod.Overlays
             if (Game1.currentMinigame is null || Game1.currentMinigame is not AbigailGame)
                 return;
             var game = (AbigailGame)Game1.currentMinigame;
+            ImGuiDetails.Add($"Wave Timer: {AbigailGame.waveTimer}");
             ImGuiDetails.Add($"Shot Timer: {game.shotTimer - 16}");
             foreach (var type in EnemyTypes)
             {
                 ImGuiDetails.Add($"{type.Item1} coins: {getCoinsIfDeadNextFrame(type.Item2)}");
             }
+            if (game.spawnQueue.Length < 4)
+                return;
+            ImGuiDetails.Add($"Spawn NORTH: {game.spawnQueue[0].Count}");
+            ImGuiDetails.Add($"Spawn EAST: {game.spawnQueue[1].Count}");
+            ImGuiDetails.Add($"Spawn SOUTH: {game.spawnQueue[2].Count}");
+            ImGuiDetails.Add($"Spawn WEST: {game.spawnQueue[3].Count}");
         }
 
         public List<Tuple<Vector2, Vector2>> GetShotLines(AbigailGame game)
