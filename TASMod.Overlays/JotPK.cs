@@ -4,7 +4,9 @@ using ImGuiNET;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
+using StardewValley.Extensions;
 using StardewValley.Minigames;
+using TASMod.Extensions;
 
 namespace TASMod.Overlays
 {
@@ -21,6 +23,55 @@ namespace TASMod.Overlays
 
         public List<string> ImGuiDetails = new();
 
+        public List<Tuple<string, int>> EnemyTypes = new List<Tuple<string, int>>()
+        {
+            new Tuple<string,int>("orc", 0),
+            new Tuple<string,int>("ghost", 1),
+            new Tuple<string,int>("ogre", 2),
+            new Tuple<string,int>("mummy", 3),
+            new Tuple<string,int>("devil", 4),
+            new Tuple<string,int>("mushroom", 5),
+            new Tuple<string,int>("spikey", 6),
+        };
+
+
+        public int getCoinsIfDeadNextFrame(int type)
+        {
+            Random random = Game1.random.Copy();
+            // add
+            switch (type)
+            {
+                case 0:
+                case 2:
+                case 5:
+                case 6:
+                case 7:
+                    random.NextBool();
+                    random.NextBool();
+                    break;
+                case 3:
+                    random.NextBool();
+                    break;
+                case 1:
+                case 4:
+                    random.NextBool();
+                    break;
+            }
+
+            if (random.NextDouble() < 0.05)
+            {
+                if (type != 0 && random.NextDouble() < 0.1)
+                {
+                    return 5;
+                }
+                if (random.NextDouble() < 0.01)
+                {
+                    return 5;
+                }
+                return 1;
+            }
+            return 0;
+        }
         public override void ActiveUpdate()
         {
             ImGuiDetails.Clear();
@@ -28,6 +79,10 @@ namespace TASMod.Overlays
                 return;
             var game = (AbigailGame)Game1.currentMinigame;
             ImGuiDetails.Add($"Shot Timer: {game.shotTimer - 16}");
+            foreach (var type in EnemyTypes)
+            {
+                ImGuiDetails.Add($"{type.Item1} coins: {getCoinsIfDeadNextFrame(type.Item2)}");
+            }
         }
 
         public List<Tuple<Vector2, Vector2>> GetShotLines(AbigailGame game)
