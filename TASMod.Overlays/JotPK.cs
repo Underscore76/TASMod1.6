@@ -242,7 +242,7 @@ namespace TASMod.Overlays
                 ImGui.SeparatorText("Enemy Drops");
                 foreach (var type in EnemyTypes)
                 {
-                    ImGui.Text($"{type.Item1}: ({type.Item2})");
+                    ImGui.Text($"{type.Item1}: {getLootIfKilledNextFrame(type.Item2)}");
                 }
                 if (game.spawnQueue.Length < 4)
                     return;

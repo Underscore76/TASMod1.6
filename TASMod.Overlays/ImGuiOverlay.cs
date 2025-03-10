@@ -96,7 +96,9 @@ namespace TASMod.Overlays
             {
                 if (overlay.Active)
                 {
+                    ImGui.PushID(overlay.Name + "##overlay");
                     overlay.RenderImGui();
+                    ImGui.PopID();
                 }
             }
             ImGui.End();
