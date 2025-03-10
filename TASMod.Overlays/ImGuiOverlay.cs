@@ -59,6 +59,17 @@ namespace TASMod.Overlays
             }
             if (ImGui.CollapsingHeader("State Info"))
             {
+                if (TextBoxInput.GetSelected() != null)
+                {
+                    // var helper = OverlayManager.Get<TextBoxHelper>();
+                    string text = TextBoxInput.Text;
+                    ImGui.InputTextMultiline("Multiline", ref text, 100000, new Num.Vector2(200, 100));
+                    TextBoxInput.Text = text;
+                }
+                else
+                {
+                    TextBoxInput.Text = "";
+                }
                 ImGui.Text($"State Name: {Controller.State.Prefix}");
                 ImGui.Text($"Frame: {TASDateTime.CurrentFrame}");
                 ImGui.Text($"Player Tile: {Game1.player.Tile.X},{Game1.player.Tile.Y}");
@@ -80,24 +91,6 @@ namespace TASMod.Overlays
                     overlay.RenderImGui();
                 }
             }
-
-            // if (ImGui.ColorEdit4("Color", ref MouseColor))
-            // {
-            //     var mouse = OverlayManager.Get<Mouse>();
-            //     if (mouse != null)
-            //         mouse.MouseColor = MouseColor.ToColor();
-            // }
-            // if (TextBoxInput.GetSelected() != null)
-            // {
-            //     // var helper = OverlayManager.Get<TextBoxHelper>();
-            //     string text = TextBoxInput.Text;
-            //     ImGui.InputTextMultiline("Multiline", ref text, 100000, new Num.Vector2(200, 100));
-            //     TextBoxInput.Text = text;
-            // }
-            // else
-            // {
-            //     TextBoxInput.Text = "";
-            // }
             ImGui.End();
         }
 
