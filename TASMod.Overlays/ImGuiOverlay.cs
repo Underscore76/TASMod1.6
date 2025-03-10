@@ -22,6 +22,7 @@ namespace TASMod.Overlays
         public static RenderTarget2D imguiTarget;
         public Num.Vector4 MouseColor = Color.Black.ToVector4().ToNumerics();
         public string RandomValue = "";
+        public float FontScale = 1.0f;
 
         public override string Name => "imgui";
         public override string Description => "draw a generic gui window to screen";
@@ -42,6 +43,13 @@ namespace TASMod.Overlays
         public void BuildLayout()
         {
             ImGui.Begin("Engine");
+            if (ImGui.CollapsingHeader("Config"))
+            {
+                if (ImGui.DragFloat("Window Scale", ref FontScale, 0.005f, 1, 2, "%.2f", ImGuiSliderFlags.AlwaysClamp))
+                {
+                    ImGui.SetWindowFontScale(FontScale);
+                }
+            }
             if (ImGui.CollapsingHeader("Overlays"))
             {
                 foreach (var overlay in OverlayManager.Overlays.Values)
