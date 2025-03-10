@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ImGuiNET;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -34,7 +35,6 @@ namespace TASMod.Overlays
         public override string Name => "TileText";
         public static List<TileTextElement> States = new List<TileTextElement>();
         public static HashSet<Vector2> Tiles = new HashSet<Vector2>();
-        public static bool DrawOrder = false;
         public Color HighlightColor = new Color(128, 0, 128, 196);
         public override string Description => "draw text on tiles";
 
@@ -43,19 +43,39 @@ namespace TASMod.Overlays
             for (int i = 0; i < States.Count; ++i)
             {
                 DrawFilledTile(spriteBatch, States[i].Tile, States[i].BgColor);
-                if (DrawOrder)
-                {
-                    float scale = FitTextInTile(States[i].Text);
+                float scale = FitTextInTile(States[i].Text);
 
-                    DrawCenteredTextInTile(
-                        spriteBatch,
-                        States[i].Tile,
-                        States[i].Text,
-                        Color.White,
-                        scale
-                    );
+                DrawCenteredTextInTile(
+                    spriteBatch,
+                    States[i].Tile,
+                    States[i].Text,
+                    Color.White,
+                    scale
+                );
+            }
+        }
+
+        public override void RenderImGui()
+        {
+            if (ImGui.CollapsingHeader("TileText"))
+            {
+                if (ImGui.Button("Clear"))
+                {
+                    Clear();
+                }
+                if (ImGui.CollapsingHeader("Tiles"))
+                {
+                    foreach (var tile in Tiles)
+                    {
+                        bool isChecked = false;
+                        if (ImGui.Checkbox(tile.ToString(), ref isChecked))
+                        {
+                            Remove(tile);
+                        }
+                    }
                 }
             }
+            base.RenderImGui();
         }
 
         public static void Add(Vector2 tile, string text)

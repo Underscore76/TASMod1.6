@@ -34,8 +34,23 @@ namespace TASMod.Overlays
             new Tuple<string,int>("spikey", 6),
         };
 
+        public Dictionary<int, string> Items = new Dictionary<int, string>()
+        {
+            { 0, "1 Coin" },
+            { 1, "5 Coin" },
+            { 2, "Spread" },
+            { 3, "Rapid Fire" },
+            { 4, "Nuke" },
+            { 5, "Zombie" },
+            { 6, "Speed" },
+            { 7, "Shotgun" },
+            { 8, "Life" },
+            { 9, "Teleport" },
+            { 10, "Sherriff" }
+        };
 
-        public int getCoinsIfDeadNextFrame(int type)
+
+        public string getLootIfKilledNextFrame(int type)
         {
             Random random = Game1.random.Copy();
             // add
@@ -57,39 +72,36 @@ namespace TASMod.Overlays
                     random.NextBool();
                     break;
             }
-
             if (random.NextDouble() < 0.05)
             {
                 if (type != 0 && random.NextDouble() < 0.1)
                 {
-                    return 5;
+                    return Items[1];
                 }
                 if (random.NextDouble() < 0.01)
                 {
-                    return 5;
+                    return Items[1];
                 }
-                return 1;
+                return Items[0];
             }
-            return 0;
-        }
-        public override void ActiveUpdate()
-        {
-            ImGuiDetails.Clear();
-            if (Game1.currentMinigame is null || Game1.currentMinigame is not AbigailGame)
-                return;
-            var game = (AbigailGame)Game1.currentMinigame;
-            ImGuiDetails.Add($"Wave Timer: {AbigailGame.waveTimer}");
-            ImGuiDetails.Add($"Shot Timer: {game.shotTimer - 16}");
-            foreach (var type in EnemyTypes)
+            if (random.NextDouble() < 0.05)
             {
-                ImGuiDetails.Add($"{type.Item1} coins: {getCoinsIfDeadNextFrame(type.Item2)}");
+                if (random.NextDouble() < 0.15)
+                {
+                    return Items[random.Next(6, 8)];
+                }
+                if (random.NextDouble() < 0.07)
+                {
+                    return Items[10];
+                }
+                int loot = random.Next(2, 10);
+                if (loot == 5 && random.NextDouble() < 0.4)
+                {
+                    loot = random.Next(2, 10);
+                }
+                return Items[loot];
             }
-            if (game.spawnQueue.Length < 4)
-                return;
-            ImGuiDetails.Add($"Spawn NORTH: {game.spawnQueue[0].Count}");
-            ImGuiDetails.Add($"Spawn EAST: {game.spawnQueue[1].Count}");
-            ImGuiDetails.Add($"Spawn SOUTH: {game.spawnQueue[2].Count}");
-            ImGuiDetails.Add($"Spawn WEST: {game.spawnQueue[3].Count}");
+            return "";
         }
 
         public List<Tuple<Vector2, Vector2>> GetShotLines(AbigailGame game)
@@ -213,6 +225,32 @@ namespace TASMod.Overlays
                     AbigailGame.topLeftScreenCoordinate + line.Item1,
                     AbigailGame.topLeftScreenCoordinate + line.Item2,
                     PlayerBulletColor, 1);
+            }
+        }
+
+        public override void RenderImGui()
+        {
+            if (Game1.currentMinigame is null || Game1.currentMinigame is not AbigailGame)
+                return;
+
+            if (ImGui.CollapsingHeader("AbigailGame"))
+            {
+                var game = (AbigailGame)Game1.currentMinigame;
+                ImGui.SeparatorText("Timers");
+                ImGui.Text($"Wave Timer: {AbigailGame.waveTimer}");
+                ImGui.Text($"Shot Timer: {game.shotTimer - 16}");
+                ImGui.SeparatorText("Enemy Drops");
+                foreach (var type in EnemyTypes)
+                {
+                    ImGui.Text($"{type.Item1}: ({type.Item2})");
+                }
+                if (game.spawnQueue.Length < 4)
+                    return;
+                ImGui.SeparatorText("Spawn Queue");
+                ImGui.Text($"Spawn NORTH: {game.spawnQueue[0].Count}");
+                ImGui.Text($"Spawn EAST: {game.spawnQueue[1].Count}");
+                ImGui.Text($"Spawn SOUTH: {game.spawnQueue[2].Count}");
+                ImGui.Text($"Spawn WEST: {game.spawnQueue[3].Count}");
             }
         }
     }

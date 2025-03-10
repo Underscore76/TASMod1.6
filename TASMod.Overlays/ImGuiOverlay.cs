@@ -61,6 +61,7 @@ namespace TASMod.Overlays
             {
                 ImGui.Text($"State Name: {Controller.State.Prefix}");
                 ImGui.Text($"Frame: {TASDateTime.CurrentFrame}");
+                ImGui.Text($"Player Tile: {Game1.player.Tile.X},{Game1.player.Tile.Y}");
                 ImGui.SeparatorText("Last Frame Input");
                 if (Controller.State.FrameStates.Count > 0)
                 {
@@ -72,16 +73,14 @@ namespace TASMod.Overlays
                 }
             }
 
-            if (Game1.currentMinigame is AbigailGame)
+            foreach (var overlay in OverlayManager.Items)
             {
-                if (ImGui.CollapsingHeader("AbigailGame"))
+                if (overlay.Active)
                 {
-                    foreach (var item in OverlayManager.Get<JotPK>().ImGuiDetails)
-                    {
-                        ImGui.Text(item);
-                    }
+                    overlay.RenderImGui();
                 }
             }
+
             // if (ImGui.ColorEdit4("Color", ref MouseColor))
             // {
             //     var mouse = OverlayManager.Get<Mouse>();
@@ -118,6 +117,17 @@ namespace TASMod.Overlays
             GuiRenderer.AfterLayout();
             Game1.graphics.GraphicsDevice.SetRenderTargets(oldTargets);
             spriteBatch.Draw(imguiTarget, Vector2.Zero, Color.White);
+        }
+
+        public static bool ColorEdit4(string label, ref Color color)
+        {
+            var col = color.ToVector4().ToNumerics();
+            if (ImGui.ColorEdit4(label, ref col))
+            {
+                color = col.ToColor();
+                return true;
+            }
+            return false;
         }
     }
 }

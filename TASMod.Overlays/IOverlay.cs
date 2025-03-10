@@ -79,6 +79,8 @@ namespace TASMod.Overlays
 
         public virtual void ActiveDraw(SpriteBatch spriteBatch) { }
 
+        public virtual void RenderImGui() { }
+
         public virtual void Reset() { }
 
         public Rectangle TransformToLocal(Rectangle global)

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using HarmonyLib;
+using ImGuiNET;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
@@ -55,6 +56,23 @@ namespace TASMod.Overlays
             {
                 DrawObjectText(spriteBatch, tile.Key, string.Join(",", tile.Value.Select(o => o.ToString())));
             }
+        }
+
+        public override void RenderImGui()
+        {
+            if (ImGui.CollapsingHeader("ClayMap"))
+            {
+                if (ImGui.InputInt("Depth", ref Depth))
+                {
+                    Depth = Math.Max(1, Depth);
+                    Reset();
+                }
+                if (ImGui.Button("Reset"))
+                {
+                    Reset();
+                }
+            }
+            base.RenderImGui();
         }
 
         public static bool IsTillable(GameLocation location, Vector2 tile)

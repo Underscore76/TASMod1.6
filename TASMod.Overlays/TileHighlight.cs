@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ImGuiNET;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -51,6 +52,30 @@ namespace TASMod.Overlays
                     );
                 }
             }
+        }
+
+        public override void RenderImGui()
+        {
+            if (ImGui.CollapsingHeader("TileHighlight"))
+            {
+                ImGui.Checkbox("Toggle Order", ref DrawOrder);
+                if (ImGui.Button("Clear"))
+                {
+                    Clear();
+                }
+                if (ImGui.CollapsingHeader("Tiles"))
+                {
+                    foreach (var tile in Tiles)
+                    {
+                        bool isChecked = false;
+                        if (ImGui.Checkbox(tile.ToString(), ref isChecked))
+                        {
+                            Remove(tile);
+                        }
+                    }
+                }
+            }
+            base.RenderImGui();
         }
 
         public static void Add(Vector2 tile)
