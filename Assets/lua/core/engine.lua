@@ -30,6 +30,7 @@ function engine.reset(frame)
     if frame == nil then
         frame = -1
     end
+    GC.Collect(0, GCCollectionMode.Forced, true, true);
     interface:ResetGame(frame)
 end
 
@@ -40,6 +41,7 @@ function engine.fast_reset(frame)
     if frame == nil then
         frame = -1
     end
+    GC.Collect(0, GCCollectionMode.Forced, true, true);
     interface:FastResetGame(frame)
 end
 
@@ -50,6 +52,7 @@ function engine.blocking_reset(frame)
     if frame == nil then
         frame = -1
     end
+    GC.Collect(0, GCCollectionMode.Forced, true, true);
     interface:BlockResetGame(frame)
 end
 
@@ -60,6 +63,7 @@ function engine.blocking_fast_reset(frame)
     if frame == nil then
         frame = -1
     end
+    GC.Collect(0, GCCollectionMode.Forced, true, true);
     interface:BlockFastResetGame(frame)
 end
 

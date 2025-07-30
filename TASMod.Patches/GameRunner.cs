@@ -165,7 +165,14 @@ namespace TASMod.Patches
             }
             if (Controller.FastAdvance)
             {
-                __instance.RunFast();
+                if (Controller.PlaybackFrame == -1 || (int)TASDateTime.CurrentFrame < Controller.PlaybackFrame)
+                {
+                    __instance.RunFast();
+                }
+                else
+                {
+                    Controller.FastAdvance = false;
+                }
                 return false;
             }
             if (GameRunner_Draw.Counter != Counter)

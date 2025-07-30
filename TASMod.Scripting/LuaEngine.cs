@@ -56,6 +56,7 @@ namespace TASMod.Scripting
             LuaState.DoString("import ('TASMod.Views')");
             LuaState.DoString("import ('TASMod.Scripting')");
             LuaState.DoString("import ('TASMod.Simulators.SkullCaverns')");
+            LuaState.DoString("import ('TASMod.Simulators.Fishing')");
         }
 
         public static void LoadAllFiles()

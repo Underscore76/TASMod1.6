@@ -56,8 +56,8 @@ namespace TASMod.Patches
             __instance.showPlacementTileForGamepad = true;
             __instance.hardwareCursor = false;
             __instance.musicVolumeLevel = 0.1f;
-            __instance.ambientVolumeLevel = 0.25f;
-            __instance.footstepVolumeLevel = 0.9f;
+            __instance.ambientVolumeLevel = 0.3f;
+            __instance.footstepVolumeLevel = 0.75f;
             __instance.soundVolumeLevel = 1f;
             __instance.preferredResolutionX = Game1
                 .graphics.GraphicsDevice.Adapter.SupportedDisplayModes.Last()
@@ -74,6 +74,7 @@ namespace TASMod.Patches
             __instance.enableFarmhandCreation = true;
             __instance.showMPEndOfNightReadyStatus = false;
             __instance.muteAnimalSounds = false;
+            __instance.showClearBackgrounds = true;
         }
     }
 
