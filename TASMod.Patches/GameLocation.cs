@@ -1,6 +1,7 @@
 // public virtual bool answerDialogueAction(string questionAndAnswer, string[] questionParams)
 
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using HarmonyLib;
 using StardewValley;
 using StardewValley.Locations;
@@ -63,65 +64,67 @@ namespace TASMod.Patches
         }
     }
 
-    public class GameLocation_DayUpdate : IPatch
-    {
-        public override string Name => "GameLocation.DayUpdate";
+    // public class GameLocation_DayUpdate : IPatch
+    // {
+    //     public override string Name => "GameLocation.DayUpdate";
+    //     public static bool IsEnabled = false;
 
-        public override void Patch(Harmony harmony)
-        {
-            harmony.Patch(
-                original: AccessTools.Method(typeof(GameLocation), "DayUpdate"),
-                prefix: new HarmonyMethod(this.GetType(), nameof(this.Prefix)),
-                postfix: new HarmonyMethod(this.GetType(), nameof(this.Postfix))
-            );
-        }
+    //     public override void Patch(Harmony harmony)
+    //     {
+    //         harmony.Patch(
+    //             original: AccessTools.Method(typeof(GameLocation), "DayUpdate"),
+    //             prefix: new HarmonyMethod(this.GetType(), nameof(this.Prefix)),
+    //             postfix: new HarmonyMethod(this.GetType(), nameof(this.Postfix))
+    //         );
+    //     }
 
-        public static bool Prefix(ref GameLocation __instance)
-        {
-            if (__instance.Name == "Forest")
-            {
-                Controller.Console.Alert($"{__instance.Name}\tprefix\t{Game1.random.ToString()}");
-            }
-            return true;
-        }
+    //     public static bool Prefix(ref GameLocation __instance)
+    //     {
+    //         if (IsEnabled && __instance.Name == "Forest")
+    //         {
+    //             Controller.Console.Alert($"{__instance.Name}\tprefix\t{Game1.random.ToString()}");
+    //         }
+    //         return true;
+    //     }
 
-        public static void Postfix(ref GameLocation __instance)
-        {
-            if (__instance.Name == "Forest")
-            {
-                Controller.Console.Alert($"{__instance.Name}\tpostfix\t{Game1.random.ToString()}");
-            }
-        }
-    }
+    //     public static void Postfix(ref GameLocation __instance)
+    //     {
+    //         if (IsEnabled && __instance.Name == "Forest")
+    //         {
+    //             Controller.Console.Alert($"{__instance.Name}\tpostfix\t{Game1.random.ToString()}");
+    //         }
+    //     }
+    // }
 
-    public class Utility_recursiveFindOpenTiles : IPatch
-    {
-        public override string Name => "Utility.recursiveFindOpenTiles";
+    // public class Utility_recursiveFindOpenTiles : IPatch
+    // {
+    //     public override string Name => "Utility.recursiveFindOpenTiles";
+    //     public static bool IsEnabled = false;
 
-        public override void Patch(Harmony harmony)
-        {
-            harmony.Patch(
-                original: AccessTools.Method(typeof(Utility), "recursiveFindOpenTiles"),
-                prefix: new HarmonyMethod(this.GetType(), nameof(this.Prefix)),
-                postfix: new HarmonyMethod(this.GetType(), nameof(this.Postfix))
-            );
-        }
+    //     public override void Patch(Harmony harmony)
+    //     {
+    //         harmony.Patch(
+    //             original: AccessTools.Method(typeof(Utility), "recursiveFindOpenTiles"),
+    //             prefix: new HarmonyMethod(this.GetType(), nameof(this.Prefix)),
+    //             postfix: new HarmonyMethod(this.GetType(), nameof(this.Postfix))
+    //         );
+    //     }
 
-        public static bool Prefix(ref GameLocation l)
-        {
-            if (l.Name == "Forest")
-            {
-                Controller.Console.Alert($"recursiveFindOpenTiles\tprefix\t{Game1.random.ToString()}");
-            }
-            return true;
-        }
+    //     public static bool Prefix(ref GameLocation l)
+    //     {
+    //         if (IsEnabled && l.Name == "Forest")
+    //         {
+    //             Controller.Console.Alert($"recursiveFindOpenTiles\tprefix\t{Game1.random.ToString()}");
+    //         }
+    //         return true;
+    //     }
 
-        public static void Postfix(ref GameLocation l)
-        {
-            if (l.Name == "Forest")
-            {
-                Controller.Console.Alert($"recursiveFindOpenTiles\tpostfix\t{Game1.random.ToString()}");
-            }
-        }
-    }
+    //     public static void Postfix(ref GameLocation l)
+    //     {
+    //         if (IsEnabled && l.Name == "Forest")
+    //         {
+    //             Controller.Console.Alert($"recursiveFindOpenTiles\tpostfix\t{Game1.random.ToString()}");
+    //         }
+    //     }
+    // }
 }

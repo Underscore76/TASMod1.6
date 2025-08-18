@@ -14,6 +14,7 @@ namespace TASMod.Patches
     public class MineShaft_addLevelChests : IPatch
     {
         public override string Name => "MineShaft.addLevelChests";
+        public static bool IsEnabled = false;
 
         public override void Patch(Harmony harmony)
         {
@@ -26,7 +27,7 @@ namespace TASMod.Patches
 
         public static bool Prefix(ref MineShaft __instance)
         {
-            if (Reflector.GetValue<MineShaft, NetBool>(__instance, "netIsTreasureRoom").Value)
+            if (IsEnabled && Reflector.GetValue<MineShaft, NetBool>(__instance, "netIsTreasureRoom").Value)
             {
                 Controller.Console.Alert(
                     $"b:addLevelChests: {Game1.random.get_Index():D4} {__instance.mineRandom.get_Index():D4}"
@@ -37,7 +38,7 @@ namespace TASMod.Patches
 
         public static void Postfix(ref MineShaft __instance)
         {
-            if (Reflector.GetValue<MineShaft, NetBool>(__instance, "netIsTreasureRoom").Value)
+            if (IsEnabled && Reflector.GetValue<MineShaft, NetBool>(__instance, "netIsTreasureRoom").Value)
             {
                 Controller.Console.Alert(
                     $"a:addLevelChests: {Game1.random.get_Index():D4} {__instance.mineRandom.get_Index():D4}"
@@ -49,6 +50,7 @@ namespace TASMod.Patches
     public class MineShaft_populateLevel : IPatch
     {
         public override string Name => "MineShaft.populateLevel";
+        public static bool IsEnabled = false;
 
         public override void Patch(Harmony harmony)
         {
@@ -61,7 +63,7 @@ namespace TASMod.Patches
 
         public static bool Prefix(ref MineShaft __instance)
         {
-            if (Reflector.GetValue<MineShaft, NetBool>(__instance, "netIsTreasureRoom").Value)
+            if (IsEnabled && Reflector.GetValue<MineShaft, NetBool>(__instance, "netIsTreasureRoom").Value)
             {
                 Controller.Console.Alert(
                     $"b:populateLevel: {Game1.random.get_Index():D4} {__instance.mineRandom.get_Index():D4}"
@@ -72,7 +74,7 @@ namespace TASMod.Patches
 
         public static void Postfix(ref MineShaft __instance)
         {
-            if (Reflector.GetValue<MineShaft, NetBool>(__instance, "netIsTreasureRoom").Value)
+            if (IsEnabled && Reflector.GetValue<MineShaft, NetBool>(__instance, "netIsTreasureRoom").Value)
             {
                 Controller.Console.Alert(
                     $"a:populateLevel: {Game1.random.get_Index():D4} {__instance.mineRandom.get_Index():D4}"
@@ -84,6 +86,7 @@ namespace TASMod.Patches
     public class MineShaft_isTileClearForMineObjects : IPatch
     {
         public override string Name => "MineShaft.isTileClearForMineObjects";
+        public static bool IsEnabled = false;
 
         public override void Patch(Harmony harmony)
         {
@@ -100,7 +103,7 @@ namespace TASMod.Patches
 
         public static bool Prefix(ref MineShaft __instance, ref Vector2 v)
         {
-            if (Reflector.GetValue<MineShaft, NetBool>(__instance, "netIsTreasureRoom").Value)
+            if (IsEnabled && Reflector.GetValue<MineShaft, NetBool>(__instance, "netIsTreasureRoom").Value)
             {
                 Controller.Console.Error(
                     $"\tb:isTileClearForMineObjects: ({(int)v.X:D2},{(int)v.Y:D2}) {Game1.random.get_Index():D4} {__instance.mineRandom.get_Index():D4} {__instance.mineRandom.Copy().NextDouble()}"
@@ -111,7 +114,7 @@ namespace TASMod.Patches
 
         public static void Postfix(ref MineShaft __instance, ref bool __result, ref Vector2 v)
         {
-            if (Reflector.GetValue<MineShaft, NetBool>(__instance, "netIsTreasureRoom").Value)
+            if (IsEnabled && Reflector.GetValue<MineShaft, NetBool>(__instance, "netIsTreasureRoom").Value)
             {
                 Controller.Console.Error(
                     $"\ta:isTileClearForMineObjects: ({(int)v.X:D2},{(int)v.Y:D2}) {Game1.random.get_Index():D4} {__instance.mineRandom.get_Index():D4} {__result}"
@@ -123,6 +126,7 @@ namespace TASMod.Patches
     public class MineShaft_chooseLevelType : IPatch
     {
         public override string Name => "MineShaft.chooseLevelType";
+        public static bool IsEnabled = false;
 
         public override void Patch(Harmony harmony)
         {
@@ -135,7 +139,7 @@ namespace TASMod.Patches
 
         public static bool Prefix(ref MineShaft __instance)
         {
-            if (Reflector.GetValue<MineShaft, NetBool>(__instance, "netIsTreasureRoom").Value)
+            if (IsEnabled && Reflector.GetValue<MineShaft, NetBool>(__instance, "netIsTreasureRoom").Value)
             {
                 Controller.Console.Alert(
                     $"b:chooseLevelType: {Game1.random.get_Index():D4} {__instance.mineRandom.get_Index():D4}"
@@ -146,7 +150,7 @@ namespace TASMod.Patches
 
         public static void Postfix(ref MineShaft __instance)
         {
-            if (Reflector.GetValue<MineShaft, NetBool>(__instance, "netIsTreasureRoom").Value)
+            if (IsEnabled && Reflector.GetValue<MineShaft, NetBool>(__instance, "netIsTreasureRoom").Value)
             {
                 Controller.Console.Alert(
                     $"a:chooseLevelType: {Game1.random.get_Index():D4} {__instance.mineRandom.get_Index():D4}"
@@ -158,6 +162,7 @@ namespace TASMod.Patches
     public class MineShaft_createLitterObject : IPatch
     {
         public override string Name => "MineShaft.createLitterObject";
+        public static bool IsEnabled = false;
 
         public override void Patch(Harmony harmony)
         {
@@ -170,7 +175,7 @@ namespace TASMod.Patches
 
         public static bool Prefix(ref MineShaft __instance, Vector2 tile)
         {
-            if (Reflector.GetValue<MineShaft, NetBool>(__instance, "netIsTreasureRoom").Value)
+            if (IsEnabled && Reflector.GetValue<MineShaft, NetBool>(__instance, "netIsTreasureRoom").Value)
             {
                 Controller.Console.Alert(
                     $"b:createLitterObject({tile}): {Game1.random.get_Index():D4} {__instance.mineRandom.get_Index():D4}"
@@ -181,7 +186,7 @@ namespace TASMod.Patches
 
         public static void Postfix(ref MineShaft __instance, Vector2 tile)
         {
-            if (Reflector.GetValue<MineShaft, NetBool>(__instance, "netIsTreasureRoom").Value)
+            if (IsEnabled && Reflector.GetValue<MineShaft, NetBool>(__instance, "netIsTreasureRoom").Value)
             {
                 Controller.Console.Alert(
                     $"a:createLitterObject({tile}): {Game1.random.get_Index():D4} {__instance.mineRandom.get_Index():D4}"
@@ -193,6 +198,7 @@ namespace TASMod.Patches
     public class MineShaft_getMonsterForThisLevel : IPatch
     {
         public override string Name => "MineShaft.getMonsterForThisLevel";
+        public static bool IsEnabled = false;
 
         public override void Patch(Harmony harmony)
         {
@@ -205,7 +211,7 @@ namespace TASMod.Patches
 
         public static bool Prefix(ref MineShaft __instance, int xTile, int yTile)
         {
-            if (Reflector.GetValue<MineShaft, NetBool>(__instance, "netIsTreasureRoom").Value)
+            if (IsEnabled && Reflector.GetValue<MineShaft, NetBool>(__instance, "netIsTreasureRoom").Value)
             {
                 Controller.Console.Alert(
                     $"b:getMonsterForThisLevel({xTile},{yTile}): {Game1.random.get_Index():D4} {__instance.mineRandom.get_Index():D4}"
@@ -216,7 +222,7 @@ namespace TASMod.Patches
 
         public static void Postfix(ref MineShaft __instance, int xTile, int yTile)
         {
-            if (Reflector.GetValue<MineShaft, NetBool>(__instance, "netIsTreasureRoom").Value)
+            if (IsEnabled && Reflector.GetValue<MineShaft, NetBool>(__instance, "netIsTreasureRoom").Value)
             {
                 Controller.Console.Alert(
                     $"a:getMonsterForThisLevel({xTile},{yTile}): {Game1.random.get_Index():D4} {__instance.mineRandom.get_Index():D4}"
@@ -228,6 +234,7 @@ namespace TASMod.Patches
     public class BreakableContainer_GetBarrelForMines : IPatch
     {
         public override string Name => "BreakableContainer.GetBarrelForMines";
+        public static bool IsEnabled = false;
 
         public override void Patch(Harmony harmony)
         {
@@ -240,7 +247,7 @@ namespace TASMod.Patches
 
         public static bool Prefix(ref MineShaft mine, Vector2 tile)
         {
-            if (Reflector.GetValue<MineShaft, NetBool>(mine, "netIsTreasureRoom").Value)
+            if (IsEnabled && Reflector.GetValue<MineShaft, NetBool>(mine, "netIsTreasureRoom").Value)
             {
                 Controller.Console.Alert(
                     $"b:GetBarrelForMines({tile}): {Game1.random.get_Index():D4} {mine.mineRandom.get_Index():D4}"
@@ -251,7 +258,7 @@ namespace TASMod.Patches
 
         public static void Postfix(ref MineShaft mine, Vector2 tile)
         {
-            if (Reflector.GetValue<MineShaft, NetBool>(mine, "netIsTreasureRoom").Value)
+            if (IsEnabled && Reflector.GetValue<MineShaft, NetBool>(mine, "netIsTreasureRoom").Value)
             {
                 Controller.Console.Alert(
                     $"a:GetBarrelForMines({tile}): {Game1.random.get_Index():D4} {mine.mineRandom.get_Index():D4}"
@@ -263,6 +270,7 @@ namespace TASMod.Patches
     public class MineShaft_generateContents : IPatch
     {
         public override string Name => "MineShaft.generateContents";
+        public static bool IsEnabled = false;
 
         public override void Patch(Harmony harmony)
         {
@@ -275,17 +283,23 @@ namespace TASMod.Patches
 
         public static bool Prefix(ref MineShaft __instance)
         {
-            Controller.Console.Alert(
-                $"b:generateContents: {Game1.random.get_Index():D4} {__instance.mineRandom.get_Index():D4}"
-            );
+            if (IsEnabled)
+            {
+                Controller.Console.Alert(
+                    $"b:generateContents: {Game1.random.get_Index():D4} {__instance.mineRandom.get_Index():D4}"
+                );
+            }
             return true;
         }
 
         public static void Postfix(ref MineShaft __instance)
         {
-            Controller.Console.Alert(
-                $"a:generateContents: {Game1.random.get_Index():D4} {__instance.mineRandom.get_Index():D4}"
-            );
+            if (IsEnabled)
+            {
+                Controller.Console.Alert(
+                    $"a:generateContents: {Game1.random.get_Index():D4} {__instance.mineRandom.get_Index():D4}"
+                );
+            }
         }
     }
 #endif

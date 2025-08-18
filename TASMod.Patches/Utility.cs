@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using HarmonyLib;
 using StardewValley;
 using TASMod.Extensions;
@@ -27,8 +28,27 @@ namespace TASMod.Patches
     public class Utility_trySpawnRareObject : IPatch
     {
         public override string Name => "Utility.trySpawnRareObject";
+        public static bool IsEnabled = true;
 
-        public static double chanceModifier = 0.33; // Tree performToolAction
+        public static Dictionary<string, double> ChanceModifier = new Dictionary<string, double>
+        {
+            { "Tree", 0.33 }, // Tree performToolAction
+            { "MonsterLoot", 1.5 } // MonsterLoot monsterDrop
+        };
+        public static double chanceModifier = ChanceModifier["MonsterLoot"];
+
+        public static void SetModifier(string key)
+        {
+            if (ChanceModifier.TryGetValue(key, out double value))
+            {
+                chanceModifier = value;
+                Controller.Console.Alert($"Set chanceModifier to {chanceModifier} for {key}");
+            }
+            else
+            {
+                Controller.Console.Alert($"No chanceModifier found for {key}");
+            }
+        }
 
         public override void Patch(Harmony harmony)
         {
@@ -40,6 +60,8 @@ namespace TASMod.Patches
 
         public static bool Prefix(Random random)
         {
+            if (!IsEnabled) return true;
+
             if (random == null)
             {
                 Random r = Game1.random.Copy();
