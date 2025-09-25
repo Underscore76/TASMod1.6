@@ -14,6 +14,8 @@ namespace TASMod.Simulators
         public static int PREV_SAME_TILE_COST = 30;
         public static int DISTANCE_COST = 10;
         public static int MAX_DISTANCE = 20;
+        public static int ALLOWED_TREE_GROWTH = 3;
+
         public struct Element
         {
             public int X;
@@ -83,7 +85,7 @@ namespace TASMod.Simulators
             if (trees
                 && Game1.currentLocation.terrainFeatures.ContainsKey(tile.ToVector())
                 && Game1.currentLocation.terrainFeatures[tile.ToVector()] is Tree tree
-                && tree.growthStage.Value >= 3)
+                && tree.growthStage.Value >= ALLOWED_TREE_GROWTH)
             {
                 return false;
             }

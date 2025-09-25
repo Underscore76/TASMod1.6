@@ -139,9 +139,10 @@ namespace TASMod.Extensions
             //ModEntry.Console.Log($"Resetting Fast... {TASDateTime.CurrentFrame} to {Controller.State.Count}", LogLevel.Error);
             Controller.FastAdvance = false;
             int counter = 0;
-            int finalFrames = 10;
             TASSpriteBatch.Active = false;
-            int maxFrame = Controller.State.Count - finalFrames;
+            int maxFrame = Controller.State.Count - Controller.FinalFrames;
+            if (Controller.PlaybackFrame != -1)
+                maxFrame = Math.Min(maxFrame, Controller.PlaybackFrame);
             while ((int)TASDateTime.CurrentFrame < maxFrame)
             {
                 try
@@ -219,6 +220,7 @@ namespace TASMod.Extensions
             runner.Reset();
             Controller.AcceptRealInput = true;
             Controller.Console.historyTail = Controller.Console.historyLog.Count - 1;
+            Controller.BlockOverlays = false;
             while ((int)TASDateTime.CurrentFrame < Controller.State.Count)
             {
                 runner.EventLoop();
@@ -240,6 +242,7 @@ namespace TASMod.Extensions
                     TASSpriteBatch.Active = true;
                 }
             }
+            Controller.BlockOverlays = true;
         }
     }
 }

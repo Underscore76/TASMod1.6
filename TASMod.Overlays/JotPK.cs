@@ -26,12 +26,12 @@ namespace TASMod.Overlays
         public List<Tuple<string, int>> EnemyTypes = new List<Tuple<string, int>>()
         {
             new Tuple<string,int>("orc", 0),
-            new Tuple<string,int>("ghost", 1),
             new Tuple<string,int>("ogre", 2),
-            new Tuple<string,int>("mummy", 3),
-            new Tuple<string,int>("devil", 4),
             new Tuple<string,int>("mushroom", 5),
             new Tuple<string,int>("spikey", 6),
+            new Tuple<string,int>("ghost", 1),
+            new Tuple<string,int>("mummy", 3),
+            new Tuple<string,int>("devil", 4),
         };
 
         public Dictionary<int, string> Items = new Dictionary<int, string>()
@@ -186,6 +186,7 @@ namespace TASMod.Overlays
                     AbigailGame.TileSize
                 );
                 DrawRectLocal(spriteBatch, rect, EnemyColor);
+                DrawCenteredTextInRectLocal(spriteBatch, rect, monster.health.ToString(), Color.White);
                 var center = AbigailGame.topLeftScreenCoordinate + monster.position.Center.ToVector2();
                 var movement = monster.acceleration;
                 var next = center + movement;
@@ -232,6 +233,7 @@ namespace TASMod.Overlays
         {
             if (Game1.currentMinigame is null || Game1.currentMinigame is not AbigailGame)
                 return;
+            try{
 
             if (ImGui.CollapsingHeader("AbigailGame"))
             {
@@ -239,9 +241,24 @@ namespace TASMod.Overlays
                 ImGui.SeparatorText("Timers");
                 ImGui.Text($"Wave Timer: {AbigailGame.waveTimer}");
                 ImGui.Text($"Shot Timer: {game.shotTimer - 16}");
+                ImGui.Text($"Confusion Timer: {AbigailGame.monsterConfusionTimer}");
+                ImGui.Text($"Zombie Timer: {AbigailGame.zombieModeTimer}");
+                foreach(var powerup in AbigailGame.powerups)
+                {
+                    if (Items.ContainsKey(powerup.which))
+                    {
+                        ImGui.Text($"Ground {Items[powerup.which]}: {powerup.position} {powerup.duration}");
+                    }
+                }
+                foreach(var kvp in game.activePowerups)
+                {
+                    ImGui.Text($"Active {Items[kvp.Key]}: {kvp.Value}");
+                }
                 ImGui.SeparatorText("Enemy Drops");
                 foreach (var type in EnemyTypes)
                 {
+                    if (game.monsterChances[type.Item2].X == 0)
+                        continue;
                     ImGui.Text($"{type.Item1}: {getLootIfKilledNextFrame(type.Item2)}");
                 }
                 if (game.spawnQueue.Length < 4)
@@ -251,6 +268,11 @@ namespace TASMod.Overlays
                 ImGui.Text($"Spawn EAST: {game.spawnQueue[1].Count}");
                 ImGui.Text($"Spawn SOUTH: {game.spawnQueue[2].Count}");
                 ImGui.Text($"Spawn WEST: {game.spawnQueue[3].Count}");
+            }
+            } catch (Exception e)
+            {
+                ModEntry.Console.Log(e.ToString(), StardewModdingAPI.LogLevel.Error);
+                ImGui.Text(e.ToString());
             }
         }
     }

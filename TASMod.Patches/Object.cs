@@ -21,7 +21,7 @@ namespace TASMod.Patches
 
         public static bool Prefix()
         {
-            Controller.Console.Alert($"Object.CutWeed: {Game1.random.get_Index():D4}");
+            // Controller.Console.Alert($"Object.CutWeed: {Game1.random.get_Index():D4}");
             return true;
         }
     }

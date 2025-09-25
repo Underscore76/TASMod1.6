@@ -38,6 +38,7 @@ namespace TASMod
 
         public static TASMouseState LastFrameMouse() => Recording.LastFrameMouse();
 
+
         public static SaveState State
         {
             get { return Recording?.State; }
@@ -49,8 +50,11 @@ namespace TASMod
         public static bool FastAdvance;
         public static bool AcceptRealInput = true;
         public static int FramesBetweenRender = 60;
+        public static int PlaybackFrame = -1;
+        public static int FinalFrames = 10;
         public static bool SkipSave = true;
         public static bool ResetGame;
+        public static bool BlockOverlays = true;
 
         public static TASMouseState RealMouse { get; private set; } = new TASMouseState();
         public static TASKeyboardState RealKeyboard { get; private set; } = new TASKeyboardState();
@@ -89,7 +93,10 @@ namespace TASMod
             RealInputState.Update();
             // Console.Warn($"RealInputState: {RealInputState.mouseState} {Mouse.GetState()}");
             Console.Update();
-            Overlays.Update();
+            if (BlockOverlays)
+            {
+                Overlays.Update();
+            }
             TASInputState.Active = false;
 
             // check if there is frame data to process
@@ -129,9 +136,12 @@ namespace TASMod
                 null,
                 null
             );
-            foreach (var overlay in OverlayManager.Items)
+            if (BlockOverlays)
             {
-                overlay.Draw();
+                foreach (var overlay in OverlayManager.Items)
+                {
+                    overlay.Draw();
+                }
             }
             Game1.spriteBatch.End();
             TASSpriteBatch.Active = tmp;

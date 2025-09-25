@@ -125,7 +125,28 @@ namespace TASMod.Console
                 {
                     if (historyLog.Count > historyRectRows)
                     {
-                        historyTail -= RealInputState.ScrollWheelDiff();
+                        int dir = RealInputState.ScrollWheelDiff();
+                        if (dir < 0) {
+                            // up?
+                            for (historyTail++;historyTail < historyLog.Count; historyTail++) {
+                                if (historyTail >= historyLog.Count) continue;
+                                if (historyLog[historyTail].Type == ConsoleTextElementType.Warn && !ShowWarnings) continue;
+                                if (historyLog[historyTail].Type == ConsoleTextElementType.Error && !ShowErrors) continue;
+                                if (historyLog[historyTail].Type == ConsoleTextElementType.Debug && !DebugMode) continue;
+
+                                break;
+                            }
+                        } else {
+                            // down
+                            for (historyTail--;historyTail > 0; historyTail--) {
+                                if (historyTail >= historyLog.Count) continue;
+                                if (historyLog[historyTail].Type == ConsoleTextElementType.Warn && !ShowWarnings) continue;
+                                if (historyLog[historyTail].Type == ConsoleTextElementType.Error && !ShowErrors) continue;
+                                if (historyLog[historyTail].Type == ConsoleTextElementType.Debug && !DebugMode) continue;
+
+                                break;
+                            }
+                        }
                         historyTail = Math.Min(
                             Math.Max(historyRectRows - 1, historyTail),
                             historyLog.Count
@@ -269,7 +290,7 @@ namespace TASMod.Console
             int renderCursorPosition = cursorPosition;
             if (entryText.Length > 0)
             {
-                for (int i = 0; i < cursorPosition; i++)
+                for (int i = 0; i < Math.Min(cursorPosition,entryText.Length); i++)
                 {
                     if (entryText[i] == '\t')
                     {

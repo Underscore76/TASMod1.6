@@ -12,6 +12,7 @@ using System;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using StardewValley.Minigames;
+using StardewValley.Objects;
 
 namespace TASMod.Overlays
 {
@@ -99,6 +100,26 @@ namespace TASMod.Overlays
                     ImGui.PushID(overlay.Name + "##overlay");
                     overlay.RenderImGui();
                     ImGui.PopID();
+                }
+            }
+            if(Game1.player != null && ImGui.CollapsingHeader("Inventory"))
+            {
+                for(int i = 0; i < Game1.player.Items.Count; i++)
+                {
+                    var item = Game1.player.Items[i];
+                    if (item == null) continue;
+                    if (item is Furniture furniture)
+                    {
+                        ImGui.Text($"{i}: {furniture.Name} (dir: {furniture.GetSittingDirection()})");
+                    }
+                    else if(item is Tool tool)
+                    {
+                        ImGui.Text($"{i}: {tool.Name}");
+                    }
+                    else
+                    {
+                        ImGui.Text($"{i}: {item.Name} x{item.Stack}");
+                    }
                 }
             }
             ImGui.End();

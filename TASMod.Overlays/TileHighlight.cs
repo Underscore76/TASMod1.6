@@ -63,15 +63,12 @@ namespace TASMod.Overlays
                 {
                     Clear();
                 }
-                if (ImGui.CollapsingHeader("Tiles"))
+                foreach (var tile in Tiles)
                 {
-                    foreach (var tile in Tiles)
+                    bool isChecked = false;
+                    if (ImGui.Checkbox(tile.ToString(), ref isChecked))
                     {
-                        bool isChecked = false;
-                        if (ImGui.Checkbox(tile.ToString(), ref isChecked))
-                        {
-                            Remove(tile);
-                        }
+                        Remove(tile);
                     }
                 }
             }

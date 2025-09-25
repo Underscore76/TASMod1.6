@@ -1,25 +1,363 @@
 using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using StardewValley;
+using StardewValley.BellsAndWhistles;
 using StardewValley.Extensions;
 using StardewValley.Menus;
 using StardewValley.Tools;
+using TASMod.Console;
 using TASMod.Extensions;
+using TASMod.System;
 
 namespace TASMod.Simulators.Fishing
 {
+    public class SFish
+    {
+        public string Name;
+        public int MotionType;
+        public int Difficulty;
+
+        public SFish(string whichFish)
+        {
+            Dictionary<string, string> fishData = DataLoader.Fish(Game1.content);
+            if(fishData.TryGetValue(whichFish, out var value))
+            {
+                string[] array = value.Split('/');
+                if (array[1] == "trap") return;
+                Name = array[0];
+                Difficulty = Convert.ToInt32(array[1]);
+                string motionType = array[2];
+                switch (motionType.ToLower())
+                {
+                    case "mixed":
+                        MotionType = 0;
+                        break;
+                    case "dart":
+                        MotionType = 1;
+                        break;
+                    case "smooth":
+                        MotionType = 2;
+                        break;
+                    case "floater":
+                        MotionType = 4;
+                        break;
+                    case "sinker":
+                        MotionType = 3;
+                        break;
+                }
+            }
+            else 
+            {
+                throw new Exception("could not load fish");
+            }
+        }
+    }
+
     public class SBobberBar
     {
+        public SFish fish;
+        public float bobberPosition;
+        public float bobberSpeed;
+        public float bobberAcceleration;
+        public float bobberTargetPosition;
+        public float scale;
+        public float everythingShakeTimer;
+        public float floaterSinkerAcceleration;
+        public bool bobberInBar;
+        public int bobberBarHeight;
+        public float bobberBarPos;
+        public float bobberBarSpeed;
+        public float distanceFromCatching;
+        public int whichBobber;
+
+        public bool perfect;
+        public bool beginnersRod;
+        public bool treasure;
+        public bool treasureCaught;
+        public Vector2 barShake;
+        public Vector2 fishShake;
+        public Vector2 treasureShake;
+        public int fishSize;
+        public int fishSizeReductionTimer;
+        public int minFishSize;
+        public int maxFishSize;
+        public float reelRotation;
+
+        public float treasurePosition;
+        public float treasureCatchLevel;
+        public float treasureAppearTimer;
+        public float treasureScale;
+        public bool flipBubble;
         public SBobberBar(BobberBar _bobberBar)
         {
+            bobberPosition = _bobberBar.bobberPosition;
+            bobberSpeed = _bobberBar.bobberSpeed;
+            bobberAcceleration = _bobberBar.bobberAcceleration;
+            bobberTargetPosition = _bobberBar.bobberTargetPosition;
+            scale = _bobberBar.scale;
+            everythingShakeTimer = _bobberBar.everythingShakeTimer;
+            floaterSinkerAcceleration = _bobberBar.floaterSinkerAcceleration;
+            bobberInBar = _bobberBar.bobberInBar;
+            bobberBarHeight = _bobberBar.bobberBarHeight;
+            bobberBarPos = _bobberBar.bobberBarPos;
+            bobberBarSpeed = _bobberBar.bobberBarSpeed;
+            distanceFromCatching = _bobberBar.distanceFromCatching;
 
+            perfect = _bobberBar.perfect;
+            beginnersRod = _bobberBar.beginnersRod;
+            treasure = _bobberBar.treasure;
+            treasureCaught = _bobberBar.treasureCaught;
+            barShake = _bobberBar.barShake;
+            fishShake = _bobberBar.fishShake;
+            treasureShake = _bobberBar.treasureShake;
+            fishSize = _bobberBar.fishSize;
+            fishSizeReductionTimer = _bobberBar.fishSizeReductionTimer;
+            minFishSize = _bobberBar.minFishSize;
+            maxFishSize = _bobberBar.maxFishSize;
+            reelRotation = _bobberBar.reelRotation;
+
+            treasurePosition = _bobberBar.treasurePosition;
+            treasureCatchLevel = _bobberBar.treasureCatchLevel;
+            treasureAppearTimer = _bobberBar.treasureAppearTimer;
+            treasureScale = _bobberBar.treasureScale;
+            flipBubble = _bobberBar.flipBubble;
+
+            fish = new SFish(_bobberBar.whichFish);
         }
-        public void update(bool buttonPress) { }
+
+        public SBobberBar(SBobberBar _bobberBar)
+        {
+            bobberPosition = _bobberBar.bobberPosition;
+            bobberSpeed = _bobberBar.bobberSpeed;
+            bobberAcceleration = _bobberBar.bobberAcceleration;
+            bobberTargetPosition = _bobberBar.bobberTargetPosition;
+            scale = _bobberBar.scale;
+            everythingShakeTimer = _bobberBar.everythingShakeTimer;
+            floaterSinkerAcceleration = _bobberBar.floaterSinkerAcceleration;
+            bobberInBar = _bobberBar.bobberInBar;
+            bobberBarHeight = _bobberBar.bobberBarHeight;
+            bobberBarPos = _bobberBar.bobberBarPos;
+            bobberBarSpeed = _bobberBar.bobberBarSpeed;
+            distanceFromCatching = _bobberBar.distanceFromCatching;
+
+            perfect = _bobberBar.perfect;
+            beginnersRod = _bobberBar.beginnersRod;
+            treasure = _bobberBar.treasure;
+            treasureCaught = _bobberBar.treasureCaught;
+            barShake = _bobberBar.barShake;
+            fishShake = _bobberBar.fishShake;
+            treasureShake = _bobberBar.treasureShake;
+            fishSize = _bobberBar.fishSize;
+            fishSizeReductionTimer = _bobberBar.fishSizeReductionTimer;
+            minFishSize = _bobberBar.minFishSize;
+            maxFishSize = _bobberBar.maxFishSize;
+            reelRotation = _bobberBar.reelRotation;
+
+            treasurePosition = _bobberBar.treasurePosition;
+            treasureCatchLevel = _bobberBar.treasureCatchLevel;
+            treasureAppearTimer = _bobberBar.treasureAppearTimer;
+            treasureScale = _bobberBar.treasureScale;
+            flipBubble = _bobberBar.flipBubble;
+
+            fish = _bobberBar.fish;
+        }
+
+        public SBobberBar Copy()
+        {
+            return new SBobberBar(this);
+        }
+
+        public void update(bool buttonPressed, Random random) { 
+            if (everythingShakeTimer > 0f)
+            {
+                random.Next(-10, 11);
+                random.Next(-10, 11);
+            }
+
+            if (random.NextDouble() < (double)(fish.Difficulty * (float)((fish.MotionType != 2) ? 1 : 20) / 4000f) && (fish.MotionType != 2 || bobberTargetPosition == -1f))
+            {
+                float spaceBelow = 548f - bobberPosition;
+                float spaceAbove = bobberPosition;
+                float percent = Math.Min(99f, fish.Difficulty + (float)random.Next(10, 45)) / 100f;
+                bobberTargetPosition = bobberPosition + (float)random.Next(-(int)spaceAbove, (int)spaceBelow) * percent;
+            }
+
+            if (fish.MotionType == 4)
+            {
+                floaterSinkerAcceleration = Math.Max(floaterSinkerAcceleration - 0.01f, -1.5f);
+            }
+            else if (fish.MotionType == 3)
+            {
+                floaterSinkerAcceleration = Math.Min(floaterSinkerAcceleration + 0.01f, 1.5f);
+            }
+            if (Math.Abs(bobberPosition - bobberTargetPosition) > 3f && bobberTargetPosition != -1f)
+            {
+                bobberAcceleration = (bobberTargetPosition - bobberPosition) / ((float)random.Next(10, 30) + (100f - Math.Min(100f, fish.Difficulty)));
+                bobberSpeed += (bobberAcceleration - bobberSpeed) / 5f;
+            }
+            else if (fish.MotionType != 2 && random.NextDouble() < (double)(fish.Difficulty / 2000f))
+            {
+                bobberTargetPosition = bobberPosition + (float)((random.NextDouble() < 0.5) ? random.Next(-100, -51) : random.Next(50, 101));
+            }
+            else
+            {
+                bobberTargetPosition = -1f;
+            }
+            if (fish.MotionType == 1 && random.NextDouble() < (double)(fish.Difficulty / 1000f))
+            {
+                bobberTargetPosition = bobberPosition + (float)((random.NextDouble() < 0.5) ? random.Next(-100 - (int)fish.Difficulty * 2, -51) : random.Next(50, 101 + (int)fish.Difficulty * 2));
+            }
+            bobberTargetPosition = Math.Max(-1f, Math.Min(bobberTargetPosition, 548f));
+            bobberPosition += bobberSpeed + floaterSinkerAcceleration;
+            if (bobberPosition > 532f)
+            {
+                bobberPosition = 532f;
+            }
+            else if (bobberPosition < 0f)
+            {
+                bobberPosition = 0f;
+            }
+            bobberInBar = (bobberPosition + 12f <= bobberBarPos - 32f + (float)bobberBarHeight && bobberPosition - 16f >= bobberBarPos - 32f);
+            if (bobberPosition >= (float)(548 - bobberBarHeight) && bobberBarPos >= (float)(568 - bobberBarHeight - 4))
+            {
+                bobberInBar = true;
+            }
+
+            float gravity = buttonPressed ? (-0.25f) : 0.25f;
+            if (buttonPressed && gravity < 0f && (bobberBarPos == 0f || bobberBarPos == (float)(568 - bobberBarHeight)))
+            {
+                bobberBarSpeed = 0f;
+            }
+            if (bobberInBar)
+            {
+                gravity *= ((whichBobber == 691) ? 0.3f : 0.6f);
+                if (whichBobber == 691)
+                {
+                    if (bobberPosition + 16f < bobberBarPos + (float)(bobberBarHeight / 2))
+                    {
+                        bobberBarSpeed -= 0.2f;
+                    }
+                    else
+                    {
+                        bobberBarSpeed += 0.2f;
+                    }
+                }
+            }
+            bobberBarSpeed += gravity;
+            bobberBarPos += bobberBarSpeed;
+            if (bobberBarPos + (float)bobberBarHeight > 568f)
+            {
+                bobberBarPos = 568 - bobberBarHeight;
+                bobberBarSpeed = (0f - bobberBarSpeed) * 2f / 3f * ((whichBobber == 692) ? 0.1f : 1f);
+            }
+            else if (bobberBarPos < 0f)
+            {
+                bobberBarPos = 0f;
+                bobberBarSpeed = (0f - bobberBarSpeed) * 2f / 3f;
+            }
+            bool treasureInBar = false;
+            if (treasure)
+            {
+                float oldTreasureAppearTimer = treasureAppearTimer;
+                treasureAppearTimer -= 16;
+                if (treasureAppearTimer <= 0f)
+                {
+                    if (treasureScale < 1f && !treasureCaught)
+                    {
+                        if (oldTreasureAppearTimer > 0f)
+                        {
+                            treasurePosition = ((bobberBarPos > 274f) ? random.Next(8, (int)bobberBarPos - 20) : random.Next(Math.Min(528, (int)bobberBarPos + bobberBarHeight), 500));
+                        }
+                        treasureScale = Math.Min(1f, treasureScale + 0.1f);
+                    }
+                    treasureInBar = (treasurePosition + 12f <= bobberBarPos - 32f + (float)bobberBarHeight && treasurePosition - 16f >= bobberBarPos - 32f);
+                    if (treasureInBar && !treasureCaught)
+                    {
+                        treasureCatchLevel += 0.0135f;
+                        treasureShake = new Vector2(random.Next(-2, 3), random.Next(-2, 3));
+                        if (treasureCatchLevel >= 1f)
+                        {
+                            treasureCaught = true;
+                        }
+                    }
+                    else if (treasureCaught)
+                    {
+                        treasureScale = Math.Max(0f, treasureScale - 0.1f);
+                    }
+                    else
+                    {
+                        treasureShake = Vector2.Zero;
+                        treasureCatchLevel = Math.Max(0f, treasureCatchLevel - 0.01f);
+                    }
+                }
+            }
+            if (bobberInBar)
+            {
+                distanceFromCatching += 0.002f;
+                reelRotation += (float)Math.PI / 8f;
+                fishShake.X = (float)random.Next(-10, 11) / 10f;
+                fishShake.Y = (float)random.Next(-10, 11) / 10f;
+                barShake = Vector2.Zero;
+            }
+            else if (!treasureInBar || treasureCaught || whichBobber != 693)
+            {
+                if (!fishShake.Equals(Vector2.Zero))
+                {
+                    perfect = false;
+                }
+                fishSizeReductionTimer -= 16;
+                if (fishSizeReductionTimer <= 0)
+                {
+                    fishSize = Math.Max(minFishSize, fishSize - 1);
+                    fishSizeReductionTimer = 800;
+                }
+                if ((Game1.player.fishCaught != null && Game1.player.fishCaught.Count() != 0) || Game1.currentMinigame != null)
+                {
+                    distanceFromCatching -= ((whichBobber == 694 || beginnersRod) ? 0.002f : 0.003f);
+                }
+                float distanceAway = Math.Abs(bobberPosition - (bobberBarPos + (float)(bobberBarHeight / 2)));
+                reelRotation -= (float)Math.PI / Math.Max(10f, 200f - distanceAway);
+                barShake.X = (float)random.Next(-10, 11) / 10f;
+                barShake.Y = (float)random.Next(-10, 11) / 10f;
+                fishShake = Vector2.Zero;
+            }
+            distanceFromCatching = Math.Max(0f, Math.Min(1f, distanceFromCatching));
+            // where the decision is made to tick random an extra time
+            //if (Game1.player.CurrentTool != null)
+            //{
+            //    Game1.player.CurrentTool.tickUpdate(time, Game1.player);
+            //}
+            if (distanceFromCatching <= 0f)
+            {
+            }
+            else if (distanceFromCatching >= 1f)
+            {
+
+                if (perfect)
+                {
+                }
+                else if (fishSize == maxFishSize)
+                {
+                    fishSize--;
+                }
+            }
+
+            if (bobberPosition < 0f)
+            {
+                bobberPosition = 0f;
+            }
+            if (bobberPosition > 548f)
+            {
+                bobberPosition = 548f;
+            }
+        }
     }
 
     public class SFishingGame
     {
         public Random Game1_random;
+        public ulong CurrentFrame;
         // farmer props
         public float jitterStrength;
         public Vector2 jitter;
@@ -47,6 +385,7 @@ namespace TASMod.Simulators.Fishing
         {
             // clone from current game
             Game1_random = Game1.random.Copy();
+            CurrentFrame = TASDateTime.CurrentFrame;
             // farmer props
             jitterStrength = Game1.player.jitterStrength;
             jitter = Game1.player.jitter;
@@ -83,17 +422,52 @@ namespace TASMod.Simulators.Fishing
             bobberBar = new SBobberBar(Game1.activeClickableMenu as BobberBar);
         }
 
+        public SFishingGame(SFishingGame game)
+        {
+            Game1_random = game.Game1_random.Copy();
+            CurrentFrame = game.CurrentFrame;
+            jitterStrength = game.jitterStrength;
+            jitter = game.jitter;
+            blinkTimer = game.blinkTimer;
+            bobber = game.bobber;
+            isFishing = game.isFishing;
+            isNibbling = game.isNibbling;
+            isReeling = game.isReeling;
+            bobberTimeAccumulator = game.bobberTimeAccumulator;
+            timePerBobberBob = game.timePerBobberBob;
+            bobberBob = game.bobberBob;
+            numArtifactSpots = game.numArtifactSpots;
+            moneyShakeTimer = game.moneyShakeTimer;
+            timeShakeTimer = game.timeShakeTimer;
+            questPulseTimer = game.questPulseTimer;
+            whenToPulseTimer = game.whenToPulseTimer;
+            bobberBar = game.bobberBar.Copy();
+        }
+
+        public SFishingGame Copy()
+        {
+            return new SFishingGame(this);
+        }
+
         public void Step(bool buttonPress)
         {
+            CurrentFrame++;
             // update
+            // ModEntry.Console.Log($"Step Random Start: {Game1_random.get_Index()}");
             updateActiveMenu(buttonPress);
+            // ModEntry.Console.Log($"After updateActiveMenu: {Game1_random.get_Index()}");
             UpdateCharacters(buttonPress);
+            // ModEntry.Console.Log($"After updateCharacters: {Game1_random.get_Index()}");
             UpdateLocations(buttonPress);
+            // ModEntry.Console.Log($"After updateLocations: {Game1_random.get_Index()}");
             UpdateOther(buttonPress);
+            // ModEntry.Console.Log($"After updateOther: {Game1_random.get_Index()}");
 
             // draw
             DrawWorld(buttonPress);
+            // ModEntry.Console.Log($"After drawWorld: {Game1_random.get_Index()}");
             DrawHud(buttonPress);
+            // ModEntry.Console.Log($"After drawHud: {Game1_random.get_Index()}");
         }
 
         public void updateActiveMenu(bool buttonPress)
@@ -103,10 +477,26 @@ namespace TASMod.Simulators.Fishing
 
         public void UpdateOther(bool buttonPress)
         {
-            if (Game1.currentLocation.Name == "Beach")
+            // check for music
+            switch (Game1.currentLocation.Name)
             {
-                // seagulls audio check
-                Game1_random.NextDouble();
+                case "Beach":
+                    Game1_random.Next();
+                    break;
+                case "Mountain":
+                    throw new NotImplementedException();
+                case "Forest":
+                    throw new NotImplementedException();
+                case "Farm":
+                    throw new NotImplementedException();
+                case "Desert":
+                    throw new NotImplementedException();
+                case "Town":
+                    throw new NotImplementedException();
+                case "Secret Woods":
+                    throw new NotImplementedException();
+                default:
+                    throw new NotImplementedException($"{Game1.currentLocation.Name}");
             }
         }
 
@@ -170,6 +560,15 @@ namespace TASMod.Simulators.Fishing
         public void base_updateWhenCurrentLocation(bool buttonPress)
         {
             // TODO:critters.update and remove all that are purged
+            foreach (var c in Game1.currentLocation.critters)
+            {
+                // seagulls audio check
+                if (c is Seagull gull)
+                {
+                    Game1_random.NextDouble();
+                }
+            }
+
             for (int i = 0; i < numArtifactSpots; i++)
             {
                 Game1_random.NextDouble();
@@ -202,7 +601,7 @@ namespace TASMod.Simulators.Fishing
         public void BobberBar_update(bool buttonPress)
         {
             //actual game update
-            bobberBar.update(buttonPress);
+            bobberBar.update(buttonPress, Game1_random);
             // post update
             FishingRod_tickUpdate(buttonPress);
         }
