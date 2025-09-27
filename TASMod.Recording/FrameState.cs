@@ -114,11 +114,43 @@ namespace TASMod.Recording
             set => injectText = value;
         }
 
+        public TASGamePadState[] controllers;
+        [JsonProperty]
+        public string controllerState
+        {
+            get
+            {
+                string res = ""
+                    + Convert.ToBase64String(controllers[0].ToBytes())
+                    + Convert.ToBase64String(controllers[1].ToBytes())
+                    + Convert.ToBase64String(controllers[2].ToBytes())
+                    + Convert.ToBase64String(controllers[3].ToBytes());
+                return res;
+            }
+            set
+            {
+                byte[] data = Convert.FromBase64String(value);
+                controllers = new TASGamePadState[4];
+                for (int i = 0; i < 4; i++)
+                {
+                    byte[] cdata = data.Skip(i * 12).Take(12).ToArray();
+                    controllers[i] = TASGamePadState.FromBytes(cdata);
+                }
+            }
+        }
+
         public FrameState()
         {
             randomState = new RandomState(Game1.random);
             keyboardState = new TASKeyboardState();
             mouseState = new TASMouseState();
+            controllers = new TASGamePadState[4]
+            {
+                new TASGamePadState(),
+                new TASGamePadState(),
+                new TASGamePadState(),
+                new TASGamePadState(),
+            };
             comments = "";
             injectText = "";
         }
@@ -133,6 +165,13 @@ namespace TASMod.Recording
             keyboardState = new TASKeyboardState(o.keyboardState);
             keyboardState.IntersectWith(ValidKeys);
             mouseState = new TASMouseState(o.mouseState);
+            controllers = new TASGamePadState[4]
+            {
+                new TASGamePadState(o.controllers[0]),
+                new TASGamePadState(o.controllers[1]),
+                new TASGamePadState(o.controllers[2]),
+                new TASGamePadState(o.controllers[3]),
+            };
             comments = o.comments;
             injectText = o.injectText;
         }
@@ -140,14 +179,63 @@ namespace TASMod.Recording
         public FrameState(
             KeyboardState kstate,
             MouseState mstate,
+            GamePadState[] gstates = null,
             string comm = "",
             string inject = ""
         )
         {
+            // clones input states to avoid reference issues
             randomState = new RandomState(Game1.random);
             keyboardState = new TASKeyboardState(kstate);
             keyboardState.IntersectWith(ValidKeys);
             mouseState = new TASMouseState(mstate);
+            controllers = new TASGamePadState[4]
+            {
+                gstates != null && gstates.Length > 0
+                    ? TASGamePadState.FromGamePadState(gstates[0])
+                    : new TASGamePadState(),
+                gstates != null && gstates.Length > 1
+                    ? TASGamePadState.FromGamePadState(gstates[1])
+                    : new TASGamePadState(),
+                gstates != null && gstates.Length > 2
+                    ? TASGamePadState.FromGamePadState(gstates[2])
+                    : new TASGamePadState(),
+                gstates != null && gstates.Length > 3
+                    ? TASGamePadState.FromGamePadState(gstates[3])
+                    : new TASGamePadState(),
+            };
+            comments = comm;
+            injectText = inject;
+        }
+
+        public FrameState(
+            TASKeyboardState kstate,
+            TASMouseState mstate,
+            TASGamePadState[] gstates = null,
+            string comm = "",
+            string inject = ""
+        )
+        {
+            // clones input states to avoid reference issues
+            randomState = new RandomState(Game1.random);
+            keyboardState = new TASKeyboardState(kstate);
+            keyboardState.IntersectWith(ValidKeys);
+            mouseState = new TASMouseState(mstate);
+            controllers = new TASGamePadState[4]
+            {
+                gstates != null && gstates.Length > 0
+                    ? new TASGamePadState(gstates[0])
+                    : new TASGamePadState(),
+                gstates != null && gstates.Length > 1
+                    ? new TASGamePadState(gstates[1])
+                    : new TASGamePadState(),
+                gstates != null && gstates.Length > 2
+                    ? new TASGamePadState(gstates[2])
+                    : new TASGamePadState(),
+                gstates != null && gstates.Length > 3
+                    ? new TASGamePadState(gstates[3])
+                    : new TASGamePadState(),
+            };
             comments = comm;
             injectText = inject;
         }
@@ -167,16 +255,31 @@ namespace TASMod.Recording
             injectText = "";
         }
 
-        public void toStates(out TASKeyboardState kstate, out TASMouseState mstate)
+        public void toStates(out TASKeyboardState kstate, out TASMouseState mstate, out TASGamePadState[] gstates)
         {
+            // clones out states to avoid reference issues
             kstate = new TASKeyboardState(keyboardState);
             mstate = new TASMouseState(mouseState);
+            gstates = new TASGamePadState[4]
+            {
+                new TASGamePadState(controllers[1]),
+                new TASGamePadState(controllers[1]),
+                new TASGamePadState(controllers[2]),
+                new TASGamePadState(controllers[3]),
+            };
         }
 
-        public void toStates(out KeyboardState kstate, out MouseState mstate)
+        public void toStates(out KeyboardState kstate, out MouseState mstate, out GamePadState[] gstates)
         {
             kstate = keyboardState.GetKeyboardState();
             mstate = mouseState.GetMouseState();
+            gstates = new GamePadState[4]
+            {
+                controllers[0].ToGamePadState(),
+                controllers[1].ToGamePadState(),
+                controllers[2].ToGamePadState(),
+                controllers[3].ToGamePadState(),
+            };
         }
 
         public static bool operator ==(FrameState left, FrameState right)

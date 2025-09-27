@@ -17,6 +17,9 @@
     <PackageReference Include="DynamicExpresso.Core" Version="2.16.1" />
   </ItemGroup>
   <ItemGroup>
+     <Reference Include="Lidgren.Network" HintPath="$(GamePath)\Lidgren.Network.dll" Private="$(_BundleExtraAssembliesForGame)" />
+  </ItemGroup>
+  <ItemGroup>
     <Content Remove="Decompile\**" />
     <Compile Remove="Decompile\**" />
     <EmbeddedResource Remove="Decompile\**" />

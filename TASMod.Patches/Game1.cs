@@ -176,7 +176,7 @@ namespace TASMod.Patches
 
         public static bool Prefix(Game1 __instance, ref int w, ref int h)
         {
-            Trace($"Game1.SetWindowSize {TASDateTime.CurrentFrame} {Game1.graphics.IsFullScreen}");
+            // Trace($"Game1.SetWindowSize {TASDateTime.CurrentFrame} {Game1.graphics.IsFullScreen}");
             bool windowed = ModEntry.Config.Windowed;
             Game1.graphics.IsFullScreen = !windowed;
             w = ModEntry.Config.ScreenWidth;
@@ -189,27 +189,27 @@ namespace TASMod.Patches
             Game1.graphics.PreferredBackBufferWidth = w;
             Game1.graphics.PreferredBackBufferHeight = h;
             Game1.graphics.SynchronizeWithVerticalRetrace = true;
-            Trace($"Prefix:viewport {Game1.viewport}");
-            Trace(
-                $"Prefix:ClientBounds {__instance.Window.ClientBounds} DisplayBounds: {__instance.Window.GetDisplayBounds(0)}"
-            );
-            Trace(
-                $"Prefix:graphics {Game1.graphics.PreferredBackBufferWidth}x{Game1.graphics.PreferredBackBufferHeight} ({Game1.graphics.GraphicsProfile})"
-            );
-            Trace($"Prefix:screen {Game1.game1.screen.Bounds}");
+            // Trace($"Prefix:viewport {Game1.viewport}");
+            // Trace(
+            //     $"Prefix:ClientBounds {__instance.Window.ClientBounds} DisplayBounds: {__instance.Window.GetDisplayBounds(0)}"
+            // );
+            // Trace(
+            //     $"Prefix:graphics {Game1.graphics.PreferredBackBufferWidth}x{Game1.graphics.PreferredBackBufferHeight} ({Game1.graphics.GraphicsProfile})"
+            // );
+            // Trace($"Prefix:screen {Game1.game1.screen.Bounds}");
             return true;
         }
 
         public static void Postfix(ref Game1 __instance)
         {
-            Trace($"Postfix:viewport {Game1.viewport}");
-            Trace(
-                $"Postfix:ClientBounds {__instance.Window.ClientBounds} DisplayBounds: {__instance.Window.GetDisplayBounds(0)}"
-            );
-            Trace(
-                $"Postfix:graphics {Game1.graphics.PreferredBackBufferWidth}x{Game1.graphics.PreferredBackBufferHeight} ({Game1.graphics.GraphicsProfile})"
-            );
-            Trace($"Postfix:screen {Game1.game1.screen.Bounds}");
+            // Trace($"Postfix:viewport {Game1.viewport}");
+            // Trace(
+            //     $"Postfix:ClientBounds {__instance.Window.ClientBounds} DisplayBounds: {__instance.Window.GetDisplayBounds(0)}"
+            // );
+            // Trace(
+            //     $"Postfix:graphics {Game1.graphics.PreferredBackBufferWidth}x{Game1.graphics.PreferredBackBufferHeight} ({Game1.graphics.GraphicsProfile})"
+            // );
+            // Trace($"Postfix:screen {Game1.game1.screen.Bounds}");
         }
     }
 
