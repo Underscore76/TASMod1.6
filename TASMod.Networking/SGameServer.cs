@@ -87,13 +87,15 @@ namespace TASMod.Networking
             return NetworkState.Connections.Contains(connectionId);
         }
 
-        public void onConnect(string connectionID)
+        public void onConnect(string connectionId)
         {
+            NetworkState.ConnectClient(connectionId);
             UpdateLocalOnlyFlag();
         }
 
-        public void onDisconnect(string connectionID)
+        public void onDisconnect(string connectionId)
         {
+            NetworkState.DisconnectClient(connectionId);
             UpdateLocalOnlyFlag();
         }
 
@@ -109,7 +111,7 @@ namespace TASMod.Networking
             {
                 return;
             }
-            Game1.hasLocalClientsOnly = connectionsCount > 0;
+            Game1.hasLocalClientsOnly = NetworkState.NumConnections > 0;
             if (Game1.hasLocalClientsOnly)
             {
                 Log("SGameServer.UpdateLocalOnlyFlag: Game has only local clients.");

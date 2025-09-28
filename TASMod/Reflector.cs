@@ -179,10 +179,6 @@ namespace TASMod
         public static Type GetTypeInAssembly(Assembly assembly, string fullname)
         {
             var matches = assembly.GetTypes().Where(t => t.FullName == fullname);
-            foreach (var v in AllTypesInAssembly(assembly))
-            {
-                ModEntry.Console.Log($"{v.FullName}");
-            }
             foreach (var t in matches)
             {
                 return t;

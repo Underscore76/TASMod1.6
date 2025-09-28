@@ -96,16 +96,6 @@ namespace TASMod.Networking
             try
             {
                 Log($"SLidgrenClient.parseDataMessageFromServer: {inc.IncomingMessageType} {inc.message.MessageType} {inc.message.Reader}");
-                // if (inc.message.MessageType == 9)
-                // {
-                //     BinaryReader msg = inc.message.Reader;
-                //     int value = msg.ReadInt32();
-                //     int value2 = msg.ReadInt32();
-                //     int value3 = msg.ReadInt32();
-                //     int num = msg.ReadByte();
-                //     msg.BaseStream.Seek(0, SeekOrigin.Begin);
-                //     Log($"SLidgrenClient.parseDataMessageFromServer[{msg.BaseStream.Length}]: loading {value} {value2} {value3} {num}");
-                // }
                 processIncomingMessage(inc.message);
             }
             finally
@@ -119,7 +109,7 @@ namespace TASMod.Networking
 
         private void receiveHandshake(SIncomingMessage msg)
         {
-            NetworkState.ConnectClient(connectionId);
+            NetworkState.SendStatusChange(connectionId, new OutgoingMessage(5, Game1.player));
         }
 
     }

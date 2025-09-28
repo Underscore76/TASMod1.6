@@ -35,6 +35,7 @@ namespace TASMod.Extensions
                 runner.gameInstances.RemoveAt(i);
                 Game1.game1 = null;
             }
+            runner.nextInstanceId = 0;
             NetworkState.Shutdown();
             // Force random to be in a vanilla state
             Controller.OverrideStaticDefaults();
@@ -81,6 +82,7 @@ namespace TASMod.Extensions
             ModEntry
                 .Reflection.GetField<Multiplayer>(typeof(Game1), "multiplayer")
                 .SetValue(new Multiplayer());
+            Game1.Multiplayer.defaultInterpolationTicks = NetworkState.InterpolationTicks;
 
             ModEntry.Console.Log("Instance_LoadContent", LogLevel.Trace);
             runner.gameInstances[0].Instance_LoadContent();

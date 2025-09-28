@@ -76,6 +76,7 @@ namespace TASMod.Networking
         public static bool VerboseLogging = false;
         public static bool Connected = false;
         public static HashSet<string> Connections = new HashSet<string>();
+        public static int InterpolationTicks = 4; // mimics exactly the local multiplayer behavior
         public static int ConnectionAttempts = 0;
         public static int NumConnections => Connections.Count;
         public static Dictionary<string, Queue<SIncomingMessage>> IncomingMessages = new();

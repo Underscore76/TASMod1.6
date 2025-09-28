@@ -63,4 +63,22 @@ namespace TASMod.Patches
             Warn($"FarmhandMenu.Constructor:Postfix: Created SLidgrenClient {client}");
         }
     }
+
+    public class Multiplayer_interpolationTicks : IPatch
+    {
+        public override string Name => "Multiplayer.interpolationTicks";
+
+        public override void Patch(Harmony harmony)
+        {
+            harmony.Patch(
+                original: AccessTools.Method(typeof(Multiplayer), "interpolationTicks"),
+                postfix: new HarmonyMethod(this.GetType(), nameof(this.Postfix))
+            );
+        }
+
+        public static void Postfix(ref int __result)
+        {
+            __result = NetworkState.InterpolationTicks;
+        }
+    }
 }
