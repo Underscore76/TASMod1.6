@@ -18,7 +18,7 @@ namespace TASMod.Overlays.Widgets
             if (ImGui.CollapsingHeader(label))
             {
                 var triggerSize = new ImGuiVector2(20.0f, 16.0f);
-                var triggerSpacing = 10.0f;
+                var triggerSpacing = 5.0f;
                 var analogWidth = 50.0f;
                 var availableRegion = ImGui.GetContentRegionAvail();
                 var controllerHeight = Math.Min(2 * analogWidth + 10f, 130);
@@ -38,13 +38,15 @@ namespace TASMod.Overlays.Widgets
                 var row1Y = startPos.Y + 30f;
 
                 // Col1: [ZL/L/R/ZR], [DPAD, ABXY], [START/SELECT]
-                // Row1 - ZL/L/R/ZR triggers
-                bool[] triggerStates = { state.ButtonZL, state.ButtonL, state.ButtonR, state.ButtonZR };
-                DrawButtonGroup(drawList, new ImGuiVector2(leftColumnX, row1Y), new string[] { "ZL", "L", "R", "ZR" }, ref triggerStates, triggerSize, triggerSpacing);
+                // Row1 - ZL/L/R/ZR triggers + the neutral clear button
+                bool[] triggerStates = { state.ButtonZL, state.ButtonL, false, state.ButtonR, state.ButtonZR };
+                DrawButtonGroup(drawList, new ImGuiVector2(leftColumnX, row1Y), new string[] { "ZL", "L", "C", "R", "ZR" }, ref triggerStates, triggerSize, triggerSpacing);
                 state.ButtonZL = triggerStates[0];
                 state.ButtonL = triggerStates[1];
-                state.ButtonR = triggerStates[2];
-                state.ButtonZR = triggerStates[3];
+                state.ButtonR = triggerStates[3];
+                state.ButtonZR = triggerStates[4];
+                if (triggerStates[2])
+                    state.Clear();
 
                 // Row2 - DPad (3x3 grid) and ABXY (diamond)
                 var dpadSize = 14.0f;

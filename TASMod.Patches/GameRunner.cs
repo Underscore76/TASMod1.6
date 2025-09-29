@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewValley;
 using TASMod.Extensions;
+using TASMod.Networking;
 using TASMod.System;
 using TASMod.Views;
 
@@ -15,6 +16,28 @@ namespace TASMod.Patches
     public static class GameRunnerState
     {
         public static int InstanceIndex = 0;
+
+        public static void TryLoad()
+        {
+            if (
+                GameRunner.instance != null
+                && GameRunner.instance.gameInstances.Count > GameRunnerState.InstanceIndex
+                && Game1.game1.instanceIndex != GameRunnerState.InstanceIndex
+            )
+            {
+                GameRunner.LoadInstance(GameRunner.instance.gameInstances[GameRunnerState.InstanceIndex]);
+            }
+        }
+
+        public static void LoadLast()
+        {
+            if (
+                GameRunner.instance != null
+                && NetworkState.NumConnections > 0)
+            {
+                GameRunner.LoadInstance(GameRunner.instance.gameInstances[NetworkState.NumConnections]);
+            }
+        }
     }
 
     public class GameRunner_Draw : IPatch
@@ -53,15 +76,12 @@ namespace TASMod.Patches
 
         public static void Postfix(ref GameTime gameTime)
         {
-            // TODO: instead of loading instance before the draw calls, probably want to swap how Controller.Draw/DrawLate work
-            // so that the correct instance(s) are loaded when needed
             if (CanDraw)
             {
                 Counter++;
                 TASDateTime.Update();
                 // NOTE: Allows for each frame to get new rng values to match Interop.GetRandomBytes
                 RandomExtensions.Update();
-                GameRunner.LoadInstance(GameRunner.instance.gameInstances[GameRunnerState.InstanceIndex]);
                 Controller.Draw();
             }
             else
@@ -70,7 +90,7 @@ namespace TASMod.Patches
                 {
                     case TASView.Base:
                         RedrawFrame(gameTime);
-                        GameRunner.LoadInstance(GameRunner.instance.gameInstances[GameRunnerState.InstanceIndex]);
+                        GameRunnerState.TryLoad(); // attempts to load the correct instance for probing state
                         Controller.Draw();
                         break;
                     default:
@@ -78,11 +98,8 @@ namespace TASMod.Patches
                         break;
                 }
             }
-            GameRunner.LoadInstance(GameRunner.instance.gameInstances[GameRunnerState.InstanceIndex]);
             Controller.DrawLate();
             CanDraw = false;
-            // roll to the correct instance for probing in lua
-            GameRunner.LoadInstance(GameRunner.instance.gameInstances[GameRunnerState.InstanceIndex]);
         }
 
         public static void RedrawFrame(GameTime gameTime)
@@ -91,6 +108,7 @@ namespace TASMod.Patches
             {
                 GameRunner.LoadInstance(instance2);
                 Viewport old_viewport = GameRunner.instance.GraphicsDevice.Viewport;
+                Game1.graphics.GraphicsDevice.Viewport = new Viewport(0, 0, Math.Min(instance2.localMultiplayerWindow.Width, Game1.graphics.GraphicsDevice.PresentationParameters.BackBufferWidth), Math.Min(instance2.localMultiplayerWindow.Height, Game1.graphics.GraphicsDevice.PresentationParameters.BackBufferHeight));
                 Game1_renderScreenBuffer.Base(instance2.screen, instance2.uiScreen);
                 GameRunner.instance.GraphicsDevice.Viewport = old_viewport;
             }
@@ -177,6 +195,7 @@ namespace TASMod.Patches
             }
             if (Controller.FastAdvance)
             {
+                GameRunnerState.LoadLast(); // forces the load state to neutral so an update can fire safely
                 if (Controller.PlaybackFrame == -1 || (int)TASDateTime.CurrentFrame < Controller.PlaybackFrame)
                 {
                     __instance.RunFast();
@@ -195,6 +214,10 @@ namespace TASMod.Patches
             {
                 CanUpdate = Controller.Update();
                 gameTime = TASDateTime.CurrentGameTime;
+            }
+            if (CanUpdate)
+            {
+                GameRunnerState.LoadLast(); // forces the load state to neutral so an update can fire safely
             }
             return CanUpdate;
         }

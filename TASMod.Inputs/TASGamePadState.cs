@@ -153,5 +153,25 @@ namespace TASMod.Inputs
             cs.ButtonSelect = (flags & 8192) != 0;
             return cs;
         }
+
+        public void Clear()
+        {
+            AnalogX = 0;
+            AnalogY = 0;
+            DPadUp = false;
+            DPadDown = false;
+            DPadLeft = false;
+            DPadRight = false;
+            ButtonA = false;
+            ButtonB = false;
+            ButtonX = false;
+            ButtonY = false;
+            ButtonL = false;
+            ButtonR = false;
+            ButtonZL = false;
+            ButtonZR = false;
+            ButtonStart = false;
+            ButtonSelect = false;
+        }
     }
 }
