@@ -52,6 +52,26 @@ namespace TASMod
             return info;
         }
 
+        public static V GetStaticValue<T, V>(string field, BindingFlags flags = HiddenFlags)
+        {
+            FieldInfo info = typeof(T).GetField(field, flags);
+            if (info != null)
+            {
+                V value = (V)info.GetValue(null);
+                return value;
+            }
+            else
+            {
+                PropertyInfo pinfo = typeof(T).GetProperty(field, flags);
+                if (pinfo != null)
+                {
+                    V value = (V)pinfo.GetValue(null, null);
+                    return value;
+                }
+            }
+            return default(V);
+        }
+
 
         public static V GetValue<T, V>(T obj, string field, BindingFlags flags = HiddenFlags)
         {

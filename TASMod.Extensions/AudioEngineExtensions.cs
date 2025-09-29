@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using StardewValley;
 using StardewValley.BellsAndWhistles;
@@ -17,6 +18,18 @@ namespace TASMod.Extensions
                 cues[i].Stop(AudioStopOptions.Immediate);
             }
         }
+
+        public static void AmbientLocationSoundsClear()
+        {
+            Reflector.GetStaticValue<AmbientLocationSounds, Dictionary<Vector2, int>>("sounds")?.Clear();
+            Reflector.GetStaticValue<AmbientLocationSounds, ICue>("cricket")?.Stop(AudioStopOptions.Immediate);
+            Reflector.GetStaticValue<AmbientLocationSounds, ICue>("engine")?.Stop(AudioStopOptions.Immediate);
+            Reflector.GetStaticValue<AmbientLocationSounds, ICue>("waterfall")?.Stop(AudioStopOptions.Immediate);
+            Reflector.GetStaticValue<AmbientLocationSounds, ICue>("waterfallBig")?.Stop(AudioStopOptions.Immediate);
+            Reflector.GetStaticValue<AmbientLocationSounds, ICue>("babblingBrook")?.Stop(AudioStopOptions.Immediate);
+            Reflector.GetStaticValue<AmbientLocationSounds, ICue>("cracklingFire")?.Stop(AudioStopOptions.Immediate);
+        }
+
         public static void Reset(this AudioEngine engine)
         {
             if (Game1.currentSong != null)
@@ -29,7 +42,8 @@ namespace TASMod.Extensions
                 (Dictionary<MusicContext, KeyValuePair<string, bool>>)
                     Reflector.GetValue(Game1.game1, "_instanceRequestedMusicTracks");
             dict.Clear();
-            AmbientLocationSounds.onLocationLeave();
+
+            AmbientLocationSoundsClear();
             Utility.killAllStaticLoopingSoundCues();
 
             // Reflector.GetValue(engine, "_activeCues");

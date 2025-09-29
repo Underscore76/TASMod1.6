@@ -12,6 +12,11 @@ using TASMod.Views;
 
 namespace TASMod.Patches
 {
+    public static class GameRunnerState
+    {
+        public static int InstanceIndex = 0;
+    }
+
     public class GameRunner_Draw : IPatch
     {
         public override string Name => "GameRunner.Draw";
@@ -48,12 +53,15 @@ namespace TASMod.Patches
 
         public static void Postfix(ref GameTime gameTime)
         {
+            // TODO: instead of loading instance before the draw calls, probably want to swap how Controller.Draw/DrawLate work
+            // so that the correct instance(s) are loaded when needed
             if (CanDraw)
             {
                 Counter++;
                 TASDateTime.Update();
                 // NOTE: Allows for each frame to get new rng values to match Interop.GetRandomBytes
                 RandomExtensions.Update();
+                GameRunner.LoadInstance(GameRunner.instance.gameInstances[GameRunnerState.InstanceIndex]);
                 Controller.Draw();
             }
             else
@@ -62,6 +70,7 @@ namespace TASMod.Patches
                 {
                     case TASView.Base:
                         RedrawFrame(gameTime);
+                        GameRunner.LoadInstance(GameRunner.instance.gameInstances[GameRunnerState.InstanceIndex]);
                         Controller.Draw();
                         break;
                     default:
@@ -69,8 +78,11 @@ namespace TASMod.Patches
                         break;
                 }
             }
+            GameRunner.LoadInstance(GameRunner.instance.gameInstances[GameRunnerState.InstanceIndex]);
             Controller.DrawLate();
             CanDraw = false;
+            // roll to the correct instance for probing in lua
+            GameRunner.LoadInstance(GameRunner.instance.gameInstances[GameRunnerState.InstanceIndex]);
         }
 
         public static void RedrawFrame(GameTime gameTime)

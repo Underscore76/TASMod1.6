@@ -17,8 +17,6 @@ namespace TASMod.Extensions
         public static void Reset(this GameRunner runner)
         {
             Controller.ViewController.Reset();
-            var input = Game1.input;
-
 
             ModEntry.Console.Log("Reseting the GameRunner", LogLevel.Trace);
             if (Game1.content != null)
