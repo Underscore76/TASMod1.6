@@ -1,6 +1,9 @@
 using HarmonyLib;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using StardewValley;
 using TASMod.Inputs;
+using TASMod.System;
 
 namespace TASMod.Patches
 {

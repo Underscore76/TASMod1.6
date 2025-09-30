@@ -70,10 +70,9 @@ namespace TASMod.Patches
 
         public static void Postfix(ref GamePadState __result)
         {
-            if (!TASInputState.Active)
+            if (TASInputState.Active && Game1.playerOneIndex != (PlayerIndex)(-1))
             {
-                // Trace($"{TASDateTime.CurrentFrame} Getting gamepad state for {Game1.playerOneIndex}");
-                __result = default;
+                __result = TASInputState.GetGamePadState(Game1.playerOneIndex);
             }
         }
     }

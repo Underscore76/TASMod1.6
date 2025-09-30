@@ -150,7 +150,7 @@ namespace TASMod.Patches
         public override void Patch(Harmony harmony)
         {
             harmony.Patch(
-                original: AccessTools.PropertyGetter(typeof(Game1), "IsActiveNoOverlay"),
+                original: AccessTools.Property(typeof(Game1), "IsActiveNoOverlay").GetMethod,
                 postfix: new HarmonyMethod(this.GetType(), nameof(this.Postfix))
             );
         }

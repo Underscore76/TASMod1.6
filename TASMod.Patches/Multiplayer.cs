@@ -25,7 +25,6 @@ namespace TASMod.Patches
 
         public static bool Prefix()
         {
-            Warn("Multiplayer.StartLocalMultiplayerServer: No SHOT this doesn't get inlined");
             return false;
         }
 
@@ -53,7 +52,6 @@ namespace TASMod.Patches
 
         public static bool Prefix(ref Client client)
         {
-            Warn($"FarmhandMenu.Constructor: No SHOT this doesn't get inlined {client}");
             client = new SLidgrenClient();
             return true;
         }
