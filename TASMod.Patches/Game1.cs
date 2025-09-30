@@ -1,4 +1,7 @@
 using System;
+using System.Collections.Generic;
+using System.Reflection;
+using System.Reflection.Emit;
 using HarmonyLib;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -176,7 +179,6 @@ namespace TASMod.Patches
 
         public static bool Prefix(Game1 __instance, ref int w, ref int h)
         {
-            // Trace($"Game1.SetWindowSize {TASDateTime.CurrentFrame} {Game1.graphics.IsFullScreen}");
             bool windowed = ModEntry.Config.Windowed;
             Game1.graphics.IsFullScreen = !windowed;
             w = ModEntry.Config.ScreenWidth;
@@ -189,84 +191,64 @@ namespace TASMod.Patches
             Game1.graphics.PreferredBackBufferWidth = w;
             Game1.graphics.PreferredBackBufferHeight = h;
             Game1.graphics.SynchronizeWithVerticalRetrace = true;
-            // Trace($"Prefix:viewport {Game1.viewport}");
-            // Trace(
-            //     $"Prefix:ClientBounds {__instance.Window.ClientBounds} DisplayBounds: {__instance.Window.GetDisplayBounds(0)}"
-            // );
-            // Trace(
-            //     $"Prefix:graphics {Game1.graphics.PreferredBackBufferWidth}x{Game1.graphics.PreferredBackBufferHeight} ({Game1.graphics.GraphicsProfile})"
-            // );
-            // Trace($"Prefix:screen {Game1.game1.screen.Bounds}");
             return true;
         }
 
         public static void Postfix(ref Game1 __instance)
         {
-            // Trace($"Postfix:viewport {Game1.viewport}");
-            // Trace(
-            //     $"Postfix:ClientBounds {__instance.Window.ClientBounds} DisplayBounds: {__instance.Window.GetDisplayBounds(0)}"
-            // );
-            // Trace(
-            //     $"Postfix:graphics {Game1.graphics.PreferredBackBufferWidth}x{Game1.graphics.PreferredBackBufferHeight} ({Game1.graphics.GraphicsProfile})"
-            // );
-            // Trace($"Postfix:screen {Game1.game1.screen.Bounds}");
         }
     }
 
-    public class Game1_CheckGamepadMode : IPatch
+    // see SMAPI_Score.cs: effectively need to patch out the IsActive check
+    public class Game1__update : IPatch
     {
-        public override string Name => "Game1.CheckGamepadMode";
+        public override string Name => "Game1._update";
 
         public override void Patch(Harmony harmony)
         {
             harmony.Patch(
-                original: AccessTools.Method(typeof(Game1), "CheckGamepadMode"),
-                prefix: new HarmonyMethod(this.GetType(), nameof(this.Prefix)),
-                postfix: new HarmonyMethod(this.GetType(), nameof(this.Postfix))
+                original: AccessTools.Method(
+                    typeof(Game1), "_update"
+                ),
+                transpiler: new HarmonyMethod(this.GetType(), nameof(this.Transpiler))
             );
         }
 
-        public static bool Prefix()
+        public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instr)
         {
-            bool _oldGamepadConnectedState = (bool)
-                Reflector.GetValue(Game1.game1, "_oldGamepadConnectedState");
-            GamePadState gamePadState = Game1.input.GetGamePadState();
-            bool flag2 =
-                Game1.isAnyGamePadButtonBeingPressed()
-                || Game1.isDPadPressed()
-                || Game1.isGamePadThumbstickInMotion()
-                || gamePadState.Triggers.Left != 0f
-                || gamePadState.Triggers.Right != 0f;
-            // Warn($"PRE: Game1.CheckGamepadMode");
-            // Warn($"   gamepadControls            {Game1.options.gamepadControls}");
-            // Warn($"   gamepadMode                {Game1.options.gamepadMode}");
-            // Warn($"   _oldGamepadConnectedState  {_oldGamepadConnectedState}");
-            // Warn($"   flag2                      {flag2}");
-            // Warn(
-            //     $"   connect diff               {_oldGamepadConnectedState} {gamePadState.IsConnected} {gamePadState.IsConnected != _oldGamepadConnectedState}"
-            // );
-            return true;
-        }
+            /*
+ ldarg.0 NULL => this
+ call System.Boolean StardewValley.InstanceGame::get_IsActive() => this.IsActive
+ brfalse Label104 => if (!this.IsActive) jump to Label104
+            */
+            List<CodeInstruction> instructions = new List<CodeInstruction>(instr);
+            List<Label> labels = null;
+            for (int i = 0; i < instructions.Count - 3; i++)
+            {
+                if (
+                    instructions[i].opcode == OpCodes.Ldarg_0
+                    && (
+                        instructions[i + 1].opcode == OpCodes.Call
+                        && instructions[i + 1].operand is MethodInfo mi
+                        && mi.Name == "get_IsActive"
+                        && mi.DeclaringType.FullName == "StardewValley.InstanceGame"
+                    )
 
-        public static void Postfix()
-        {
-            bool _oldGamepadConnectedState = (bool)
-                Reflector.GetValue(Game1.game1, "_oldGamepadConnectedState");
-            GamePadState gamePadState = Game1.input.GetGamePadState();
-            bool flag2 =
-                Game1.isAnyGamePadButtonBeingPressed()
-                || Game1.isDPadPressed()
-                || Game1.isGamePadThumbstickInMotion()
-                || gamePadState.Triggers.Left != 0f
-                || gamePadState.Triggers.Right != 0f;
-            // Warn($"POST: Game1.CheckGamepadMode");
-            // Warn($"   gamepadControls            {Game1.options.gamepadControls}");
-            // Warn($"   gamepadMode                {Game1.options.gamepadMode}");
-            // Warn($"   _oldGamepadConnectedState  {_oldGamepadConnectedState}");
-            // Warn($"   flag2                      {flag2}");
-            // Warn(
-            //     $"   connect diff               {_oldGamepadConnectedState} {gamePadState.IsConnected} {gamePadState.IsConnected != _oldGamepadConnectedState}"
-            // );
+                )
+                {
+                    labels = instructions[i].labels;
+                    instructions.RemoveRange(i, 3);
+                }
+                if (labels != null)
+                {
+                    instructions[i].labels.AddRange(labels);
+                    labels = null;
+                }
+            }
+            foreach (var i in instructions)
+            {
+                yield return i;
+            }
         }
     }
 }
