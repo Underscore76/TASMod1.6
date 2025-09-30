@@ -43,7 +43,7 @@ namespace TASMod.Patches
                 Game1.forceSnapOnNextViewportUpdate = true;
             }
             __instance.zoomButtons = true;
-            __instance.pauseWhenOutOfFocus = true;
+            __instance.pauseWhenOutOfFocus = false;
             __instance.screenFlash = true;
             __instance.snowTransparency = 1f;
             __instance.invertScrollDirection = false;

@@ -569,5 +569,24 @@ namespace TASMod.Scripting
         {
             Process.GetCurrentProcess().Kill();
         }
+
+        public object InspectStaticVars(int index, string key)
+        {
+            try
+            {
+                var obj = GameRunner.instance.gameInstances[index].staticVarHolder;
+                return Reflector.GetValue(obj, key);
+            }
+            catch (Exception)
+            {
+                Console.PushResult($"failed to get static var {index}:{key}");
+                return null;
+            }
+        }
+
+        public void LoadGameByIndex(int index)
+        {
+            GameRunner.LoadInstance(GameRunner.instance.gameInstances[index], true);
+        }
     }
 }

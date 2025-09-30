@@ -23,6 +23,7 @@ using TASMod.Recording;
 using TASMod.Scripting;
 using TASMod.System;
 using TASMod.Views;
+using TASMod.Networking;
 
 namespace TASMod
 {
@@ -237,6 +238,7 @@ namespace TASMod
             TASDateTime.Reset();
             RandomExtensions.Reset();
             TextBoxInput.Reset();
+            NetworkState.Shutdown();
             State.ReRecords++;
             // IsPaused = false;
         }

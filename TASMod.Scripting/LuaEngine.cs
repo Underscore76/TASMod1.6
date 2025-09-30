@@ -52,6 +52,7 @@ namespace TASMod.Scripting
             LuaState.DoString("import ('TASMod.Patches')");
             LuaState.DoString("import ('TASMod.System')");
             LuaState.DoString("import ('TASMod.Minigames')");
+            LuaState.DoString("import ('TASMod.Networking')");
             LuaState.DoString("import ('TASMod.Simulators')");
             LuaState.DoString("import ('TASMod.Views')");
             LuaState.DoString("import ('TASMod.Scripting')");

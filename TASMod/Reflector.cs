@@ -13,7 +13,7 @@ namespace TASMod
         public static Dictionary<string, PropertyInfo> PropertyInfos = new Dictionary<string, PropertyInfo>();
         public static Dictionary<string, MethodInfo> MethodInfos = new Dictionary<string, MethodInfo>();
         public static Dictionary<string, List<string>> FieldsInTypeInfos = new Dictionary<string, List<string>>();
-
+        public static Dictionary<string, Type> RemoteAssemblyTypes = new Dictionary<string, Type>();
         public const BindingFlags AllFlags = (BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static);
         public const BindingFlags HiddenFlags = (BindingFlags.NonPublic | BindingFlags.Instance);
 
@@ -50,6 +50,26 @@ namespace TASMod
             MethodInfo info = type.GetType().GetMethod(field, flags);
             MethodInfos.Add(key, info);
             return info;
+        }
+
+        public static V GetStaticValue<T, V>(string field, BindingFlags flags = HiddenFlags)
+        {
+            FieldInfo info = typeof(T).GetField(field, flags);
+            if (info != null)
+            {
+                V value = (V)info.GetValue(null);
+                return value;
+            }
+            else
+            {
+                PropertyInfo pinfo = typeof(T).GetProperty(field, flags);
+                if (pinfo != null)
+                {
+                    V value = (V)pinfo.GetValue(null, null);
+                    return value;
+                }
+            }
+            return default(V);
         }
 
 
@@ -158,14 +178,27 @@ namespace TASMod
         {
             return assembly.GetTypes().ToArray();
         }
-
+        public static Type GetTypeInAnyAssembly(string fullname)
+        {
+            if (RemoteAssemblyTypes.ContainsKey(fullname))
+            {
+                return RemoteAssemblyTypes[fullname];
+            }
+            Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
+            foreach (var assembly in assemblies)
+            {
+                var t = GetTypeInAssembly(assembly, fullname);
+                if (t != null)
+                {
+                    RemoteAssemblyTypes.Add(fullname, t);
+                    return t;
+                }
+            }
+            return null;
+        }
         public static Type GetTypeInAssembly(Assembly assembly, string fullname)
         {
             var matches = assembly.GetTypes().Where(t => t.FullName == fullname);
-            foreach (var v in AllTypesInAssembly(assembly))
-            {
-                ModEntry.Console.Log($"{v.FullName}");
-            }
             foreach (var t in matches)
             {
                 return t;

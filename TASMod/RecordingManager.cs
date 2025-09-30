@@ -58,7 +58,7 @@ namespace TASMod
             }
             State
                 .FrameStates[(int)TASDateTime.CurrentFrame - 1]
-                .toStates(out _, out TASMouseState mouse);
+                .toStates(out _, out TASMouseState mouse, out _);
             return mouse;
         }
 
@@ -102,7 +102,7 @@ namespace TASMod
         {
             State
                 .FrameStates[(int)TASDateTime.CurrentFrame]
-                .toStates(out TASInputState.kState, out TASInputState.mState);
+                .toStates(out TASInputState.kState, out TASInputState.mState, out TASInputState.gState);
             TASInputState.Active = true;
             return State.FrameStates[(int)TASDateTime.CurrentFrame];
         }
@@ -110,7 +110,7 @@ namespace TASMod
         public void PushFrame()
         {
             State.FrameStates.Add(
-                new FrameState(TASInputState.GetKeyboard(), TASInputState.GetMouse())
+                new FrameState(TASInputState.kState, TASInputState.mState, TASInputState.gState)
             );
             TASInputState.Active = true;
         }

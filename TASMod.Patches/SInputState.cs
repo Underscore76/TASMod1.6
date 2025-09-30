@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using StardewValley;
 using TASMod.Inputs;
+using TASMod.System;
 
 namespace TASMod.Patches
 {
@@ -23,7 +24,7 @@ namespace TASMod.Patches
 
         public static void Postfix(ref MouseState __result)
         {
-            if (TASInputState.Active)
+            if (TASInputState.Active && (Game1.playerOneIndex == PlayerIndex.One || Game1.playerOneIndex == (PlayerIndex)(-1)))
             {
                 __result = TASInputState.GetMouse();
             }
@@ -46,7 +47,7 @@ namespace TASMod.Patches
 
         public static void Postfix(ref KeyboardState __result)
         {
-            if (TASInputState.Active)
+            if (TASInputState.Active && (Game1.playerOneIndex == PlayerIndex.One || Game1.playerOneIndex == (PlayerIndex)(-1)))
             {
                 __result = TASInputState.GetKeyboard();
             }
@@ -69,9 +70,9 @@ namespace TASMod.Patches
 
         public static void Postfix(ref GamePadState __result)
         {
-            if (TASInputState.Active)
+            if (TASInputState.Active && Game1.playerOneIndex != (PlayerIndex)(-1))
             {
-                __result = TASInputState.GetGamePad((PlayerIndex)Game1.game1.instanceIndex);
+                __result = TASInputState.GetGamePadState(Game1.playerOneIndex);
             }
         }
     }

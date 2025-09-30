@@ -10,6 +10,7 @@ namespace TASMod.Inputs
 
         public static TASMouseState mState = new TASMouseState();
         public static TASKeyboardState kState = new TASKeyboardState();
+        public static int NumControllers = 4;
         public static TASGamePadState[] gState = new TASGamePadState[4]
         {
             new TASGamePadState(),
@@ -35,6 +36,10 @@ namespace TASMod.Inputs
         public static KeyboardState GetKeyboard()
         {
             return kState.GetKeyboardState();
+        }
+        public static TASKeyboardState GetTASKeyboard()
+        {
+            return kState;
         }
 
         public static void AddKey(Keys key)
@@ -71,6 +76,10 @@ namespace TASMod.Inputs
         public static MouseState GetMouse()
         {
             return mState.GetMouseState();
+        }
+        public static TASMouseState GetTASMouse()
+        {
+            return mState;
         }
 
         public static void MoveMouse(int x, int y)
@@ -151,14 +160,49 @@ namespace TASMod.Inputs
             RemoveKeys(rejectedKeys);
         }
 
-        public static GamePadState GetGamePad(PlayerIndex index)
+        public static TASGamePadState[] GetTASGamePadStates()
         {
-            return gState[(int)index].GetGamePadState();
+            TASGamePadState[] states = new TASGamePadState[NumControllers];
+            for (int i = 0; i < NumControllers; i++)
+            {
+                states[i] = new TASGamePadState(gState[i]);
+            }
+            return states;
+        }
+        public static GamePadState[] GetGamePadStates()
+        {
+            GamePadState[] states = new GamePadState[NumControllers];
+            for (int i = 0; i < NumControllers; i++)
+            {
+                states[i] = gState[i].ToGamePadState();
+            }
+            return states;
         }
 
-        public static void AddButton(PlayerIndex index, Buttons button)
+        public static GamePadState GetGamePadState(PlayerIndex index) => GetGamePadState((int)index);
+        public static GamePadState GetGamePadState(int index)
         {
-            gState[(int)index].AddButton(button);
+            if (index < 0 || index >= NumControllers)
+                return new GamePadState();
+            return gState[index].ToGamePadState();
+        }
+
+        public static TASGamePadState GetTASGamePadState(PlayerIndex index) => GetTASGamePadState((int)index);
+        public static TASGamePadState GetTASGamePadState(int index)
+        {
+            return gState[index];
+        }
+
+        public static void SetTASGamePadState(PlayerIndex index, TASGamePadState state) => SetTASGamePadState((int)index, state);
+        public static void SetTASGamePadState(int index, TASGamePadState state)
+        {
+            gState[index] = state;
+        }
+
+        public static void SetGamePadState(PlayerIndex index, GamePadState state) => SetGamePadState((int)index, state);
+        public static void SetGamePadState(int index, GamePadState state)
+        {
+            gState[index] = TASGamePadState.FromGamePadState(state);
         }
     }
 }
