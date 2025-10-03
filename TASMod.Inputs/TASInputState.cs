@@ -190,12 +190,16 @@ namespace TASMod.Inputs
         public static TASGamePadState GetTASGamePadState(PlayerIndex index) => GetTASGamePadState((int)index);
         public static TASGamePadState GetTASGamePadState(int index)
         {
+            if (index < 0 || index >= NumControllers)
+                return new TASGamePadState();
             return gState[index];
         }
 
         public static void SetTASGamePadState(PlayerIndex index, TASGamePadState state) => SetTASGamePadState((int)index, state);
         public static void SetTASGamePadState(int index, TASGamePadState state)
         {
+            if (index < 0 || index >= NumControllers)
+                return;
             gState[index] = state;
         }
 

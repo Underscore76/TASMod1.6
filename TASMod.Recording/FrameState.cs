@@ -221,21 +221,30 @@ namespace TASMod.Recording
             keyboardState = new TASKeyboardState(kstate);
             keyboardState.IntersectWith(ValidKeys);
             mouseState = new TASMouseState(mstate);
-            controllers = new TASGamePadState[4]
+            if (gstates == null)
             {
-                gstates != null && gstates.Length > 0
-                    ? new TASGamePadState(gstates[0])
-                    : new TASGamePadState(),
-                gstates != null && gstates.Length > 1
-                    ? new TASGamePadState(gstates[1])
-                    : new TASGamePadState(),
-                gstates != null && gstates.Length > 2
-                    ? new TASGamePadState(gstates[2])
-                    : new TASGamePadState(),
-                gstates != null && gstates.Length > 3
-                    ? new TASGamePadState(gstates[3])
-                    : new TASGamePadState(),
-            };
+                controllers = new TASGamePadState[4] {
+                    new(),
+                    new(),
+                    new(),
+                    new()
+                };
+            }
+            else
+            {
+                controllers = new TASGamePadState[4];
+                for (int i = 0; i < gstates.Length; i++)
+                {
+                    if (gstates[i] == null)
+                    {
+                        controllers[i] = new TASGamePadState();
+                    }
+                    else
+                    {
+                        controllers[i] = new TASGamePadState(gstates[i]);
+                    }
+                }
+            }
             comments = comm;
             injectText = inject;
         }
@@ -262,7 +271,7 @@ namespace TASMod.Recording
             mstate = new TASMouseState(mouseState);
             gstates = new TASGamePadState[4]
             {
-                new TASGamePadState(controllers[1]),
+                new TASGamePadState(controllers[0]),
                 new TASGamePadState(controllers[1]),
                 new TASGamePadState(controllers[2]),
                 new TASGamePadState(controllers[3]),

@@ -53,6 +53,7 @@ namespace TASMod.Scripting
             LuaState.DoString("import ('TASMod.System')");
             LuaState.DoString("import ('TASMod.Minigames')");
             LuaState.DoString("import ('TASMod.Networking')");
+            LuaState.DoString("import ('TASMod.Recording')");
             LuaState.DoString("import ('TASMod.Simulators')");
             LuaState.DoString("import ('TASMod.Views')");
             LuaState.DoString("import ('TASMod.Scripting')");
@@ -189,6 +190,13 @@ namespace TASMod.Scripting
                 curr += item + " ";
             }
             err += "\n\t" + curr;
+            foreach (var line in innerException.StackTrace.Split("\n"))
+            {
+                // Remove home directory from stack trace lines
+                string homePath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+                string sanitizedLine = line.Replace(homePath, "~");
+                err += "\n\t" + sanitizedLine.Trim();
+            }
             return err;
         }
     }

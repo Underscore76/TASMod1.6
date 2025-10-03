@@ -84,3 +84,8 @@ function save_state_exists(name)
     local items = Controller.Console.Commands['ls']:GetFilePaths(RunCS(string.format('new string[]{"%s.json"}', name)))
     return items.Count == 1
 end
+
+--- dump console output to random file
+function dumpconsole()
+    Controller.Console:WriteToRandomFile()
+end

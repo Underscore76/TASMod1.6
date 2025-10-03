@@ -155,12 +155,14 @@ namespace TASMod.Scripting
                 input,
                 out TASKeyboardState kstate,
                 out TASMouseState mstate,
+                out TASGamePadState[] gstate,
                 out string injectText
             );
             Controller.State.FrameStates.Add(
                 new FrameState(
-                    kstate.GetKeyboardState(),
-                    mstate.GetMouseState(),
+                    kstate,
+                    mstate,
+                    gstate,
                     inject: injectText
                 )
             );
@@ -180,10 +182,43 @@ namespace TASMod.Scripting
             Controller.AcceptRealInput = true;
         }
 
+        public void ClearGamePadInputQueues()
+        {
+            GamePadInputQueue.Clear();
+        }
+
+        public void AddGamePadInput(int index, LuaTable tbl)
+        {
+            if (tbl != null)
+            {
+                var gState = new TASGamePadState
+                {
+                    DPadUp = Convert.ToBoolean(tbl["up"]),
+                    DPadDown = Convert.ToBoolean(tbl["down"]),
+                    DPadLeft = Convert.ToBoolean(tbl["left"]),
+                    DPadRight = Convert.ToBoolean(tbl["right"]),
+                    ButtonStart = Convert.ToBoolean(tbl["start"]),
+                    ButtonSelect = Convert.ToBoolean(tbl["select"]),
+                    ButtonZL = Convert.ToBoolean(tbl["zl"]),
+                    ButtonZR = Convert.ToBoolean(tbl["zr"]),
+                    ButtonA = Convert.ToBoolean(tbl["a"]),
+                    ButtonB = Convert.ToBoolean(tbl["b"]),
+                    ButtonX = Convert.ToBoolean(tbl["x"]),
+                    ButtonY = Convert.ToBoolean(tbl["y"]),
+                    ButtonL = Convert.ToBoolean(tbl["lt"]),
+                    ButtonR = Convert.ToBoolean(tbl["rt"]),
+                    AnalogX = Convert.ToSingle(tbl["rx"]),
+                    AnalogY = Convert.ToSingle(tbl["ry"])
+                };
+                GamePadInputQueue.PushGamePadInput(index, gState);
+            }
+        }
+
         public static void ReadInputStates(
             LuaTable input,
             out TASKeyboardState kstate,
             out TASMouseState mstate,
+            out TASGamePadState[] gstate,
             out string injectText
         )
         {
@@ -221,6 +256,8 @@ namespace TASMod.Scripting
             {
                 mstate = new TASMouseState(Controller.LastFrameMouse(), false, false);
             }
+
+            gstate = GamePadInputQueue.GetNextInputs();
         }
 
         public void ResetGame(int frame)

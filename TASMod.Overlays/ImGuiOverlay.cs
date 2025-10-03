@@ -46,7 +46,7 @@ namespace TASMod.Overlays
 
         public void MultiplayerControllers()
         {
-            for (int i = 0; i < TASInputState.NumControllers - 1; i++)
+            for (int i = 1; i < TASInputState.NumControllers; i++)
             {
                 ImGui.SetNextWindowPos(new ImGuiVector2(10, 10 + (i - 1) * 150), ImGuiCond.FirstUseEver);
                 ImGui.SetNextWindowSize(new ImGuiVector2(300, 140), ImGuiCond.FirstUseEver);

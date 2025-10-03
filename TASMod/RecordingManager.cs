@@ -13,6 +13,7 @@ namespace TASMod
     {
         public bool Active { get; set; } = true;
         public SaveState State { get; set; } = new SaveState();
+        public bool TrackRandom = false;
 
         public bool HasUpdate()
         {
@@ -30,10 +31,10 @@ namespace TASMod
             if (HandleStoredInput())
             {
                 FrameState state = PullFrame();
-                if (
+                if (TrackRandom && (
                     Game1.random.get_Index() != state.randomState.index
                     || Game1.random.get_Seed() != state.randomState.seed
-                )
+                ))
                 {
                     ModEntry.Console.Log(
                         string.Format(

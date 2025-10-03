@@ -117,6 +117,10 @@ namespace TASMod
             {
                 TASInputState.SetKeyboard(RealKeyboard);
                 TASInputState.SetMouse(RealMouse);
+                for (int i = 0; i < 4; i++)
+                {
+                    TASInputState.SetTASGamePadState(i, GamePadInputQueue.GetNextInput(i));
+                }
                 Recording.PushFrame();
                 return true;
             }
