@@ -15,6 +15,7 @@ using StardewValley.Minigames;
 using StardewValley.Objects;
 using ImGuiVector2 = System.Numerics.Vector2;
 using TASMod.Overlays.Widgets;
+using TASMod.Recording;
 
 namespace TASMod.Overlays
 {
@@ -56,6 +57,93 @@ namespace TASMod.Overlays
                 if (ImGui.Begin($"Controller {i}", ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.AlwaysAutoResize))
                 {
                     TASGamePadState con = TASInputState.GetTASGamePadState(i);
+                    bool hasInput = GamePadInputQueue.HasInput(i);
+
+                    // Input status display with inline clear button
+                    if (hasInput)
+                    {
+                        ImGui.TextColored(new Num.Vector4(0, 1, 0, 1), "✓ Has Queued Input");
+                    }
+                    else
+                    {
+                        ImGui.TextColored(new Num.Vector4(0.6f, 0.6f, 0.6f, 1), "○ No Queued Input");
+                    }
+                    ImGui.SameLine();
+                    if (!hasInput) ImGui.BeginDisabled();
+                    if (ImGui.Button("Clear##input"))
+                    {
+                        GamePadInputQueue.ClearQueue(i);
+                    }
+                    if (!hasInput) ImGui.EndDisabled();
+
+                    // Frame function status display with inline clear button
+                    bool hasFrameFunction = GamePadInputQueue.HasFrameFunction(i);
+
+                    if (hasFrameFunction)
+                    {
+                        ImGui.TextColored(new Num.Vector4(0, 1, 0, 1), "✓ Has Frame Function");
+                    }
+                    else
+                    {
+                        ImGui.TextColored(new Num.Vector4(0.6f, 0.6f, 0.6f, 1), "○ No Frame Function");
+                    }
+                    ImGui.SameLine();
+                    if (!hasFrameFunction) ImGui.BeginDisabled();
+                    if (ImGui.Button("Clear##function"))
+                    {
+                        GamePadInputQueue.ClearFrameFunction(i);
+                    }
+                    if (!hasFrameFunction) ImGui.EndDisabled();
+
+                    if (hasFrameFunction)
+                    {
+                        FrameFunction frameFunc = GamePadInputQueue.GetFrameFunction(i);
+                        ImGui.Text($"Name: {frameFunc?.name}");
+                        if (ImGui.IsItemHovered())
+                        {
+                            string description = frameFunc?.description;
+                            if (!string.IsNullOrEmpty(description))
+                            {
+                                ImGui.SetTooltip(description);
+                            }
+                        }
+                    }
+
+                    ImGui.Separator();
+
+                    // Function assignment section
+                    if (ImGui.CollapsingHeader("Assign Function"))
+                    {
+                        var namedFunctions = GamePadInputQueue.NamedFunctions;
+                        if (namedFunctions.Count > 0)
+                        {
+                            ImGui.Text("Available Functions:");
+                            foreach (var kvp in namedFunctions)
+                            {
+                                string functionName = kvp.Key;
+                                var frameFunction = kvp.Value;
+
+                                if (ImGui.Button($"Assign '{functionName}'"))
+                                {
+                                    GamePadInputQueue.SetFrameFunction(i, functionName);
+                                }
+
+                                // Show description as tooltip
+                                if (ImGui.IsItemHovered() && !string.IsNullOrEmpty(frameFunction.description))
+                                {
+                                    ImGui.SetTooltip(frameFunction.description);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            ImGui.TextColored(new Num.Vector4(0.6f, 0.6f, 0.6f, 1), "No named functions available");
+                        }
+                    }
+
+                    ImGui.Separator();
+
+                    // Controller input display
                     ControllerWidget.Draw("Input", ref con);
                     ImGui.End();
                 }

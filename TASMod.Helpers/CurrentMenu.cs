@@ -57,6 +57,27 @@ namespace TASMod.Helpers
         {
             get { return (Game1.activeClickableMenu as DialogueBox).safetyTimer; }
         }
+
+        public static int SelectedResponseIndex
+        {
+            get { return (Game1.activeClickableMenu as DialogueBox).selectedResponse; }
+        }
+        public static string SelectedResponse
+        {
+            get
+            {
+                if (
+                    (Game1.activeClickableMenu as DialogueBox).responses != null
+                    && (Game1.activeClickableMenu as DialogueBox).responses.Length > 0
+                )
+                {
+                    return (Game1.activeClickableMenu as DialogueBox)
+                        .responses[SelectedResponseIndex]
+                        .responseText;
+                }
+                return null;
+            }
+        }
         public static string CurrentString
         {
             get { return (Game1.activeClickableMenu as DialogueBox).getCurrentString(); }
