@@ -41,6 +41,7 @@ namespace TASMod.Overlays.Widgets
             {
                 TextBoxInput.Text = "";
             }
+            PlayerWidget.Draw(index);
             ImGui.End();
             ImGui.PopStyleVar(2);
         }

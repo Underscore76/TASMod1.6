@@ -113,6 +113,7 @@ namespace TASMod.Overlays.Widgets
 
             // Controller input display
             GamePadInputWidget.Draw("Input", ref con);
+            PlayerWidget.Draw(index);
             ImGui.End();
             ImGui.PopStyleVar(2);
         }
