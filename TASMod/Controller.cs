@@ -345,7 +345,6 @@ namespace TASMod
             using (StreamReader file = File.OpenText(filePath))
             {
                 JsonSerializer serializer = new JsonSerializer();
-                // TODO: any safety rails for overwriting current State?
                 state = (EngineState)serializer.Deserialize(file, typeof(EngineState));
             }
             state.UpdateGame();

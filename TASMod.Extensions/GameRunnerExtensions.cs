@@ -65,9 +65,7 @@ namespace TASMod.Extensions
             Game1.game1.instancePlayerOneIndex = PlayerIndex.One;
             Game1.game1.instanceIndex = 0;
 
-            // TODO: force an initialization of the rng. Our Frame 0 RNG isn't the same for some reason
-            // I assume it's cause we are getting a garbo'd random that is unassigned
-            // it's getting the actual game seed time
+            // force a stale random start state for day 1 seeding
             Game1.random = new Random(Controller.State == null ? 0 : Controller.State.Frame0RandomSeed);
             for (int i = 0; i < Controller.State?.Frame0RandomIndex; i++)
                 Game1.random.Next();

@@ -147,7 +147,6 @@ namespace TASMod.Recording
                 using (StreamReader file = File.OpenText(filePath))
                 {
                     JsonSerializer serializer = new JsonSerializer();
-                    // TODO: any safety rails for overwriting current State?
                     state = (SaveState)serializer.Deserialize(file, typeof(SaveState));
                 }
                 state.Prefix = newPrefix;
