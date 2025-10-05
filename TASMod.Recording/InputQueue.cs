@@ -175,6 +175,16 @@ namespace TASMod.Recording
             FrameFunctions[index] = new FrameFunction(name, NamedFunctions[name].function, NamedFunctions[name].description);
         }
 
+        public static void SetManualFrameFunction(int index, string name, LuaFunction func, string description = "")
+        {
+            if (index < 0 || index >= 4)
+            {
+                Controller.Console.PushResult($"Invalid controller index {index}");
+                return;
+            }
+            FrameFunctions[index] = new FrameFunction(name, func, description);
+        }
+
         public static void ClearFrameFunctions()
         {
             for (int i = 0; i < 4; i++)

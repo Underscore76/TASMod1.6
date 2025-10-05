@@ -47,111 +47,10 @@ namespace TASMod.Overlays
 
         public void MultiplayerControllers()
         {
-            for (int i = 1; i < TASInputState.NumControllers; i++)
-            {
-                ImGui.SetNextWindowPos(new ImGuiVector2(10, 10 + (i - 1) * 150), ImGuiCond.FirstUseEver);
-                ImGui.SetNextWindowSize(new ImGuiVector2(300, 140), ImGuiCond.FirstUseEver);
-                ImGui.SetNextWindowBgAlpha(0.9f);
-                ImGui.PushStyleVar(ImGuiStyleVar.WindowRounding, 5.0f);
-                ImGui.PushStyleVar(ImGuiStyleVar.FrameRounding, 3.0f);
-                if (ImGui.Begin($"Controller {i}", ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.AlwaysAutoResize))
-                {
-                    TASGamePadState con = TASInputState.GetTASGamePadState(i);
-                    bool hasInput = GamePadInputQueue.HasInput(i);
 
-                    // Input status display with inline clear button
-                    if (hasInput)
-                    {
-                        ImGui.TextColored(new Num.Vector4(0, 1, 0, 1), "✓ Has Queued Input");
-                    }
-                    else
-                    {
-                        ImGui.TextColored(new Num.Vector4(0.6f, 0.6f, 0.6f, 1), "○ No Queued Input");
-                    }
-                    ImGui.SameLine();
-                    if (!hasInput) ImGui.BeginDisabled();
-                    if (ImGui.Button("Clear##input"))
-                    {
-                        GamePadInputQueue.ClearQueue(i);
-                    }
-                    if (!hasInput) ImGui.EndDisabled();
-
-                    // Frame function status display with inline clear button
-                    bool hasFrameFunction = GamePadInputQueue.HasFrameFunction(i);
-
-                    if (hasFrameFunction)
-                    {
-                        ImGui.TextColored(new Num.Vector4(0, 1, 0, 1), "✓ Has Frame Function");
-                    }
-                    else
-                    {
-                        ImGui.TextColored(new Num.Vector4(0.6f, 0.6f, 0.6f, 1), "○ No Frame Function");
-                    }
-                    ImGui.SameLine();
-                    if (!hasFrameFunction) ImGui.BeginDisabled();
-                    if (ImGui.Button("Clear##function"))
-                    {
-                        GamePadInputQueue.ClearFrameFunction(i);
-                    }
-                    if (!hasFrameFunction) ImGui.EndDisabled();
-
-                    if (hasFrameFunction)
-                    {
-                        FrameFunction frameFunc = GamePadInputQueue.GetFrameFunction(i);
-                        ImGui.Text($"Name: {frameFunc?.name}");
-                        if (ImGui.IsItemHovered())
-                        {
-                            string description = frameFunc?.description;
-                            if (!string.IsNullOrEmpty(description))
-                            {
-                                ImGui.SetTooltip(description);
-                            }
-                        }
-                    }
-
-                    ImGui.Separator();
-
-                    // Function assignment section
-                    if (ImGui.CollapsingHeader("Assign Function"))
-                    {
-                        var namedFunctions = GamePadInputQueue.NamedFunctions;
-                        if (namedFunctions.Count > 0)
-                        {
-                            ImGui.Text("Available Functions:");
-                            foreach (var kvp in namedFunctions)
-                            {
-                                string functionName = kvp.Key;
-                                var frameFunction = kvp.Value;
-
-                                if (ImGui.Button($"Assign '{functionName}'"))
-                                {
-                                    GamePadInputQueue.SetFrameFunction(i, functionName);
-                                }
-
-                                // Show description as tooltip
-                                if (ImGui.IsItemHovered() && !string.IsNullOrEmpty(frameFunction.description))
-                                {
-                                    ImGui.SetTooltip(frameFunction.description);
-                                }
-                            }
-                        }
-                        else
-                        {
-                            ImGui.TextColored(new Num.Vector4(0.6f, 0.6f, 0.6f, 1), "No named functions available");
-                        }
-                    }
-
-                    ImGui.Separator();
-
-                    // Controller input display
-                    ControllerWidget.Draw("Input", ref con);
-                    ImGui.End();
-                }
-                ImGui.PopStyleVar(2);
-            }
         }
 
-        public void BuildLayout()
+        public void EngineLayout()
         {
             ImGui.Begin("Engine");
             if (ImGui.CollapsingHeader("Config"))
@@ -243,11 +142,16 @@ namespace TASMod.Overlays
         public override void ActiveDraw(SpriteBatch spriteBatch)
         {
             GuiRenderer.BeforeLayout(TASDateTime.CurrentGameTime);
-            BuildLayout();
+            EngineLayout();
+
             if (ShowControllers)
             {
-                MultiplayerControllers();
+                for (int i = 1; i < TASInputState.NumControllers; i++)
+                {
+                    ControllerWidget.Draw(i);
+                }
             }
+
             // ImGui.ShowDemoWindow();
             if (imguiTarget == null || imguiTarget.Width != Game1.graphics.PreferredBackBufferWidth || imguiTarget.Height != Game1.graphics.PreferredBackBufferHeight)
             {
