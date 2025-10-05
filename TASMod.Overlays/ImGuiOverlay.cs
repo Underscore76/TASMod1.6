@@ -7,15 +7,8 @@ using StardewValley;
 using TASMod.System;
 using TASMod.Extensions;
 using TASMod.Inputs;
-using TASMod.Console;
-using System;
-using System.Diagnostics;
-using System.Runtime.CompilerServices;
-using StardewValley.Minigames;
 using StardewValley.Objects;
-using ImGuiVector2 = System.Numerics.Vector2;
 using TASMod.Overlays.Widgets;
-using TASMod.Recording;
 using TASMod.Patches;
 
 namespace TASMod.Overlays
@@ -56,6 +49,9 @@ namespace TASMod.Overlays
                     ImGui.SetWindowFontScale(FontScale);
                 }
             }
+
+            FileSelection.Draw();
+
             if (ImGui.CollapsingHeader("Overlays"))
             {
                 foreach (var overlay in OverlayManager.Overlays.Values)
@@ -64,6 +60,7 @@ namespace TASMod.Overlays
                     ImGui.Checkbox(overlay.Name, ref overlay.Active);
                 }
             }
+
             if (ImGui.CollapsingHeader("Logic"))
             {
                 foreach (var logic in AutomationManager.Automation.Values)
@@ -71,12 +68,14 @@ namespace TASMod.Overlays
                     ImGui.Checkbox(logic.Name, ref logic.Active);
                 }
             }
+
             if (ImGui.CollapsingHeader("Multiplayer"))
             {
                 ImGui.Checkbox("Show Controllers", ref ShowControllers);
                 ImGui.SliderInt("Total Players", ref TASInputState.NumControllers, 2, 4);
                 ImGui.SliderInt("Active Instance", ref GameRunnerState.InstanceIndex, 0, GameRunner.instance.gameInstances.Count - 1);
             }
+
             if (ImGui.CollapsingHeader("State Info"))
             {
                 ImGui.Text($"State Name: {Controller.State.Prefix}");

@@ -35,17 +35,18 @@ namespace TASMod.Patches
             __instance.dialogueTyping = true;
             __instance.rumble = true;
             __instance.fullscreen = false;
-            __instance.pinToolbarToggle = false;
+            __instance.pinToolbarToggle = true;
             __instance.baseZoomLevel = 1f;
             __instance.localCoopBaseZoomLevel = 1f;
+            __instance.localCoopDesiredUIScale = 1.25f;
             if (Game1.options == __instance)
             {
                 Game1.forceSnapOnNextViewportUpdate = true;
             }
             __instance.zoomButtons = true;
             __instance.pauseWhenOutOfFocus = false;
-            __instance.screenFlash = true;
-            __instance.snowTransparency = 1f;
+            __instance.screenFlash = false;
+            __instance.snowTransparency = 0f;
             __instance.invertScrollDirection = false;
             __instance.ambientOnlyToggle = false;
             __instance.showAdvancedCraftingInformation = true;
