@@ -16,6 +16,29 @@ namespace TASMod.Patches
     public static class GameRunnerState
     {
         public static int InstanceIndex = 0;
+        public static int StashedIndex = -1;
+        public static void Stash(int index)
+        {
+            if (StashedIndex != -1)
+            {
+                Controller.Console.PushResult("Already have a stashed index!");
+                return;
+            }
+            StashedIndex = InstanceIndex;
+            InstanceIndex = index;
+            TryLoad();
+        }
+        public static void Pop()
+        {
+            if (StashedIndex == -1)
+            {
+                Controller.Console.PushResult("Already have a stashed index!");
+                return;
+            }
+            InstanceIndex = StashedIndex;
+            StashedIndex = -1;
+            TryLoad();
+        }
 
         public static void TryLoad()
         {

@@ -30,11 +30,11 @@ namespace TASMod.Overlays.Widgets
             // Input status display with inline clear button
             if (hasInput)
             {
-                ImGui.TextColored(new ImGuiVector4(0, 1, 0, 1), "✓ Has Queued Input");
+                ImGui.TextColored(new ImGuiVector4(0, 1, 0, 1), "+ Has Queued Input");
             }
             else
             {
-                ImGui.TextColored(new ImGuiVector4(0.6f, 0.6f, 0.6f, 1), "○ No Queued Input");
+                ImGui.TextColored(new ImGuiVector4(0.6f, 0.6f, 0.6f, 1), "o No Queued Input");
             }
             ImGui.SameLine();
             if (!hasInput) ImGui.BeginDisabled();
@@ -49,11 +49,11 @@ namespace TASMod.Overlays.Widgets
 
             if (hasFrameFunction)
             {
-                ImGui.TextColored(new ImGuiVector4(0, 1, 0, 1), "✓ Has Frame Function");
+                ImGui.TextColored(new ImGuiVector4(0, 1, 0, 1), "+ Has Frame Function");
             }
             else
             {
-                ImGui.TextColored(new ImGuiVector4(0.6f, 0.6f, 0.6f, 1), "○ No Frame Function");
+                ImGui.TextColored(new ImGuiVector4(0.6f, 0.6f, 0.6f, 1), "o No Frame Function");
             }
             ImGui.SameLine();
             if (!hasFrameFunction) ImGui.BeginDisabled();

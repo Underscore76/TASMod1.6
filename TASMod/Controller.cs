@@ -106,22 +106,43 @@ namespace TASMod
                 return true;
             }
 
-            // check if there is automation data to process
-            if (Automation.Update())
+            // if sp then just update if the automation has something to do
+            if (NetworkState.NumConnections == 0)
             {
-                Recording.PushFrame();
+                if (Automation.Update())
+                {
+                    Recording.PushMultiplayerFrame();
+                    return true;
+                }
+                if (HandleRealInput())
+                {
+                    TASInputState.SetKeyboard(RealKeyboard);
+                    TASInputState.SetMouse(RealMouse);
+                    Recording.PushMultiplayerFrame();
+                    return true;
+                }
+                return false;
+            }
+
+            // multiplayer - check if gamepad input AND automation have something to do
+            if (Automation.HasUpdate())
+            {
+                Automation.Update();
+                Recording.PushMultiplayerFrame();
                 return true;
             }
 
+            // forced update by player, run the automation if it exists
+            // (in case we're just not worrying about gamepad)
             if (HandleRealInput())
             {
-                TASInputState.SetKeyboard(RealKeyboard);
-                TASInputState.SetMouse(RealMouse);
-                for (int i = 0; i < 4; i++)
+                Automation.Update();
+                if (AutomationManager.AppliedLogic == null)
                 {
-                    TASInputState.SetTASGamePadState(i, GamePadInputQueue.GetNextInput(i));
+                    TASInputState.SetKeyboard(RealKeyboard);
+                    TASInputState.SetMouse(RealMouse);
                 }
-                Recording.PushFrame();
+                Recording.PushMultiplayerFrame();
                 return true;
             }
 

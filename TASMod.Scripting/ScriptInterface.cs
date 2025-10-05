@@ -17,6 +17,7 @@ using TASMod.Extensions;
 using TASMod.Helpers;
 using TASMod.Inputs;
 using TASMod.Minigames;
+using TASMod.Networking;
 using TASMod.Recording;
 using TASMod.Simulators;
 using TASMod.Simulators.SkullCaverns;
@@ -120,7 +121,7 @@ namespace TASMod.Scripting
         public bool HasStep
 #pragma warning restore CA1822 // Mark members as static
         {
-            get { return TASInputState.Active; }
+            get { return Controller.HasUpdate(); }
         }
 
         public void WaitPrefix()

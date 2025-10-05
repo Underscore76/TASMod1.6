@@ -21,6 +21,16 @@ namespace TASMod.Overlays.Widgets
             {
                 GameRunnerState.InstanceIndex = index;
             }
+
+            if (AutomationManager.AppliedLogic != null)
+            {
+                ImGui.TextColored(new ImGuiVector4(0, 1, 0, 1), $"+ Queued: {AutomationManager.AppliedLogic}");
+            }
+            else
+            {
+                ImGui.TextColored(new ImGuiVector4(0.6f, 0.6f, 0.6f, 1), "o No Queued Input");
+            }
+
             ImGui.SeparatorText("Last Frame Input");
             if (Controller.State.FrameStates.Count > 0)
             {

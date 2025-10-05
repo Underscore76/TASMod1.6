@@ -4,6 +4,10 @@ using System.Collections.Generic;
 using System.Reflection;
 using TASMod.Automation;
 using TASMod.Inputs;
+using TASMod.Networking;
+using TASMod.Patches;
+using TASMod.Recording;
+using TASMod.System;
 
 namespace TASMod
 {
@@ -15,6 +19,8 @@ namespace TASMod
         public static IEnumerable<string> Names => Automation.Keys;
         public static IEnumerable<IAutomatedLogic> Items => Automation.Values;
         public static IEnumerable<KeyValuePair<string, IAutomatedLogic>> Pairs => Automation;
+        public static string AppliedLogic = null;
+        public static int AppliedFrame = -1;
 
         public static bool ContainsKey(string logicName) => Automation.ContainsKey(logicName);
         public static IAutomatedLogic Get(string logicName)
@@ -75,14 +81,25 @@ namespace TASMod
             {
                 return false;
             }
+            GameRunnerState.Stash(0);
+            bool flag = false;
+            AppliedLogic = null;
             foreach (IAutomatedLogic logic in Automation.Values)
             {
                 if (logic.Update(out _, out _, out _))
                 {
-                    return true;
+                    flag = true;
+                    AppliedLogic = logic.Name;
+                    break;
                 }
             }
-            return false;
+            if (flag)
+            {
+                for (int i = 1; i < NetworkState.NumConnections; i++)
+                    flag &= GamePadInputQueue.HasInput(i) || GamePadInputQueue.HasFrameFunction(i);
+            }
+            GameRunnerState.Pop();
+            return flag;
         }
 
         public bool Update()
@@ -91,6 +108,17 @@ namespace TASMod
             {
                 return false;
             }
+            if ((int)TASDateTime.CurrentFrame == AppliedFrame)
+            {
+                // already applied this frame
+                return AppliedLogic != null;
+            }
+
+            GameRunnerState.Stash(0);
+            bool flag = false;
+            AppliedLogic = null;
+            AppliedFrame = -1;
+
             foreach (IAutomatedLogic logic in Automation.Values)
             {
                 if (logic.Update(out TASKeyboardState keys, out TASMouseState mouse, out _))
@@ -100,10 +128,14 @@ namespace TASMod
 
                     if (mouse != null)
                         TASInputState.SetMouse(mouse);
-                    return true;
+                    flag = true;
+                    AppliedLogic = logic.Name;
+                    AppliedFrame = (int)TASDateTime.CurrentFrame;
+                    break;
                 }
             }
-            return false;
+            GameRunnerState.Pop();
+            return flag;
         }
     }
 }

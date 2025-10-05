@@ -115,5 +115,17 @@ namespace TASMod
             );
             TASInputState.Active = true;
         }
+
+        public void PushMultiplayerFrame()
+        {
+            for (int i = 0; i < 4; i++)
+            {
+                TASInputState.SetTASGamePadState(i, GamePadInputQueue.GetNextInput(i));
+            }
+            State.FrameStates.Add(
+                new FrameState(TASInputState.kState, TASInputState.mState, TASInputState.gState)
+            );
+            TASInputState.Active = true;
+        }
     }
 }
