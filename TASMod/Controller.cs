@@ -130,6 +130,7 @@ namespace TASMod
 
         public static bool Draw()
         {
+            GameRunnerState.TryLoad(); // attempts to load the correct instance for probing state
             bool tmp = TASSpriteBatch.Active;
             TASSpriteBatch.Active = true;
             if (Game1.spriteBatch.inBeginEndPair())

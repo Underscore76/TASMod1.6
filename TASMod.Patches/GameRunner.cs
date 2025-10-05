@@ -90,7 +90,6 @@ namespace TASMod.Patches
                 {
                     case TASView.Base:
                         RedrawFrame(gameTime);
-                        GameRunnerState.TryLoad(); // attempts to load the correct instance for probing state
                         Controller.Draw();
                         break;
                     default:

@@ -16,6 +16,7 @@ using StardewValley.Objects;
 using ImGuiVector2 = System.Numerics.Vector2;
 using TASMod.Overlays.Widgets;
 using TASMod.Recording;
+using TASMod.Patches;
 
 namespace TASMod.Overlays
 {
@@ -43,11 +44,6 @@ namespace TASMod.Overlays
         }
         public override void ActiveUpdate()
         {
-        }
-
-        public void MultiplayerControllers()
-        {
-
         }
 
         public void EngineLayout()
@@ -79,32 +75,13 @@ namespace TASMod.Overlays
             {
                 ImGui.Checkbox("Show Controllers", ref ShowControllers);
                 ImGui.SliderInt("Total Players", ref TASInputState.NumControllers, 2, 4);
+                ImGui.SliderInt("Active Instance", ref GameRunnerState.InstanceIndex, 0, GameRunner.instance.gameInstances.Count - 1);
             }
             if (ImGui.CollapsingHeader("State Info"))
             {
-                if (TextBoxInput.GetSelected() != null)
-                {
-                    // var helper = OverlayManager.Get<TextBoxHelper>();
-                    string text = TextBoxInput.Text;
-                    ImGui.InputTextMultiline("Multiline", ref text, 100000, new Num.Vector2(200, 100));
-                    TextBoxInput.Text = text;
-                }
-                else
-                {
-                    TextBoxInput.Text = "";
-                }
                 ImGui.Text($"State Name: {Controller.State.Prefix}");
                 ImGui.Text($"Frame: {TASDateTime.CurrentFrame}");
                 ImGui.Text($"Player Tile: {Game1.player.Tile.X},{Game1.player.Tile.Y}");
-                ImGui.SeparatorText("Last Frame Input");
-                if (Controller.State.FrameStates.Count > 0)
-                {
-                    ImGui.Text("Left Click: " + Controller.LastFrameMouse().LeftMouseClicked);
-                    ImGui.Text("Right Click: " + Controller.LastFrameMouse().RightMouseClicked);
-                    ImGui.Text($"Mouse Position: {Controller.LastFrameMouse().MouseX},{Controller.LastFrameMouse().MouseY}");
-                    string keys = string.Join(",", Controller.State.FrameStates.Last().keyboardState);
-                    ImGui.Text("Keyboard: " + keys);
-                }
             }
 
             foreach (var overlay in OverlayManager.Items)
@@ -144,11 +121,12 @@ namespace TASMod.Overlays
             GuiRenderer.BeforeLayout(TASDateTime.CurrentGameTime);
             EngineLayout();
 
+            KeyboardMouseWindow.Draw(0);
             if (ShowControllers)
             {
                 for (int i = 1; i < TASInputState.NumControllers; i++)
                 {
-                    ControllerWidget.Draw(i);
+                    ControllerWindow.Draw(i);
                 }
             }
 

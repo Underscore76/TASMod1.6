@@ -102,11 +102,11 @@ namespace TASMod.Overlays
                 double addedCoalChance = ((who != null && who.hasBuff("dwarfStatue_2")) ? 0.03 : 0.0);
                 if (r.NextDouble() < 0.035 * (double)burrowerMultiplier + addedCoalChance && Game1.stats.DaysPlayed > 1)
                 {
-                    items.Add(new("coal"));
+                    items.Add(new("Coal"));
                 }
                 if (r.NextDouble() < 0.01 && Game1.stats.DaysPlayed > 1)
                 {
-                    items.Add(new("stone"));
+                    items.Add(new("Stone"));
                 }
             }
             items.AddRange(breakStone(stoneId, x, y, who, Utility.CreateDaySaveRandom(x * 4000, y)));

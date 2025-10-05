@@ -6,10 +6,11 @@ using TASMod.Recording;
 using TASMod.System;
 using TASMod.Extensions;
 using TASMod.Inputs;
+using TASMod.Patches;
 
 namespace TASMod.Overlays.Widgets
 {
-    public class ControllerWidget
+    public class ControllerWindow
     {
         public static void Draw(int index)
         {
@@ -19,7 +20,10 @@ namespace TASMod.Overlays.Widgets
             ImGui.PushStyleVar(ImGuiStyleVar.WindowRounding, 5.0f);
             ImGui.PushStyleVar(ImGuiStyleVar.FrameRounding, 3.0f);
             ImGui.Begin($"Controller {index}", ImGuiWindowFlags.AlwaysAutoResize);
-
+            if (ImGui.IsWindowFocused())
+            {
+                GameRunnerState.InstanceIndex = index;
+            }
             TASGamePadState con = TASInputState.GetTASGamePadState(index);
             bool hasInput = GamePadInputQueue.HasInput(index);
 
