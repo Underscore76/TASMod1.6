@@ -103,19 +103,7 @@ namespace TASMod.Patches
 
         public static bool Prefix(Random __instance)
         {
-            if (__instance == Game1.random)
-            {
-                if (!RandomExtensions.StackTraces.ContainsKey((int)TASDateTime.CurrentFrame))
-                {
-                    RandomExtensions.StackTraces.Add(
-                        (int)TASDateTime.CurrentFrame,
-                        new List<string>()
-                    );
-                }
-                RandomExtensions
-                    .StackTraces[(int)TASDateTime.CurrentFrame]
-                    .Add(Environment.StackTrace);
-            }
+            RandomExtensions.PushTrace(__instance, (int)TASDateTime.CurrentFrame, Game1.game1.instanceIndex);
             return true;
         }
     }
@@ -135,19 +123,7 @@ namespace TASMod.Patches
 
         public static bool Prefix(Random __instance)
         {
-            if (__instance == Game1.random)
-            {
-                if (!RandomExtensions.StackTraces.ContainsKey((int)TASDateTime.CurrentFrame))
-                {
-                    RandomExtensions.StackTraces.Add(
-                        (int)TASDateTime.CurrentFrame,
-                        new List<string>()
-                    );
-                }
-                RandomExtensions
-                    .StackTraces[(int)TASDateTime.CurrentFrame]
-                    .Add(Environment.StackTrace);
-            }
+            RandomExtensions.PushTrace(__instance, (int)TASDateTime.CurrentFrame, Game1.game1.instanceIndex);
             return true;
         }
 

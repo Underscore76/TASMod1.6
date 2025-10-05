@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using StardewValley;
 
 namespace TASMod.Extensions
 {
@@ -14,7 +15,7 @@ namespace TASMod.Extensions
     {
         public static int SharedSeed = 0;
         public static Random SharedRandom;
-        public static Dictionary<int, List<string>> StackTraces;
+        public static Dictionary<int, Dictionary<int, List<string>>> StackTraces;
 
         public const string ImplName = "_impl";
         public const string Net6_ImplName = "XoshiroImpl";
@@ -92,13 +93,29 @@ namespace TASMod.Extensions
             )!;
 
             SharedRandom = new Random(SharedSeed);
-            StackTraces = new Dictionary<int, List<string>>();
+            StackTraces = new();
         }
 
         public static void Reset()
         {
             SharedRandom = new Random(SharedSeed);
             StackTraces.Clear();
+        }
+
+        public static void PushTrace(Random r, int frame, int playerIndex)
+        {
+            if (r == Game1.random)
+            {
+                if (!StackTraces.ContainsKey(frame))
+                {
+                    StackTraces.Add(frame, new Dictionary<int, List<string>>());
+                }
+                if (!StackTraces[frame].ContainsKey(playerIndex))
+                {
+                    StackTraces[frame].Add(playerIndex, new List<string>());
+                }
+                StackTraces[frame][playerIndex].Add(Environment.StackTrace);
+            }
         }
 
         public static void Update()
