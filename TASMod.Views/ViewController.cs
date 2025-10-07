@@ -1,4 +1,3 @@
-using System;
 using StardewValley;
 
 namespace TASMod.Views
@@ -51,7 +50,9 @@ namespace TASMod.Views
                     // baseView.Exit();
                     break;
                 case TASView.Map:
+                    ActiveInstance.Stash(0);
                     MapView.Exit();
+                    ActiveInstance.Pop();
                     break;
             }
 
@@ -63,7 +64,9 @@ namespace TASMod.Views
                     // baseView.Enter();
                     break;
                 case TASView.Map:
+                    ActiveInstance.Stash(0);
                     MapView.Enter();
+                    ActiveInstance.Pop();
                     break;
             }
         }
@@ -71,7 +74,9 @@ namespace TASMod.Views
         public void ViewLocation(GameLocation location)
         {
             SetView(TASView.Map);
+            ActiveInstance.Stash(0);
             MapView.SetLocation(location);
+            ActiveInstance.Pop();
         }
 
         public void Update()
@@ -79,7 +84,9 @@ namespace TASMod.Views
             switch (CurrentView)
             {
                 case TASView.Map:
+                    ActiveInstance.Stash(0);
                     MapView.Update();
+                    ActiveInstance.Pop();
                     break;
                 default:
                     break;
@@ -91,7 +98,9 @@ namespace TASMod.Views
             switch (CurrentView)
             {
                 case TASView.Map:
+                    ActiveInstance.Stash(0);
                     MapView.Draw();
+                    ActiveInstance.Pop();
                     break;
                 default:
                     break;

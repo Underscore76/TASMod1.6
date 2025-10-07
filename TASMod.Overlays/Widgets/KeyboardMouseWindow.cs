@@ -19,7 +19,7 @@ namespace TASMod.Overlays.Widgets
             ImGui.Begin($"Controller {index}", ImGuiWindowFlags.AlwaysAutoResize);
             if (ImGui.IsWindowFocused())
             {
-                GameRunnerState.InstanceIndex = index;
+                ActiveInstance.InstanceIndex = index;
             }
 
             if (AutomationManager.AppliedLogic != null)

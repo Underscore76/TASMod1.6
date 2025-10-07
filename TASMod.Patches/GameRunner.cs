@@ -13,56 +13,6 @@ using TASMod.Views;
 
 namespace TASMod.Patches
 {
-    public static class GameRunnerState
-    {
-        public static int InstanceIndex = 0;
-        public static int StashedIndex = -1;
-        public static void Stash(int index)
-        {
-            if (StashedIndex != -1)
-            {
-                Controller.Console.PushResult("Already have a stashed index!");
-                return;
-            }
-            StashedIndex = InstanceIndex;
-            InstanceIndex = index;
-            TryLoad();
-        }
-        public static void Pop()
-        {
-            if (StashedIndex == -1)
-            {
-                Controller.Console.PushResult("Already have a stashed index!");
-                return;
-            }
-            InstanceIndex = StashedIndex;
-            StashedIndex = -1;
-            TryLoad();
-        }
-
-        public static void TryLoad()
-        {
-            if (
-                GameRunner.instance != null
-                && GameRunner.instance.gameInstances.Count > GameRunnerState.InstanceIndex
-                && Game1.game1.instanceIndex != GameRunnerState.InstanceIndex
-            )
-            {
-                GameRunner.LoadInstance(GameRunner.instance.gameInstances[GameRunnerState.InstanceIndex]);
-            }
-        }
-
-        public static void LoadLast()
-        {
-            if (
-                GameRunner.instance != null
-                && NetworkState.NumConnections > 0)
-            {
-                GameRunner.LoadInstance(GameRunner.instance.gameInstances[NetworkState.NumConnections]);
-            }
-        }
-    }
-
     public class GameRunner_Draw : IPatch
     {
         public override string Name => "GameRunner.Draw";
@@ -137,7 +87,7 @@ namespace TASMod.Patches
 
             if (LocalMultiplayer.IsLocalMultiplayer())
             {
-                GameRunner.instance.GraphicsDevice.Clear(Color.White);
+                GameRunner.instance.GraphicsDevice.Clear(Game1.bgColor);
                 foreach (Game1 gameInstance in GameRunner.instance.gameInstances)
                 {
                     Game1.isRenderingScreenBuffer = true;
@@ -217,7 +167,7 @@ namespace TASMod.Patches
             }
             if (Controller.FastAdvance)
             {
-                GameRunnerState.LoadLast(); // forces the load state to neutral so an update can fire safely
+                ActiveInstance.LoadLast(); // forces the load state to neutral so an update can fire safely
                 if (Controller.PlaybackFrame == -1 || (int)TASDateTime.CurrentFrame < Controller.PlaybackFrame)
                 {
                     __instance.RunFast();
@@ -239,7 +189,7 @@ namespace TASMod.Patches
             }
             if (CanUpdate)
             {
-                GameRunnerState.LoadLast(); // forces the load state to neutral so an update can fire safely
+                ActiveInstance.LoadLast(); // forces the load state to neutral so an update can fire safely
             }
             return CanUpdate;
         }

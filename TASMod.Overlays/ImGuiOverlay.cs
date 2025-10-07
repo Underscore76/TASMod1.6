@@ -73,7 +73,7 @@ namespace TASMod.Overlays
             {
                 ImGui.Checkbox("Show Controllers", ref ShowControllers);
                 ImGui.SliderInt("Total Players", ref TASInputState.NumControllers, 2, 4);
-                ImGui.SliderInt("Active Instance", ref GameRunnerState.InstanceIndex, 0, GameRunner.instance.gameInstances.Count - 1);
+                ImGui.SliderInt("Active Instance", ref ActiveInstance.InstanceIndex, 0, GameRunner.instance.gameInstances.Count - 1);
             }
 
             if (ImGui.CollapsingHeader("State Info"))

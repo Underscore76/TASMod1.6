@@ -91,15 +91,15 @@ namespace TASMod.Overlays
                 Math.Max((int)(global.Width * Game1.options.zoomLevel), 1),
                 Math.Max((int)(global.Height * Game1.options.zoomLevel), 1)
             );
-            local.Offset(Game1.game1.localMultiplayerWindow.X, Game1.game1.localMultiplayerWindow.Y);
+            local.Offset(ActiveInstance.Window.X, ActiveInstance.Window.Y);
             return local;
         }
 
         public Vector2 TransformToLocal(Vector2 global)
         {
             Vector2 local = new Vector2(
-                (int)((global.X - Game1.viewport.X) * Game1.options.zoomLevel) + Game1.game1.localMultiplayerWindow.X,
-                (int)((global.Y - Game1.viewport.Y) * Game1.options.zoomLevel) + Game1.game1.localMultiplayerWindow.Y
+                (int)((global.X - Game1.viewport.X) * Game1.options.zoomLevel) + ActiveInstance.Window.X,
+                (int)((global.Y - Game1.viewport.Y) * Game1.options.zoomLevel) + ActiveInstance.Window.Y
             );
             return local;
         }
@@ -170,7 +170,7 @@ namespace TASMod.Overlays
             else if (vector.Y < 0)
                 vector.Y = 0;
             Rectangle background = new Rectangle((int)vector.X, (int)vector.Y, (int)textSize.X, (int)textSize.Y);
-            if (!background.Intersects(Game1.game1.localMultiplayerWindow))
+            if (!background.Intersects(ActiveInstance.Window))
                 return;
             spriteBatch.Draw(
                 SolidColor,
@@ -432,7 +432,7 @@ namespace TASMod.Overlays
                 (int)Math.Abs(start.X - end.X),
                 (int)Math.Abs(start.Y - end.Y)
             );
-            rect = Rectangle.Intersect(rect, Game1.game1.localMultiplayerWindow);
+            rect = Rectangle.Intersect(rect, ActiveInstance.Window);
             edge = new Vector2(rect.Width, rect.Height);
             Rectangle line = new(rect.X, rect.Y, (int)edge.Length(), thickness);
 
@@ -704,7 +704,7 @@ namespace TASMod.Overlays
         {
             Vector2 local = TransformToLocal(tile * Game1.tileSize);
             Rectangle rect = new Rectangle((int)local.X, (int)local.Y, (int)(Game1.tileSize * scale * Game1.options.zoomLevel), (int)(Game1.tileSize * scale * Game1.options.zoomLevel));
-            if (!rect.Intersects(Game1.game1.localMultiplayerWindow))
+            if (!rect.Intersects(ActiveInstance.Window))
                 return;
             spriteBatch.Draw(
                 Game1.mouseCursors,
@@ -728,7 +728,7 @@ namespace TASMod.Overlays
         {
             Vector2 local = TransformToLocal(tile * Game1.tileSize);
             Rectangle rect = new Rectangle((int)local.X, (int)local.Y, (int)(Game1.tileSize * scale.X * Game1.options.zoomLevel), (int)(Game1.tileSize * scale.Y * Game1.options.zoomLevel));
-            if (!rect.Intersects(Game1.game1.localMultiplayerWindow))
+            if (!rect.Intersects(ActiveInstance.Window))
                 return;
             spriteBatch.Draw(
                 Game1.mouseCursors,

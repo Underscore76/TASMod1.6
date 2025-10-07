@@ -27,7 +27,7 @@ namespace TASMod.Overlays
         {
             MouseState mouseState = XMouse.GetState();
             Vector2 actualCoords = new Vector2(mouseState.X, mouseState.Y);
-            Vector2 coords = new Vector2(mouseState.X - Game1.game1.localMultiplayerWindow.X, mouseState.Y - Game1.game1.localMultiplayerWindow.Y);
+            Vector2 coords = new Vector2(mouseState.X - ActiveInstance.Window.X, mouseState.Y - ActiveInstance.Window.Y);
             Vector2 zoomedCoords = coords * (1f / Game1.options.zoomLevel);
 
             int mouseTileX = (int)(zoomedCoords.X + Game1.viewport.X) / Game1.tileSize;

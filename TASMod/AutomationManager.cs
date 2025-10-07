@@ -1,4 +1,3 @@
-// TODO: add ability to queue inputs for player1 if multiplayer
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -81,7 +80,7 @@ namespace TASMod
             {
                 return false;
             }
-            GameRunnerState.Stash(0);
+            ActiveInstance.Stash(0);
             bool flag = false;
             AppliedLogic = null;
             foreach (IAutomatedLogic logic in Automation.Values)
@@ -98,7 +97,7 @@ namespace TASMod
                 for (int i = 1; i < NetworkState.NumConnections; i++)
                     flag &= GamePadInputQueue.HasInput(i) || GamePadInputQueue.HasFrameFunction(i);
             }
-            GameRunnerState.Pop();
+            ActiveInstance.Pop();
             return flag;
         }
 
@@ -114,7 +113,7 @@ namespace TASMod
                 return AppliedLogic != null;
             }
 
-            GameRunnerState.Stash(0);
+            ActiveInstance.Stash(0);
             bool flag = false;
             AppliedLogic = null;
             AppliedFrame = -1;
@@ -134,7 +133,7 @@ namespace TASMod
                     break;
                 }
             }
-            GameRunnerState.Pop();
+            ActiveInstance.Pop();
             return flag;
         }
     }
