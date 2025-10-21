@@ -7,37 +7,22 @@ using TASMod.Scripting;
 
 namespace TASMod.Recording
 {
-    public class FrameFunction
+    public class NamedLuaFunction
     {
-        public string name;
+        public string Name;
+        public string Description;
         public LuaFunction function;
-        public string description;
 
-        public FrameFunction(string n, LuaFunction func, string desc = "")
+        public NamedLuaFunction(string name, LuaFunction func, string description = "")
         {
-            name = n;
+            Name = name;
             function = func;
-            this.description = desc;
+            Description = description;
         }
 
-        public bool Call(int index)
+        public LuaCoroutine CreateCoroutine(int playerIndex)
         {
-            try
-            {
-                var res = function.Call(index);
-                if (res.Length > 0 && res[0] is bool b)
-                {
-                    return b;
-                }
-                return false;
-            }
-            catch (LuaScriptException e)
-            {
-                ModEntry.Console.Log(e.Message, StardewModdingAPI.LogLevel.Warn);
-                Controller.Console.PushResult(LuaEngine.FormatError(e.Message, e.InnerException?.InnerException ?? e.InnerException));
-                // default to current state on error
-                return false;
-            }
+            return new LuaCoroutine(LuaEngine.LuaState, function, playerIndex, Name, Description);
         }
     }
 
@@ -52,7 +37,7 @@ namespace TASMod.Recording
             new Queue<TASGamePadState>()
         };
 
-        public static FrameFunction[] FrameFunctions = new FrameFunction[4]
+        public static LuaCoroutine[] PlayerCoroutines = new LuaCoroutine[4]
         {
             null,
             null,
@@ -61,9 +46,9 @@ namespace TASMod.Recording
         };
 
         public static List<string> FrameFunctionNames = new List<string>();
-        public static Dictionary<string, FrameFunction> NamedFunctions = new Dictionary<string, FrameFunction>();
+        public static Dictionary<string, NamedLuaFunction> NamedFunctions = new Dictionary<string, NamedLuaFunction>();
 
-        public static FrameFunction GetFunctionByName(string name)
+        public static NamedLuaFunction GetFunctionByName(string name)
         {
             if (NamedFunctions.ContainsKey(name))
             {
@@ -78,7 +63,7 @@ namespace TASMod.Recording
             {
                 Queues[i].Clear();
             }
-            ClearFrameFunctions();
+            ClearPlayerCoroutines();
             NamedFunctions.Clear();
             FrameFunctionNames.Clear();
         }
@@ -135,15 +120,16 @@ namespace TASMod.Recording
                 return Queues[index].Dequeue();
             }
             // no frame function, just return current state
-            if (FrameFunctions[index] == null)
+            if (PlayerCoroutines[index] == null)
             {
                 return TASInputState.gState[index];
             }
 
-            FrameFunction func = FrameFunctions[index];
-            if (!func.Call(index))
+            LuaCoroutine func = PlayerCoroutines[index];
+            if (func.Resume() != LuaCoroutineStatus.Suspended)
             {
-                FrameFunctions[index] = null;
+                func.Dispose();
+                PlayerCoroutines[index] = null;
             }
             if (Queues[index].Count > 0)
             {
@@ -172,10 +158,10 @@ namespace TASMod.Recording
             {
                 FrameFunctionNames.Add(name);
             }
-            NamedFunctions[name] = new FrameFunction(name, func, description);
+            NamedFunctions[name] = new NamedLuaFunction(name, func, description);
         }
 
-        public static void SetFrameFunction(int index, string name)
+        public static void SetPlayerCoroutine(int index, string name)
         {
             if (index < 0 || index >= 4)
             {
@@ -187,60 +173,76 @@ namespace TASMod.Recording
                 Controller.Console.PushResult($"No such function '{name}'");
                 return;
             }
-            FrameFunctions[index] = new FrameFunction(name, NamedFunctions[name].function, NamedFunctions[name].description);
+            if (PlayerCoroutines[index] != null)
+            {
+                PlayerCoroutines[index].Dispose();
+            }
+            PlayerCoroutines[index] = NamedFunctions[name].CreateCoroutine(index);
         }
 
-        public static void SetManualFrameFunction(int index, string name, LuaFunction func, string description = "")
+        public static void SetManualFrameFunction(int index, LuaFunction func, string name, string description = "")
         {
             if (index < 0 || index >= 4)
             {
                 Controller.Console.PushResult($"Invalid controller index {index}");
                 return;
             }
-            FrameFunctions[index] = new FrameFunction(name, func, description);
+            if (PlayerCoroutines[index] != null)
+            {
+                PlayerCoroutines[index].Dispose();
+            }
+            PlayerCoroutines[index] = new LuaCoroutine(LuaEngine.LuaState, func, index, name, description);
         }
 
-        public static void ClearFrameFunctions()
+        public static void ClearPlayerCoroutines()
         {
             for (int i = 0; i < 4; i++)
             {
-                FrameFunctions[i] = null;
+                if (PlayerCoroutines[i] != null)
+                {
+                    PlayerCoroutines[i].Close();
+                }
+                PlayerCoroutines[i] = null;
             }
         }
-        public static void ClearFrameFunction(int index)
+        public static void ClearPlayerCoroutine(int index)
         {
             if (index < 0 || index >= 4)
             {
                 return;
             }
-            FrameFunctions[index] = null;
+            if (PlayerCoroutines[index] != null)
+            {
+                PlayerCoroutines[index].Close();
+            }
+            PlayerCoroutines[index] = null;
         }
 
-        public static bool HasFrameFunction(int index)
+        public static bool HasPlayerCoroutine(int index)
         {
             if (index < 0 || index >= 4)
             {
                 return false;
             }
-            return FrameFunctions[index] != null;
+            return PlayerCoroutines[index] != null;
         }
 
-        public static string GetFrameFunctionName(int i)
+        public static string GetPlayerCoroutineName(int i)
         {
             if (i < 0 || i >= 4)
             {
                 return null;
             }
-            return FrameFunctions[i]?.name;
+            return PlayerCoroutines[i]?.Name;
         }
 
-        public static FrameFunction GetFrameFunction(int i)
+        public static LuaCoroutine GetPlayerCoroutine(int i)
         {
             if (i < 0 || i >= 4)
             {
                 return null;
             }
-            return FrameFunctions[i];
+            return PlayerCoroutines[i];
         }
     }
 }

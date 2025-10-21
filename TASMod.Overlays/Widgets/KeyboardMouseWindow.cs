@@ -16,7 +16,7 @@ namespace TASMod.Overlays.Widgets
             ImGui.SetNextWindowBgAlpha(0.9f);
             ImGui.PushStyleVar(ImGuiStyleVar.WindowRounding, 5.0f);
             ImGui.PushStyleVar(ImGuiStyleVar.FrameRounding, 3.0f);
-            ImGui.Begin($"Controller {index}", ImGuiWindowFlags.AlwaysAutoResize);
+            ImGui.Begin($"Controller {index}");
             if (ImGui.IsWindowFocused())
             {
                 ActiveInstance.InstanceIndex = index;

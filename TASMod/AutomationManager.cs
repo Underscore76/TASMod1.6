@@ -95,7 +95,7 @@ namespace TASMod
             if (flag)
             {
                 for (int i = 1; i <= NetworkState.NumConnections; i++)
-                    flag &= GamePadInputQueue.HasInput(i) || GamePadInputQueue.HasFrameFunction(i);
+                    flag &= GamePadInputQueue.HasInput(i) || GamePadInputQueue.HasPlayerCoroutine(i);
             }
             ActiveInstance.Pop();
             return flag;

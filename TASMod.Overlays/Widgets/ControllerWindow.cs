@@ -7,6 +7,7 @@ using TASMod.System;
 using TASMod.Extensions;
 using TASMod.Inputs;
 using TASMod.Patches;
+using TASMod.Scripting;
 
 namespace TASMod.Overlays.Widgets
 {
@@ -19,7 +20,7 @@ namespace TASMod.Overlays.Widgets
             ImGui.SetNextWindowBgAlpha(0.9f);
             ImGui.PushStyleVar(ImGuiStyleVar.WindowRounding, 5.0f);
             ImGui.PushStyleVar(ImGuiStyleVar.FrameRounding, 3.0f);
-            ImGui.Begin($"Controller {index}", ImGuiWindowFlags.AlwaysAutoResize);
+            ImGui.Begin($"Controller {index}");
             if (ImGui.IsWindowFocused())
             {
                 ActiveInstance.InstanceIndex = index;
@@ -45,9 +46,9 @@ namespace TASMod.Overlays.Widgets
             if (!hasInput) ImGui.EndDisabled();
 
             // Frame function status display with inline clear button
-            bool hasFrameFunction = GamePadInputQueue.HasFrameFunction(index);
+            bool hasCoroutine = GamePadInputQueue.HasPlayerCoroutine(index);
 
-            if (hasFrameFunction)
+            if (hasCoroutine)
             {
                 ImGui.TextColored(new ImGuiVector4(0, 1, 0, 1), "+ Has Frame Function");
             }
@@ -56,20 +57,20 @@ namespace TASMod.Overlays.Widgets
                 ImGui.TextColored(new ImGuiVector4(0.6f, 0.6f, 0.6f, 1), "o No Frame Function");
             }
             ImGui.SameLine();
-            if (!hasFrameFunction) ImGui.BeginDisabled();
+            if (!hasCoroutine) ImGui.BeginDisabled();
             if (ImGui.Button("Clear##function"))
             {
-                GamePadInputQueue.ClearFrameFunction(index);
+                GamePadInputQueue.ClearPlayerCoroutine(index);
             }
-            if (!hasFrameFunction) ImGui.EndDisabled();
+            if (!hasCoroutine) ImGui.EndDisabled();
 
-            if (hasFrameFunction)
+            if (hasCoroutine)
             {
-                FrameFunction frameFunc = GamePadInputQueue.GetFrameFunction(index);
-                ImGui.Text($"Name: {frameFunc?.name}");
+                LuaCoroutine coroutine = GamePadInputQueue.GetPlayerCoroutine(index);
+                ImGui.Text($"Name: {coroutine?.Name}");
                 if (ImGui.IsItemHovered())
                 {
-                    string description = frameFunc?.description;
+                    string description = coroutine?.Description;
                     if (!string.IsNullOrEmpty(description))
                     {
                         ImGui.SetTooltip(description);
@@ -92,13 +93,13 @@ namespace TASMod.Overlays.Widgets
 
                         if (ImGui.Button($"Assign '{functionName}'"))
                         {
-                            GamePadInputQueue.SetFrameFunction(index, functionName);
+                            GamePadInputQueue.SetPlayerCoroutine(index, functionName);
                         }
 
                         // Show description as tooltip
-                        if (ImGui.IsItemHovered() && !string.IsNullOrEmpty(frameFunction.description))
+                        if (ImGui.IsItemHovered() && !string.IsNullOrEmpty(frameFunction.Description))
                         {
-                            ImGui.SetTooltip(frameFunction.description);
+                            ImGui.SetTooltip(frameFunction.Description);
                         }
                     }
                 }

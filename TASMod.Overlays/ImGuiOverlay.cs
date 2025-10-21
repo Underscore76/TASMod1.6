@@ -185,7 +185,7 @@ namespace TASMod.Overlays
                     }
                     else if (i < TASInputState.NumControllers)
                     {
-                        hasActivity = GamePadInputQueue.HasInput(i) || GamePadInputQueue.HasFrameFunction(i);
+                        hasActivity = GamePadInputQueue.HasInput(i) || GamePadInputQueue.HasPlayerCoroutine(i);
                     }
 
                     float x = playerStartX + i * (squareSize + spacing);
