@@ -82,14 +82,13 @@ namespace TASMod.Overlays.Widgets
             // Function assignment section
             if (ImGui.CollapsingHeader("Assign Function"))
             {
-                var namedFunctions = GamePadInputQueue.NamedFunctions;
+                var namedFunctions = GamePadInputQueue.FrameFunctionNames;
                 if (namedFunctions.Count > 0)
                 {
                     ImGui.Text("Available Functions:");
-                    foreach (var kvp in namedFunctions)
+                    foreach (var functionName in namedFunctions)
                     {
-                        string functionName = kvp.Key;
-                        var frameFunction = kvp.Value;
+                        var frameFunction = GamePadInputQueue.GetFunctionByName(functionName);
 
                         if (ImGui.Button($"Assign '{functionName}'"))
                         {
@@ -114,6 +113,9 @@ namespace TASMod.Overlays.Widgets
             // Controller input display
             GamePadInputWidget.Draw("Input", ref con);
             PlayerWidget.Draw(index);
+            MinesWidget.Draw(index);
+            WeedsWidget.Draw(index);
+            TreeWidget.Draw(index);
             ImGui.End();
             ImGui.PopStyleVar(2);
         }

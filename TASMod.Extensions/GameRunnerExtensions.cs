@@ -80,6 +80,9 @@ namespace TASMod.Extensions
                 .SetValue(new Multiplayer());
             Game1.Multiplayer.defaultInterpolationTicks = NetworkState.InterpolationTicks;
 
+            // clear any changes on splitscreen options
+            Game1.splitscreenOptions.Clear();
+
             ModEntry.Console.Log("Instance_LoadContent", LogLevel.Trace);
             runner.gameInstances[0].Instance_LoadContent();
 

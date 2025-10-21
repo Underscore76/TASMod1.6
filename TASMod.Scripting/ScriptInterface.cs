@@ -539,9 +539,10 @@ namespace TASMod.Scripting
 
         public MineShaft SpawnMineShaft(int level)
         {
+            ActiveInstance.TryLoad();
             // stash state
-            ICue old_cue = Game1.currentSong;
-            Random old_random = Game1.random.Copy();
+            Random old_random = ((Random)Reflector.GetStaticVar(ActiveInstance.InstanceIndex, "Game1_random")).Copy();
+            ICue old_cue = Game1.game1.instanceCurrentSong;
             Random sharedRandom = RandomExtensions.SharedRandom.Copy();
 
             int LowestMineLevel = MineShaft.lowestLevelReached;
@@ -567,10 +568,10 @@ namespace TASMod.Scripting
                 }
             }
             Reflector.InvokeMethod(mineShaft, "addLevelChests");
-
             // reset the state
-            Game1.currentSong = old_cue;
+            Game1.game1.instanceCurrentSong = old_cue;
             Game1.random = old_random;
+            Reflector.SetStaticVar(ActiveInstance.InstanceIndex, "Game1_random", old_random);
             RandomExtensions.SharedRandom = sharedRandom;
             MineShaft.lowestLevelReached = LowestMineLevel;
             MineShaft.mushroomLevelsGeneratedToday = mushroomLevelsGeneratedToday;
@@ -619,6 +620,21 @@ namespace TASMod.Scripting
             {
                 Console.PushResult($"failed to get static var {index}:{key}");
                 return null;
+            }
+        }
+
+        public bool SetStaticVars(int index, string key, object value)
+        {
+            try
+            {
+                var obj = GameRunner.instance.gameInstances[index].staticVarHolder;
+                Reflector.SetValue(obj, key, value);
+                return true;
+            }
+            catch (Exception)
+            {
+                Console.PushResult($"failed to set static var {index}:{key}");
+                return false;
             }
         }
 

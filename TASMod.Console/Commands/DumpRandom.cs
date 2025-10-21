@@ -65,7 +65,7 @@ namespace TASMod.Console.Commands
 
         private string CleanLine(string line)
         {
-            if (line.ToLower().Contains("tasmod") || line.Contains("at Microsoft.Xna.Framework"))
+            if (line.Contains("at TASMod") || line.Contains("at Microsoft.Xna.Framework"))
                 return "";
 
             return line.Replace(

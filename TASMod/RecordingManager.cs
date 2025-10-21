@@ -1,3 +1,4 @@
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using StardewValley;
 using StardewValley.Menus;
@@ -122,9 +123,14 @@ namespace TASMod
             {
                 TASInputState.SetTASGamePadState(i, GamePadInputQueue.GetNextInput(i));
             }
+            var window = GameRunner.instance.gameInstances[0].localMultiplayerWindow;
+            if (!window.Contains(new Vector2(TASInputState.mState.MouseX, TASInputState.mState.MouseY)))
+            {
+                TASInputState.MoveMouse(LastFrameMouse().MouseX, LastFrameMouse().MouseY);
+            }
             State.FrameStates.Add(
-                new FrameState(TASInputState.kState, TASInputState.mState, TASInputState.gState)
-            );
+                    new FrameState(TASInputState.kState, TASInputState.mState, TASInputState.gState)
+                );
             TASInputState.Active = true;
         }
     }

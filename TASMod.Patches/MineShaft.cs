@@ -6,6 +6,7 @@ using StardewValley;
 using StardewValley.Locations;
 using StardewValley.Objects;
 using TASMod.Extensions;
+using TASMod.System;
 using xTile.Layers;
 
 namespace TASMod.Patches
@@ -286,7 +287,7 @@ namespace TASMod.Patches
             if (IsEnabled)
             {
                 Controller.Console.Alert(
-                    $"b:generateContents: {Game1.random.get_Index():D4} {__instance.mineRandom.get_Index():D4}"
+                    $"b:generateContents: {TASDateTime.CurrentFrame}  {Game1.game1.instanceIndex} {RandomExtensions.SharedRandom} {Game1.random} {__instance.mineRandom}"
                 );
             }
             return true;
@@ -297,7 +298,7 @@ namespace TASMod.Patches
             if (IsEnabled)
             {
                 Controller.Console.Alert(
-                    $"a:generateContents: {Game1.random.get_Index():D4} {__instance.mineRandom.get_Index():D4}"
+                    $"a:generateContents: {TASDateTime.CurrentFrame} {Game1.game1.instanceIndex} {RandomExtensions.SharedRandom} {Game1.random} {__instance.mineRandom}"
                 );
             }
         }

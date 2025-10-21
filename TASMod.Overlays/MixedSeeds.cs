@@ -5,6 +5,7 @@ using StardewValley;
 using StardewValley.Extensions;
 using TASMod.Extensions;
 using TASMod.Helpers;
+using TASMod.Networking;
 using TASMod.System;
 
 namespace TASMod.Overlays
@@ -18,10 +19,8 @@ namespace TASMod.Overlays
         public ulong LastFrame = 0;
         public string objectName = "";
 
-        public static string GetRandomLowGradeCropForThisSeason()
+        public static string GetRandomLowGradeCropForThisSeason(Random random)
         {
-            Random random = Game1.random.Copy();
-            random.NextDouble();
             Season season = Game1.GetSeasonForLocation(Game1.currentLocation);
             if (season == Season.Winter)
             {
@@ -30,18 +29,19 @@ namespace TASMod.Overlays
             string res = season switch
             {
                 //472
-                Season.Spring => random.Next(472,476).ToString(),
+                Season.Spring => random.Next(472, 476).ToString(),
                 Season.Summer => random.Next(4) switch
                 {
-                    0 => "487", 
-                    1 => "483", 
-                    2 => "482", 
-                    _ => "484", 
+                    0 => "487",
+                    1 => "483",
+                    2 => "482",
+                    _ => "484",
                 },
                 Season.Fall => random.Next(487, 491).ToString(),
                 _ => null
             };
-            if (res == "473") {
+            if (res == "473")
+            {
                 res = "472";
             }
             if (res == null)
@@ -55,7 +55,19 @@ namespace TASMod.Overlays
         {
             if (TASDateTime.CurrentFrame != LastFrame)
             {
-                objectName = GetRandomLowGradeCropForThisSeason();    
+                Random r = Game1.random.Copy();
+                GetRandomLowGradeCropForThisSeason(r);
+                if (ActiveInstance.InstanceIndex == 0)
+                {
+                    objectName = GetRandomLowGradeCropForThisSeason(r);
+
+                }
+                else
+                {
+                    GetRandomLowGradeCropForThisSeason(r);
+                    objectName = GetRandomLowGradeCropForThisSeason(r);
+
+                }
                 LastFrame = TASDateTime.CurrentFrame;
             }
         }

@@ -60,7 +60,17 @@ namespace TASMod.Recording
             null
         };
 
+        public static List<string> FrameFunctionNames = new List<string>();
         public static Dictionary<string, FrameFunction> NamedFunctions = new Dictionary<string, FrameFunction>();
+
+        public static FrameFunction GetFunctionByName(string name)
+        {
+            if (NamedFunctions.ContainsKey(name))
+            {
+                return NamedFunctions[name];
+            }
+            return null;
+        }
 
         public static void Clear()
         {
@@ -70,6 +80,7 @@ namespace TASMod.Recording
             }
             ClearFrameFunctions();
             NamedFunctions.Clear();
+            FrameFunctionNames.Clear();
         }
 
         public static void ClearQueue(int index)
@@ -156,6 +167,10 @@ namespace TASMod.Recording
             if (NamedFunctions.ContainsKey(name))
             {
                 Controller.Console.PushResult($"Overriding existing function '{name}'");
+            }
+            if (!FrameFunctionNames.Contains(name))
+            {
+                FrameFunctionNames.Add(name);
             }
             NamedFunctions[name] = new FrameFunction(name, func, description);
         }

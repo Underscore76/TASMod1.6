@@ -52,6 +52,9 @@ namespace TASMod.Overlays.Widgets
                 TextBoxInput.Text = "";
             }
             PlayerWidget.Draw(index);
+            MinesWidget.Draw(index);
+            WeedsWidget.Draw(index);
+            TreeWidget.Draw(index);
             ImGui.End();
             ImGui.PopStyleVar(2);
         }

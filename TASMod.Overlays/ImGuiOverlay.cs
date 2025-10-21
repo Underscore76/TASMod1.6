@@ -10,6 +10,9 @@ using TASMod.Inputs;
 using StardewValley.Objects;
 using TASMod.Overlays.Widgets;
 using TASMod.Patches;
+using TASMod.Recording;
+using TASMod.Networking;
+using System.Linq;
 
 namespace TASMod.Overlays
 {
@@ -109,7 +112,8 @@ namespace TASMod.Overlays
                 }
             }
 
-            // ImGui.ShowDemoWindow();
+            DrawPlayerStatusWindow();
+
             if (imguiTarget == null || imguiTarget.Width != Game1.graphics.PreferredBackBufferWidth || imguiTarget.Height != Game1.graphics.PreferredBackBufferHeight)
             {
                 imguiTarget?.Dispose();
@@ -121,6 +125,120 @@ namespace TASMod.Overlays
             GuiRenderer.AfterLayout();
             Game1.graphics.GraphicsDevice.SetRenderTargets(oldTargets);
             spriteBatch.Draw(imguiTarget, Vector2.Zero, Color.White);
+        }
+
+        private static void DrawPlayerStatusWindow()
+        {
+            ImGui.SetNextWindowPos(new Num.Vector2(10, 10), ImGuiCond.FirstUseEver);
+            ImGui.SetNextWindowSize(new Num.Vector2(200, 60), ImGuiCond.FirstUseEver);
+            ImGui.PushStyleVar(ImGuiStyleVar.WindowRounding, 5.0f);
+
+            if (ImGui.Begin("Player Status", ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.AlwaysAutoResize))
+            {
+                var drawList = ImGui.GetWindowDrawList();
+                var pos = ImGui.GetCursorScreenPos();
+                float squareSize = 20.0f;
+                float spacing = 5.0f;
+
+                int serverMessages = 0;
+                if (NetworkState.IncomingMessages.ContainsKey("SERVER"))
+                {
+                    serverMessages = NetworkState.IncomingMessages["SERVER"].Count;
+                }
+
+                float serverWidth = 40.0f;
+                Num.Vector4 serverBgColor = serverMessages > 0
+                    ? new Num.Vector4(1, 0, 0, 1)
+                    : new Num.Vector4(0.3f, 0.3f, 0.3f, 1);
+
+                drawList.AddRectFilled(
+                    new Num.Vector2(pos.X, pos.Y),
+                    new Num.Vector2(pos.X + serverWidth, pos.Y + squareSize),
+                    ImGui.ColorConvertFloat4ToU32(serverBgColor)
+                );
+
+                drawList.AddRect(
+                    new Num.Vector2(pos.X, pos.Y),
+                    new Num.Vector2(pos.X + serverWidth, pos.Y + squareSize),
+                    ImGui.ColorConvertFloat4ToU32(new Num.Vector4(0, 0, 0, 1))
+                );
+
+                string serverText = serverMessages.ToString();
+                var textSize = ImGui.CalcTextSize(serverText);
+                float textX = pos.X + (serverWidth - textSize.X) / 2;
+                float textY = pos.Y + (squareSize - textSize.Y) / 2;
+                drawList.AddText(
+                    new Num.Vector2(textX, textY),
+                    ImGui.ColorConvertFloat4ToU32(new Num.Vector4(1, 1, 1, 1)),
+                    serverText
+                );
+
+                float playerStartX = pos.X + serverWidth + spacing;
+
+                for (int i = 0; i < 4; i++)
+                {
+                    bool hasActivity = false;
+
+                    if (i == 0)
+                    {
+                        hasActivity = AutomationManager.AppliedLogic != null;
+                    }
+                    else if (i < TASInputState.NumControllers)
+                    {
+                        hasActivity = GamePadInputQueue.HasInput(i) || GamePadInputQueue.HasFrameFunction(i);
+                    }
+
+                    float x = playerStartX + i * (squareSize + spacing);
+                    float y = pos.Y;
+
+                    Num.Vector4 color = hasActivity
+                        ? new Num.Vector4(0, 1, 0, 1)
+                        : new Num.Vector4(0.5f, 0.5f, 0.5f, 1);
+
+                    drawList.AddRectFilled(
+                        new Num.Vector2(x, y),
+                        new Num.Vector2(x + squareSize, y + squareSize),
+                        ImGui.ColorConvertFloat4ToU32(color)
+                    );
+
+                    drawList.AddRect(
+                        new Num.Vector2(x, y),
+                        new Num.Vector2(x + squareSize, y + squareSize),
+                        ImGui.ColorConvertFloat4ToU32(new Num.Vector4(0, 0, 0, 1))
+                    );
+                }
+
+                float totalWidth = serverWidth + spacing + 4 * (squareSize + spacing) - spacing;
+                float totalHeight = squareSize + 5 + ImGui.GetTextLineHeight();
+
+                ImGui.Dummy(new Num.Vector2(totalWidth, totalHeight));
+
+                float labelY = pos.Y + squareSize + 5;
+
+                string srvLabel = "SRV";
+                var srvTextSize = ImGui.CalcTextSize(srvLabel);
+                float srvLabelX = pos.X + (serverWidth - srvTextSize.X) / 2;
+                drawList.AddText(
+                    new Num.Vector2(srvLabelX, labelY),
+                    ImGui.ColorConvertFloat4ToU32(new Num.Vector4(1, 1, 1, 1)),
+                    srvLabel
+                );
+
+                for (int i = 0; i < 4; i++)
+                {
+                    string playerLabel = $"P{i}";
+                    var playerTextSize = ImGui.CalcTextSize(playerLabel);
+                    float playerLabelX = playerStartX + i * (squareSize + spacing) + (squareSize - playerTextSize.X) / 2;
+
+                    drawList.AddText(
+                        new Num.Vector2(playerLabelX, labelY),
+                        ImGui.ColorConvertFloat4ToU32(new Num.Vector4(1, 1, 1, 1)),
+                        playerLabel
+                    );
+                }
+            }
+            ImGui.End();
+            ImGui.PopStyleVar();
         }
 
         public static bool ColorEdit4(string label, ref Color color)

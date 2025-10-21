@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using StardewValley;
 
 namespace TASMod
 {
@@ -262,6 +263,18 @@ namespace TASMod
             {
                 return null;
             }
+        }
+
+        public static object GetStaticVar(int index, string key)
+        {
+            var obj = GameRunner.instance.gameInstances[index].staticVarHolder;
+            return GetValue(obj, key);
+        }
+
+        public static void SetStaticVar(int index, string key, object value)
+        {
+            var obj = GameRunner.instance.gameInstances[index].staticVarHolder;
+            SetValue(obj, key, value);
         }
     }
 }

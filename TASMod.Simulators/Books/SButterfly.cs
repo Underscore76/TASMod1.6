@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using StardewValley;
+using StardewValley.BellsAndWhistles;
 using TASMod.System;
 using BF = StardewValley.BellsAndWhistles.Butterfly;
 
@@ -26,6 +27,7 @@ namespace TASMod.Simulators.Books
         public SButterfly(Random r, BF other)
         : base(r)
         {
+            sprite = new AnimatedSprite(Critter.critterTexture, baseFrame, 16, 16);
             flapTimer = Reflector.GetValue<BF, int>(other, "flapTimer");
             flapSpeed = Reflector.GetValue<BF, int>(other, "flapSpeed");
             motion = Reflector.GetValue<BF, Vector2>(other, "motion");
@@ -33,6 +35,37 @@ namespace TASMod.Simulators.Books
             summerButterfly = Reflector.GetValue<BF, bool>(other, "summerButterfly");
             stayInbounds = Reflector.GetValue<BF, bool>(other, "stayInbounds");
             isPrismatic = Reflector.GetValue<BF, bool>(other, "isPrismatic");
+
+            if (other.sprite.CurrentAnimation != null)
+            {
+                if (summerButterfly)
+                {
+                    sprite.setCurrentAnimation(new List<FarmerSprite.AnimationFrame>
+                    {
+                        new FarmerSprite.AnimationFrame(baseFrame + 1, flapSpeed),
+                        new FarmerSprite.AnimationFrame(baseFrame + 2, flapSpeed),
+                        new FarmerSprite.AnimationFrame(baseFrame + 3, flapSpeed),
+                        new FarmerSprite.AnimationFrame(baseFrame + 2, flapSpeed),
+                        new FarmerSprite.AnimationFrame(baseFrame + 1, flapSpeed),
+                        new FarmerSprite.AnimationFrame(baseFrame, flapSpeed, secondaryArm: false, flip: false, doneWithFlap)
+                    });
+                }
+                else
+                {
+                    sprite.setCurrentAnimation(new List<FarmerSprite.AnimationFrame>
+                    {
+                        new FarmerSprite.AnimationFrame(baseFrame + 1, flapSpeed),
+                        new FarmerSprite.AnimationFrame(baseFrame + 2, flapSpeed),
+                        new FarmerSprite.AnimationFrame(baseFrame + 1, flapSpeed),
+                        new FarmerSprite.AnimationFrame(baseFrame, flapSpeed, secondaryArm: false, flip: false, doneWithFlap)
+                    });
+                }
+                sprite.oldFrame = other.sprite.oldFrame;
+                sprite.currentFrame = other.sprite.currentFrame;
+                sprite.currentAnimationIndex = other.sprite.currentAnimationIndex;
+                sprite.timer = other.sprite.timer;
+                sprite.loop = other.sprite.loop;
+            }
         }
 
         public SButterfly(Random r, Vector2 position)
