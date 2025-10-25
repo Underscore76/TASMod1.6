@@ -5,6 +5,7 @@ using StardewValley.Locations;
 using StardewValley.Monsters;
 using StardewValley.Objects;
 using TASMod.Simulators.EnemyKill;
+using TASMod.Simulators.GemNode;
 
 namespace TASMod.Overlays.Widgets
 {
@@ -33,7 +34,7 @@ namespace TASMod.Overlays.Widgets
                 ImGui.Indent();
                 if (ImGui.CollapsingHeader("Enemies"))
                 {
-                    ImGui.BeginTable("Enemies", 3, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg);
+                    ImGui.BeginTable("Enemies", 4, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg);
                     ImGui.TableSetupColumn("Name", ImGuiTableColumnFlags.WidthStretch);
                     ImGui.TableSetupColumn("HP", ImGuiTableColumnFlags.WidthStretch);
                     ImGui.TableSetupColumn("Tile", ImGuiTableColumnFlags.WidthStretch);
@@ -98,6 +99,26 @@ namespace TASMod.Overlays.Widgets
                     ImGui.TableSetColumnIndex(4);
                     ImGui.Text((hit.IndexNeededVoidBook - hit.IndexAtVoidBook).ToString());
 
+                    ImGui.EndTable();
+                }
+                if (ImGui.CollapsingHeader("Gem Nodes"))
+                {
+                    ImGui.BeginTable("Gem Nodes", 3, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg);
+                    ImGui.TableSetupColumn("Tile", ImGuiTableColumnFlags.WidthStretch);
+                    ImGui.TableSetupColumn("Current", ImGuiTableColumnFlags.WidthStretch);
+                    ImGui.TableSetupColumn("Ladder", ImGuiTableColumnFlags.WidthStretch);
+                    ImGui.TableHeadersRow();
+                    var hit = GemNode.Estimate(index);
+                    for (int i = 0; i < hit.CurrentGems.Count; i++)
+                    {
+                        ImGui.TableNextRow();
+                        ImGui.TableSetColumnIndex(0);
+                        ImGui.Text(hit.Tile.X + "," + hit.Tile.Y);
+                        ImGui.TableSetColumnIndex(1);
+                        ImGui.Text(hit.CurrentGems[i]);
+                        ImGui.TableSetColumnIndex(2);
+                        ImGui.Text(hit.LadderGems[i]);
+                    }
                     ImGui.EndTable();
                 }
                 ImGui.Unindent();

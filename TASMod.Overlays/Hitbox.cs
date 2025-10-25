@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
@@ -22,23 +23,39 @@ namespace TASMod.Overlays
 
         public override void ActiveDraw(SpriteBatch spriteBatch)
         {
-            if (CurrentLocation.Active)
+            for (int i = 0; i < GameRunner.instance.gameInstances.Count; i++)
             {
-                foreach (NPC current in CurrentLocation.Characters)
+                try
                 {
-                    DrawRectGlobal(spriteBatch, current.GetBoundingBox(), NPCColor, LineColor);
+                    DrawHitboxesForInstance(i, spriteBatch);
                 }
-                foreach (NPC current in CurrentLocation.Monsters)
+                catch (Exception e)
+                {
+                    ModEntry.Console.Log($"Hitbox2 ActiveDraw Exception: {e}", StardewModdingAPI.LogLevel.Error);
+                }
+            }
+        }
+        public void DrawHitboxesForInstance(int i, SpriteBatch spriteBatch)
+        {
+            var currentLocation = GameRunner.instance.gameInstances[i].instanceGameLocation;
+            var player = Reflector.GetStaticVar(i, "Game1__player") as Farmer;
+            if (currentLocation != null)
+            {
+                foreach (NPC current in currentLocation?.characters.Where((n) => n is not Monster))
+                {
+                    DrawRectGlobal(i, spriteBatch, current.GetBoundingBox(), NPCColor, LineColor);
+                }
+                foreach (NPC current in currentLocation?.characters.Where((n) => n is Monster))
                 {
                     if ((current as Monster).isInvincible())
-                        DrawRectGlobal(spriteBatch, current.GetBoundingBox(), MonsterInvincibleColor, LineColor);
+                        DrawRectGlobal(i, spriteBatch, current.GetBoundingBox(), MonsterInvincibleColor, LineColor);
                     else
-                        DrawRectGlobal(spriteBatch, current.GetBoundingBox(), MonsterColor, LineColor);
+                        DrawRectGlobal(i, spriteBatch, current.GetBoundingBox(), MonsterColor, LineColor);
                 }
-                if (!Game1.player.temporarilyInvincible && Game1.player.CanMove)
-                    DrawRectGlobal(spriteBatch, PlayerInfo.BoundingBox, PlayerColor, LineColor);
+                if (!player.temporarilyInvincible && player.CanMove)
+                    DrawRectGlobal(i, spriteBatch, player.GetBoundingBox(), PlayerColor, LineColor);
                 else
-                    DrawRectGlobal(spriteBatch, PlayerInfo.BoundingBox, PlayerInvincibleColor, LineColor);
+                    DrawRectGlobal(i, spriteBatch, player.GetBoundingBox(), PlayerInvincibleColor, LineColor);
             }
         }
     }

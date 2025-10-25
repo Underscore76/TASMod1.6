@@ -1,0 +1,95 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Microsoft.Xna.Framework;
+using StardewValley;
+using StardewValley.Extensions;
+using StardewValley.Locations;
+using StardewValley.Tools;
+using TASMod.Extensions;
+using TASMod.Helpers;
+using TASMod.Overlays;
+using TASMod.System;
+namespace TASMod.Simulators.GemNode
+{
+    public class GemNodeHit
+    {
+        public Vector2 Tile;
+        public List<string> CurrentGems = new List<string>();
+        public List<string> LadderGems = new List<string>();
+    }
+
+    public class GemNode
+    {
+        public static MinesRocks minesRocks = new MinesRocks();
+        public static int CurrentFrame = -1;
+        public static List<GemNodeHit> Hits = new List<GemNodeHit> { new(), new(), new(), new() };
+
+        public static GemNodeHit Current()
+        {
+            return Estimate(Game1.game1.instanceIndex);
+        }
+
+        public static GemNodeHit Estimate(int index)
+        {
+            if (TASDateTime.CurrentFrame == (uint)Controller.State.Count)
+            {
+                if (CurrentFrame != Controller.State.Count)
+                {
+                    CurrentFrame = Controller.State.Count;
+                    for (int i = 0; i < 4; i++)
+                    {
+                        try
+                        {
+                            Hits[i] = EstimateIndex(i);
+                        }
+                        catch (Exception e)
+                        {
+                            ModEntry.Console.Log($"GemNode Estimate Exception: {e}", StardewModdingAPI.LogLevel.Error);
+                        }
+                    }
+                }
+                return Hits[index];
+            }
+            return new();
+        }
+
+        public static GemNodeHit EstimateIndex(int index)
+        {
+            Farmer farmer = Reflector.GetStaticVar(index, "Game1__player") as Farmer;
+            Random random = (Reflector.GetStaticVar(index, "Game1_random") as Random).Copy();
+            GameLocation loc = GameRunner.instance.gameInstances[index].instanceGameLocation;
+            return EstimateFarmer(random, loc, farmer);
+        }
+
+        public static GemNodeHit EstimateFarmer(Random random, GameLocation loc, Farmer farmer)
+        {
+            GemNodeHit hit = new GemNodeHit();
+            if (loc == null || farmer == null || loc is not MineShaft)
+                return hit;
+            foreach (var obj in loc.objects.Pairs)
+            {
+                if (obj.Value.ItemId == "44") // Gem Node
+                {
+                    string gemType = GetGemType((int)obj.Key.X, (int)obj.Key.Y, farmer, (loc as MineShaft).mineLevel, false);
+                    string ladderGemType = GetGemType((int)obj.Key.X, (int)obj.Key.Y, farmer, (loc as MineShaft).mineLevel, true);
+                    hit.Tile = obj.Key;
+                    hit.CurrentGems.Add(gemType);
+                    hit.LadderGems.Add(ladderGemType);
+                }
+            }
+            return hit;
+        }
+
+        public static string GetGemType(int x, int y, Farmer who, int mineLevel, bool hasLadderSpawned)
+        {
+            Random r = Utility.CreateDaySaveRandom(x * 1000, y, mineLevel);
+            r.NextDouble();
+            if (!hasLadderSpawned)
+            {
+                r.NextDouble();
+            }
+            return minesRocks.BreakStone("44", x, y, who, r).Aggregate((a, b) => a + "," + b);
+        }
+    }
+}

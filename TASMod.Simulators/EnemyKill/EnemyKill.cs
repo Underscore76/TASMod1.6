@@ -89,7 +89,7 @@ namespace TASMod.Simulators.EnemyKill
             // at StardewValley.Tools.MeleeWeapon.getAreaOfEffect
             Vector2 tileLoc = Vector2.Zero;
             Vector2 tileLoc2 = Vector2.Zero;
-            Rectangle areaOfEffect = WeaponInfo.GetAreaOfEffect(weapon, x, y, facingDirection, ref tileLoc, ref tileLoc2, PlayerInfo.BoundingBox, 0, Game1_random);
+            Rectangle areaOfEffect = WeaponInfo.GetAreaOfEffect(weapon, x, y, facingDirection, ref tileLoc, ref tileLoc2, who.GetBoundingBox(), 0, Game1_random);
 
             // at StardewValley.GameLocation.damageMonster
             float effectiveCritChance = weapon.critChance.Value;

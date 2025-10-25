@@ -60,7 +60,8 @@ namespace TASMod
         {
             if (
                 GameRunner.instance != null
-                && NetworkState.NumConnections > 0)
+                && NetworkState.NumConnections > 0
+                && NetworkState.NumConnections < GameRunner.instance.gameInstances.Count)
             {
                 GameRunner.LoadInstance(GameRunner.instance.gameInstances[NetworkState.NumConnections]);
             }

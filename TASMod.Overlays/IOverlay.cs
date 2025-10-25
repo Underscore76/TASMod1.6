@@ -83,6 +83,20 @@ namespace TASMod.Overlays
 
         public virtual void Reset() { }
 
+        public Rectangle TransformToLocal(int index, Rectangle global)
+        {
+            var viewport = (xTile.Dimensions.Rectangle)Reflector.GetStaticVar(index, "Game1_viewport");
+            var options = GameRunner.instance.gameInstances[index].instanceOptions;
+            var window = GameRunner.instance.gameInstances[index].localMultiplayerWindow;
+            Rectangle local = new Rectangle(
+                (int)((global.X - viewport.X) * options.zoomLevel),
+                (int)((global.Y - viewport.Y) * options.zoomLevel),
+                Math.Max((int)(global.Width * options.zoomLevel), 1),
+                Math.Max((int)(global.Height * options.zoomLevel), 1)
+            );
+            local.Offset(window.X, window.Y);
+            return local;
+        }
         public Rectangle TransformToLocal(Rectangle global)
         {
             Rectangle local = new Rectangle(
@@ -95,6 +109,17 @@ namespace TASMod.Overlays
             return local;
         }
 
+        public Vector2 TransformToLocal(int index, Vector2 global)
+        {
+            var viewport = (xTile.Dimensions.Rectangle)Reflector.GetStaticVar(index, "Game1_viewport");
+            var options = GameRunner.instance.gameInstances[index].instanceOptions;
+            var window = GameRunner.instance.gameInstances[index].localMultiplayerWindow;
+            Vector2 local = new Vector2(
+                (int)((global.X - viewport.X) * options.zoomLevel) + window.X,
+                (int)((global.Y - viewport.Y) * options.zoomLevel) + window.Y
+            );
+            return local;
+        }
         public Vector2 TransformToLocal(Vector2 global)
         {
             Vector2 local = new Vector2(
@@ -362,6 +387,19 @@ namespace TASMod.Overlays
         }
 
         public void DrawLineGlobal(
+            int index,
+            SpriteBatch spriteBatch,
+            Vector2 start,
+            Vector2 end,
+            Color color,
+            int thickness = 1
+        )
+        {
+            Vector2 startCoord = TransformToLocal(index, start);
+            Vector2 endCoord = TransformToLocal(index, end);
+            DrawLineLocal(index, spriteBatch, startCoord, endCoord, color, thickness);
+        }
+        public void DrawLineGlobal(
             SpriteBatch spriteBatch,
             Vector2 start,
             Vector2 end,
@@ -416,6 +454,45 @@ namespace TASMod.Overlays
         }
 
         public void DrawLineLocal(
+            int index,
+            SpriteBatch spriteBatch,
+            Vector2 start,
+            Vector2 end,
+            Color color,
+            int thickness = 1
+        )
+        {
+            Vector2 edge = end - start;
+            float angle = (float)Math.Atan2(edge.Y, edge.X);
+            // generate the clipped rectangle
+            Rectangle rect = new Rectangle(
+                start.X > end.X ? (int)end.X : (int)start.X,
+                start.Y > end.Y ? (int)end.Y : (int)start.Y,
+                (int)Math.Abs(start.X - end.X),
+                (int)Math.Abs(start.Y - end.Y)
+            );
+            var window = GameRunner.instance.gameInstances[index].localMultiplayerWindow;
+            rect = Rectangle.Intersect(rect, window);
+            edge = new Vector2(rect.Width, rect.Height);
+            // which rect corner should I pick?
+            // want the corner that is closest to the start point
+            int startX = start.X > end.X ? rect.Right : rect.Left;
+            int startY = start.Y > end.Y ? rect.Bottom : rect.Top;
+            Rectangle line = new(startX, startY, (int)edge.Length(), thickness);
+
+            spriteBatch.Draw(
+                SolidColor,
+                line,
+                null,
+                color,
+                angle,
+                Vector2.Zero,
+                SpriteEffects.None,
+                0
+            );
+        }
+
+        public void DrawLineLocal(
             SpriteBatch spriteBatch,
             Vector2 start,
             Vector2 end,
@@ -434,7 +511,11 @@ namespace TASMod.Overlays
             );
             rect = Rectangle.Intersect(rect, ActiveInstance.Window);
             edge = new Vector2(rect.Width, rect.Height);
-            Rectangle line = new(rect.X, rect.Y, (int)edge.Length(), thickness);
+            // which rect corner should I pick?
+            // want the corner that is closest to the start point
+            int startX = start.X > end.X ? rect.Right : rect.Left;
+            int startY = start.Y > end.Y ? rect.Bottom : rect.Top;
+            Rectangle line = new(startX, startY, (int)edge.Length(), thickness);
 
             spriteBatch.Draw(
                 SolidColor,
@@ -477,6 +558,17 @@ namespace TASMod.Overlays
             DrawRectLocal(spriteBatch, localRect, color);
         }
 
+        public void DrawRectGlobal(
+            int index,
+            SpriteBatch spriteBatch,
+            Rectangle rect,
+            Color color,
+            Color crossColor
+        )
+        {
+            Rectangle localRect = TransformToLocal(index, rect);
+            DrawRectLocal(index, spriteBatch, localRect, color, crossColor);
+        }
         public void DrawRectGlobal(
             SpriteBatch spriteBatch,
             Rectangle rect,
@@ -533,6 +625,32 @@ namespace TASMod.Overlays
             }
         }
 
+        public void DrawRectLocal(
+            int index,
+            SpriteBatch spriteBatch,
+            Rectangle rect,
+            Color color,
+            Color crossColor
+        )
+        {
+            var window = GameRunner.instance.gameInstances[index].localMultiplayerWindow;
+            var drawRect = Rectangle.Intersect(rect, window);
+            spriteBatch.Draw(SolidColor, drawRect, color);
+            DrawLineLocal(
+                index,
+                spriteBatch,
+                new Vector2(rect.Left, rect.Center.Y),
+                new Vector2(rect.Right, rect.Center.Y),
+                crossColor
+            );
+            DrawLineLocal(
+                index,
+                spriteBatch,
+                new Vector2(rect.Center.X, rect.Top),
+                new Vector2(rect.Center.X, rect.Bottom),
+                crossColor
+            );
+        }
         public void DrawRectLocal(
             SpriteBatch spriteBatch,
             Rectangle rect,

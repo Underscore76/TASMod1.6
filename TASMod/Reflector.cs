@@ -267,7 +267,9 @@ namespace TASMod
 
         public static object GetStaticVar(int index, string key)
         {
-            var obj = GameRunner.instance.gameInstances[index].staticVarHolder;
+            var obj = GameRunner.instance.gameInstances[index]?.staticVarHolder;
+            if (obj == null)
+                return null;
             return GetValue(obj, key);
         }
 
