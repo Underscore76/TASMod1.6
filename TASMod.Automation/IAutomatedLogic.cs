@@ -19,6 +19,7 @@ namespace TASMod.Automation
         }
 
         public virtual bool ActiveUpdate(
+            int index,
             out TASKeyboardState kstate,
             out TASMouseState mstate,
             out TASGamePadState gstate
@@ -31,6 +32,7 @@ namespace TASMod.Automation
         }
 
         public bool Update(
+            int index,
             out TASKeyboardState kstate,
             out TASMouseState mstate,
             out TASGamePadState gstate
@@ -43,7 +45,7 @@ namespace TASMod.Automation
                 gstate = null;
                 return false;
             }
-            return ActiveUpdate(out kstate, out mstate, out gstate);
+            return ActiveUpdate(index, out kstate, out mstate, out gstate);
         }
 
         public void Log(string message, LogLevel level)

@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
+using TASMod.Helpers;
 using TASMod.System;
 
 namespace TASMod.Overlays
@@ -28,7 +29,7 @@ namespace TASMod.Overlays
         }
         public void DrawGridForInstance(int i, SpriteBatch spriteBatch)
         {
-            var viewport = (xTile.Dimensions.Rectangle)Reflector.GetStaticVar(i, "Game1_viewport");
+            var viewport = InstanceViewport.Get(i).Viewport;
             int offsetX = (int)((viewport.X - Game1.tileSize) / Game1.tileSize) * Game1.tileSize;
             int offsetY = (int)((viewport.Y - Game1.tileSize) / Game1.tileSize) * Game1.tileSize;
             int xMin = viewport.X;

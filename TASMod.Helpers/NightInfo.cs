@@ -34,8 +34,9 @@ namespace TASMod.Helpers
 
         public static Tomorrow GetTomorrow(int numExtraSteps)
         {
-            int day = (int)Game1.stats.DaysPlayed;
-            int seed = Utility.CreateRandomSeed(Game1.uniqueIDForThisGame / 100, day * 10 + 1, Game1.stats.StepsTaken+numExtraSteps);
+            var player = InstanceCurrentPlayer.Get(0).Player;
+            int day = (int)player.stats.DaysPlayed + 1;
+            int seed = Utility.CreateRandomSeed(Game1.uniqueIDForThisGame / 100, day * 10 + 1, player.stats.StepsTaken + numExtraSteps);
             Random r = Utility.CreateRandom(seed);
             for (int k = 0; k < GetDayOfMonthFromDay(day); k++)
             {
@@ -43,15 +44,16 @@ namespace TASMod.Helpers
             }
             (var dish, var count) = UpdateDishOfTheDay(r);
             string friend = "";
-            if(Utility.TryGetRandom(Game1.player.friendshipData, out var whichFriend, out var friendship, r))
+            if (Utility.TryGetRandom(player.friendshipData, out var whichFriend, out var friendship, r))
             {
                 friend = whichFriend;
             }
-            int required = r.Next(10)+1;
+            int required = r.Next(10) + 1;
             r.Next(); //rarecrow
-            
+
             double dailyLuck = Math.Min(0.10000000149011612, (double)r.Next(-100, 101) / 1000.0);
-            return new(){
+            return new()
+            {
                 dishOfTheDay = dish,
                 numDishOfTheDay = count,
                 friend = friend,

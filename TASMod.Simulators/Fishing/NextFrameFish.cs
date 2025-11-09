@@ -78,7 +78,9 @@ namespace TASMod.Simulators.Fishing
             bool usingMagicBait = false;
             bool hasCuriosityLure = false;
             string baitTargetFish = null;
+#pragma warning disable CS0219 // Variable is assigned but its value is never used
             bool usingGoodBait = false;
+#pragma warning restore CS0219 // Variable is assigned but its value is never used
             if (player?.CurrentTool is FishingRod rod && rod.isFishing)
             {
                 usingMagicBait = rod.HasMagicBait();

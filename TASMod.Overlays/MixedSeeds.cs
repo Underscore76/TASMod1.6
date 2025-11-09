@@ -16,6 +16,7 @@ namespace TASMod.Overlays
 
         public override string Description => "determine next crop if planting a mixed seed";
 
+        public int LastInstanceIndex = -1;
         public ulong LastFrame = 0;
         public string objectName = "";
 
@@ -53,9 +54,13 @@ namespace TASMod.Overlays
 
         public override void ActiveUpdate()
         {
-            if (TASDateTime.CurrentFrame != LastFrame)
+            if (ActiveInstance.InstanceIndex < 0 || ActiveInstance.InstanceIndex >= GameRunner.instance.gameInstances.Count)
             {
-                Random r = Game1.random.Copy();
+                return;
+            }
+            if (TASDateTime.CurrentFrame != LastFrame || ActiveInstance.InstanceIndex != LastInstanceIndex)
+            {
+                Random r = InstanceData.Get(ActiveInstance.InstanceIndex).random.Copy();
                 GetRandomLowGradeCropForThisSeason(r);
                 if (ActiveInstance.InstanceIndex == 0)
                 {
@@ -69,6 +74,7 @@ namespace TASMod.Overlays
 
                 }
                 LastFrame = TASDateTime.CurrentFrame;
+                LastInstanceIndex = ActiveInstance.InstanceIndex;
             }
         }
 

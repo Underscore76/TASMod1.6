@@ -1,3 +1,4 @@
+// TODO: I want to be able to show what index I would need to hit a mixed seed
 using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
@@ -17,10 +18,12 @@ namespace TASMod.Simulators.CutWeed
         public int NumHats = 0;
         public int NumQuartz = 0;
         public int NumWeeds = 0;
+        public int NeededRandom = 0;
     }
 
     public class CutWeed
     {
+        public static int MaxOffset = 100;
         public static int CurrentFrame = -1;
         public static List<SwingHit> Hits = new List<SwingHit> { new(), new(), new(), new() };
 
@@ -41,6 +44,20 @@ namespace TASMod.Simulators.CutWeed
                         try
                         {
                             Hits[i] = EstimateIndex(i);
+                            if (i == 0 && Hits[i].NumMixedSeeds == 0)
+                            {
+                                int offset = 0;
+                                SwingHit hit;
+                                do
+                                {
+                                    hit = EstimateIndex(i, ++offset);
+
+                                } while (hit.NumMixedSeeds == 0 && offset < MaxOffset);
+                                if (hit.NumMixedSeeds > 0)
+                                {
+                                    Hits[i].NeededRandom = offset;
+                                }
+                            }
                         }
                         catch (Exception e)
                         {
@@ -53,16 +70,20 @@ namespace TASMod.Simulators.CutWeed
             return new();
         }
 
-        public static SwingHit EstimateIndex(int index)
+        public static SwingHit EstimateIndex(int index, int offset = 0)
         {
             Farmer farmer = Reflector.GetStaticVar(index, "Game1__player") as Farmer;
             Random random = (Reflector.GetStaticVar(index, "Game1_random") as Random).Copy();
             GameLocation loc = GameRunner.instance.gameInstances[index].instanceGameLocation;
-            return EstimateFarmer(random, loc, farmer);
+            return EstimateFarmer(random, loc, farmer, offset);
         }
-        public static SwingHit EstimateFarmer(Random random, GameLocation loc, Farmer who)
+        public static SwingHit EstimateFarmer(Random random, GameLocation loc, Farmer who, int offset)
         {
             Random r = random.Copy();
+            for (int i = 0; i < offset; i++)
+            {
+                r.Next();
+            }
             MeleeWeapon weapon = who.CurrentTool as MeleeWeapon;
             SwingHit hit = new SwingHit();
             if (weapon != null)

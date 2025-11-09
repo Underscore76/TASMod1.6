@@ -44,6 +44,10 @@ namespace TASMod.Patches
         {
             CanDraw = (Counter + 1) == GameRunner_Update.Counter;
             gameTime = TASDateTime.CurrentGameTime;
+            if (CanDraw)
+            {
+                Controller.Timing.DrawPrefix();
+            }
             return CanDraw;
         }
 
@@ -51,6 +55,8 @@ namespace TASMod.Patches
         {
             if (CanDraw)
             {
+                Controller.Timing.DrawPostfix();
+                Controller.Timing.EndFrame();
                 Counter++;
                 TASDateTime.Update();
                 // NOTE: Allows for each frame to get new rng values to match Interop.GetRandomBytes
@@ -167,7 +173,7 @@ namespace TASMod.Patches
             }
             if (Controller.FastAdvance)
             {
-                ActiveInstance.LoadLast(); // forces the load state to neutral so an update can fire safely
+                ActiveInstance.LoadZero(); // forces the load state to neutral so an update can fire safely
                 if (Controller.PlaybackFrame == -1 || (int)TASDateTime.CurrentFrame < Controller.PlaybackFrame)
                 {
                     __instance.RunFast();
@@ -189,7 +195,9 @@ namespace TASMod.Patches
             }
             if (CanUpdate)
             {
-                ActiveInstance.LoadLast(); // forces the load state to neutral so an update can fire safely
+                Controller.Timing.StartFrame();
+                Controller.Timing.UpdatePrefix();
+                ActiveInstance.LoadZero(); // forces the load state to neutral so an update can fire safely
             }
             return CanUpdate;
         }
@@ -198,6 +206,7 @@ namespace TASMod.Patches
         {
             if (CanUpdate)
             {
+                Controller.Timing.UpdatePostfix();
                 Counter++;
             }
             else

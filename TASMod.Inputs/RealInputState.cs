@@ -62,6 +62,12 @@ namespace TASMod.Inputs
                 && mouseState.LeftButton == ButtonState.Pressed;
         }
 
+        public static bool LeftMouseReleased()
+        {
+            return oldMouseState.LeftButton == ButtonState.Pressed
+                && mouseState.LeftButton == ButtonState.Released;
+        }
+
         public static bool RightMouseClicked()
         {
             return oldMouseState.RightButton == ButtonState.Released

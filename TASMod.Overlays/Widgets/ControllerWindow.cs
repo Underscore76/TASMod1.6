@@ -8,6 +8,7 @@ using TASMod.Extensions;
 using TASMod.Inputs;
 using TASMod.Patches;
 using TASMod.Scripting;
+using System.Collections.Generic;
 
 namespace TASMod.Overlays.Widgets
 {
@@ -77,7 +78,9 @@ namespace TASMod.Overlays.Widgets
                     }
                 }
             }
+            ImGui.Separator();
 
+            FrameTasks.Draw(index);
             ImGui.Separator();
 
             // Function assignment section
@@ -108,7 +111,6 @@ namespace TASMod.Overlays.Widgets
                     ImGui.TextColored(new ImGuiVector4(0.6f, 0.6f, 0.6f, 1), "No named functions available");
                 }
             }
-
             ImGui.Separator();
 
             // Controller input display

@@ -168,6 +168,10 @@ namespace TASMod.Simulators.EnemyKill
             {
                 return Bug_takeDamage(Game1_random, bug, damage, xTrajectory, yTrajectory, isBomb, addedPrecision, who);
             }
+            if (monster is GreenSlime slime)
+            {
+                return GreenSlime_takeDamage(Game1_random, slime, damage, xTrajectory, yTrajectory, isBomb, addedPrecision, who);
+            }
             return Monster_baseTakeDamage(Game1_random, monster, damage, xTrajectory, yTrajectory, isBomb, addedPrecision, "");
         }
 
@@ -215,6 +219,23 @@ namespace TASMod.Simulators.EnemyKill
                 Debris_ctor(Game1_random, 1);
                 numberOfChunks--;
             }
+        }
+
+        public static int GreenSlime_takeDamage(Random Game1_random, GreenSlime slime, int damage, int xTrajectory, int yTrajectory, bool isBomb, double addedPrecision, Farmer who)
+        {
+            int actualDamage = Math.Max(1, damage - slime.resilience.Value);
+            if (Game1_random.NextDouble() < slime.missChance.Value - slime.missChance.Value * addedPrecision)
+            {
+                actualDamage = -1;
+            }
+            else
+            {
+                if (Game1.random.NextDouble() < 0.025 && slime.cute.Value)
+                {
+                    // shake
+                }
+            }
+            return actualDamage;
         }
 
         public static int Bug_takeDamage(Random Game1_random, Bug bug, int damage, int xTrajectory, int yTrajectory, bool isBomb, double addedPrecision, Farmer who)

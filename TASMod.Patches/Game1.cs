@@ -199,6 +199,32 @@ namespace TASMod.Patches
         }
     }
 
+    public class Game1_Draw : IPatch
+    {
+        public override string Name => "Game1.Draw";
+
+        public override void Patch(Harmony harmony)
+        {
+            harmony.Patch(
+                original: AccessTools.Method(
+                    typeof(Game1), "Draw"
+                ),
+                prefix: new HarmonyMethod(this.GetType(), nameof(this.Prefix)),
+                postfix: new HarmonyMethod(this.GetType(), nameof(this.Postfix))
+            );
+        }
+        public static bool Prefix(ref Game1 __instance)
+        {
+            Controller.Timing.GameDrawPrefix(__instance.instanceIndex);
+            return true;
+        }
+
+        public static void Postfix(ref Game1 __instance)
+        {
+            Controller.Timing.GameDrawPostfix(__instance.instanceIndex);
+        }
+    }
+
     // see SMAPI_Score.cs: effectively need to patch out the IsActive check
     public class Game1__update : IPatch
     {
@@ -210,8 +236,20 @@ namespace TASMod.Patches
                 original: AccessTools.Method(
                     typeof(Game1), "_update"
                 ),
+                prefix: new HarmonyMethod(this.GetType(), nameof(this.Prefix)),
+                postfix: new HarmonyMethod(this.GetType(), nameof(this.Postfix)),
                 transpiler: new HarmonyMethod(this.GetType(), nameof(this.Transpiler))
             );
+        }
+        public static bool Prefix(ref Game1 __instance)
+        {
+            Controller.Timing.GameUpdatePrefix(__instance.instanceIndex);
+            return true;
+        }
+
+        public static void Postfix(ref Game1 __instance)
+        {
+            Controller.Timing.GameUpdatePostfix(__instance.instanceIndex);
         }
 
         public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instr)

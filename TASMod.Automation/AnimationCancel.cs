@@ -1,5 +1,6 @@
 using StardewValley;
 using StardewValley.Tools;
+using TASMod.Helpers;
 using TASMod.Inputs;
 
 namespace TASMod.Automation
@@ -17,45 +18,47 @@ namespace TASMod.Automation
         }
 
         public override bool ActiveUpdate(
+            int index,
             out TASKeyboardState kstate,
             out TASMouseState mstate,
             out TASGamePadState gstate
         )
         {
+            var playerInfo = InstanceCurrentPlayer.Get(index);
             if (
-                Game1.player.UsingTool
+                playerInfo.UsingTool
                 && (
-                    Game1.player.CurrentTool is Hoe
-                    || Game1.player.CurrentTool is Axe
-                    || Game1.player.CurrentTool is Pickaxe
-                    || Game1.player.CurrentTool is WateringCan
+                    playerInfo.CurrentTool is Hoe
+                    || playerInfo.CurrentTool is Axe
+                    || playerInfo.CurrentTool is Pickaxe
+                    || playerInfo.CurrentTool is WateringCan
                 )
             )
             {
                 kstate = null;
                 mstate = new TASMouseState(Controller.LastFrameMouse(), false, false);
                 gstate = null;
-                if (ShouldCancel())
+                if (ShouldCancel(playerInfo))
                 {
                     return false;
                 }
                 return true;
             }
-            return base.ActiveUpdate(out kstate, out mstate, out gstate);
+            return base.ActiveUpdate(index, out kstate, out mstate, out gstate);
         }
 
-        public bool ShouldCancel()
+        public bool ShouldCancel(PlayerInfo playerInfo)
         {
-            switch (Game1.player.FarmerSprite.CurrentSingleAnimation)
+            switch (playerInfo.FarmerSprite.CurrentSingleAnimation)
             {
                 case 66: // axe/pickaxe/hoe down
                 case 48: // axe/pickaxe/hoe left/right
                 case 36: // axe/pickaxe/hoe down
-                    return Game1.player.FarmerSprite.currentAnimationIndex >= 2;
+                    return playerInfo.FarmerSprite.currentAnimationIndex >= 2;
                 case 54: // watering can down
                 case 58: // watering can left/right
                 case 62: // watering can up
-                    return Game1.player.FarmerSprite.currentAnimationIndex >= 3;
+                    return playerInfo.FarmerSprite.currentAnimationIndex >= 3;
                 default:
                     return false;
             }

@@ -35,18 +35,20 @@ namespace TASMod.Overlays
 
         public override void ActiveUpdate()
         {
-            if (ShouldUpdate())
+            int index = ActiveInstance.InstanceIndex;
+            var locationInfo = InstanceCurrentLocation.Get(index);
+            var playerInfo = InstanceCurrentPlayer.Get(index);
+            if (ShouldUpdate(locationInfo, playerInfo))
             {
                 rockCounters = new Dictionary<Vector2, int>();
-                last_mineLevel = CurrentLocation.MineLevel;
-                last_miningLevel = Game1.player.MiningLevel;
-                last_luckLevel = Game1.player.LuckLevel;
-                last_stonesLeftOnThisLevel = CurrentLocation.StonesLeftOnThisLevel();
-                last_characterCount = CurrentLocation.EnemyCount;
+                last_mineLevel = locationInfo.MineLevel;
+                last_miningLevel = playerInfo.Player.MiningLevel;
+                last_luckLevel = playerInfo.Player.LuckLevel;
+                last_stonesLeftOnThisLevel = locationInfo.StonesLeftOnThisLevel();
+                last_characterCount = locationInfo.EnemyCount;
 
                 foreach (
-                    KeyValuePair<Vector2, StardewValley.Object> current in Game1
-                        .currentLocation
+                    KeyValuePair<Vector2, StardewValley.Object> current in locationInfo.Location
                         .Objects
                         .Pairs
                 )
@@ -55,18 +57,18 @@ namespace TASMod.Overlays
                     {
                         rockCounters.Add(
                             current.Key,
-                            EvalTile(Game1.currentLocation as MineShaft, current.Key)
+                            EvalTile(index, locationInfo.Location as MineShaft, current.Key)
                         );
                     }
                 }
             }
-            if (CurrentLocation.IsMines)
+            if (locationInfo.IsMines)
             {
-                hasLadder = CurrentLocation.HasLadder(out ladderLocation);
-                Vector2 baseTile = Game1.player.Tile;
-                if (Game1.currentLocation.Name != Game1.player.currentLocation.Name)
+                hasLadder = locationInfo.HasLadder(out ladderLocation);
+                Vector2 baseTile = playerInfo.CurrentTile;
+                if (locationInfo.Name != playerInfo.Player.currentLocation.Name)
                 {
-                    baseTile = (Game1.currentLocation as MineShaft).tileBeneathLadder;
+                    baseTile = (locationInfo.Location as MineShaft).tileBeneathLadder;
                 }
                 if (!hasLadder)
                 {
@@ -114,27 +116,31 @@ namespace TASMod.Overlays
 
         public override void ActiveDraw(SpriteBatch b)
         {
-            if (!CurrentLocation.IsMines)
+            int index = ActiveInstance.InstanceIndex;
+            var locationInfo = InstanceCurrentLocation.Get(index);
+            var playerInfo = InstanceCurrentPlayer.Get(index);
+            if (!locationInfo.IsMines)
                 return;
 
-            Vector2 baseTile = Game1.player.Tile;
-            if (Game1.currentLocation.Name != Game1.player.currentLocation.Name)
+            Vector2 baseTile = playerInfo.CurrentTile;
+            if (locationInfo.Name != playerInfo.Player.currentLocation.Name)
             {
-                baseTile = (Game1.currentLocation as MineShaft).tileBeneathLadder;
+                baseTile = (locationInfo.Location as MineShaft).tileBeneathLadder;
             }
             // draw best line
             if (hasLadder)
             {
-                DrawLineBetweenTiles(b, baseTile, ladderLocation, Color.LightCyan, lineThickness);
+                DrawLineBetweenTiles(index, b, baseTile, ladderLocation, Color.LightCyan, lineThickness);
             }
             else if (minRockCount != Int32.MaxValue)
             {
                 foreach (KeyValuePair<Vector2, int> current in rockCounters)
                 {
                     if (current.Value <= minRockCount + 10)
-                        DrawDepth(b, current.Key, current.Value);
+                        DrawDepth(index, b, current.Key, current.Value);
                 }
                 DrawLineBetweenTiles(
+                    index,
                     b,
                     baseTile,
                     minLocation,
@@ -144,20 +150,21 @@ namespace TASMod.Overlays
             }
         }
 
-        private void DrawDepth(SpriteBatch spriteBatch, Vector2 tile, int depth)
+        private void DrawDepth(int index, SpriteBatch spriteBatch, Vector2 tile, int depth)
         {
-            DrawCenteredTextInTile(spriteBatch, tile, depth.ToString(), GetRockColor(depth));
+            DrawCenteredTextInTile(index, spriteBatch, tile, depth.ToString(), GetRockColor(depth));
         }
 
-        public int EvalTile(MineShaft mine, Vector2 tile)
+        public int EvalTile(int index, MineShaft mine, Vector2 tile)
         {
+            var playerInfo = InstanceCurrentPlayer.Get(index);
             if (mine.ladderHasSpawned || mine.stonesLeftOnThisLevel == 0)
             {
                 return -1;
             }
-            int farmerLuckLevel = Game1.player.LuckLevel;
+            int farmerLuckLevel = playerInfo.Player.LuckLevel;
             double chanceForLadderDown =
-                0.02 + (double)farmerLuckLevel / 100.0 + Game1.player.DailyLuck / 5.0;
+                0.02 + (double)farmerLuckLevel / 100.0 + playerInfo.Player.DailyLuck / 5.0;
             if (mine.EnemyCount == 0)
             {
                 chanceForLadderDown += 0.04;
@@ -178,13 +185,13 @@ namespace TASMod.Overlays
             return -1;
         }
 
-        public bool ShouldUpdate()
+        public bool ShouldUpdate(LocationInfo CurrentLocation, PlayerInfo CurrentPlayer)
         {
             if (CurrentLocation.IsMines)
             {
                 return (last_mineLevel != CurrentLocation.MineLevel)
-                    || (last_miningLevel != Game1.player.MiningLevel)
-                    || (last_luckLevel != Game1.player.LuckLevel)
+                    || (last_miningLevel != CurrentPlayer.Player.MiningLevel)
+                    || (last_luckLevel != CurrentPlayer.Player.LuckLevel)
                     || (last_stonesLeftOnThisLevel != CurrentLocation.StonesLeftOnThisLevel())
                     || (last_characterCount != CurrentLocation.EnemyCount);
             }

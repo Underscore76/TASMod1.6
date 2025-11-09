@@ -63,6 +63,13 @@ namespace TASMod.Scripting
                 bool success = (bool)output[0];
                 if (!success)
                 {
+                    if (output.Length > 1)
+                    {
+                        ModEntry.Console.Log(
+                            $"Error in coroutine '{Name}': {output[1]}",
+                            StardewModdingAPI.LogLevel.Error
+                        );
+                    }
                     return LuaCoroutineStatus.Dead;
                 }
                 return Status;

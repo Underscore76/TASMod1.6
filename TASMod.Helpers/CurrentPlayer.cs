@@ -10,60 +10,54 @@ namespace TASMod.Helpers
 {
     public class PlayerInfo
     {
-        public static bool Active
+        public int index;
+        public Farmer Player;
+        public FarmerSprite FarmerSprite => Player?.FarmerSprite;
+        public ViewportInfo Viewport => InstanceViewport.Get(index);
+        public Options Options
         {
-            get { return Game1.player != null; }
+            get
+            {
+                if (index >= GameRunner.instance.gameInstances.Count)
+                    return null;
+                return GameRunner.instance.gameInstances[index]?.instanceOptions;
+            }
         }
-        public static bool CanMove
+        public Rectangle Window
         {
-            get { return Game1.player.CanMove; }
+            get
+            {
+                if (index >= GameRunner.instance.gameInstances.Count)
+                    return Rectangle.Empty;
+                return GameRunner.instance.gameInstances[index].localMultiplayerWindow;
+            }
         }
-        public static bool FreezePause
-        {
-            get { return Game1.player.freezePause > 0; }
-        }
-        public static bool IsEmoting
-        {
-            get { return Game1.player.isEmoting; }
-        }
-        public static bool UsingTool
-        {
-            get { return Game1.player.UsingTool; }
-        }
-        public static Tool CurrentTool
-        {
-            get { return Game1.player?.CurrentTool; }
-        }
+        public bool Active => Player != null;
+        public bool CanMove => Player.CanMove;
+        public bool FreezePause => Player.freezePause > 0;
+        public bool IsEmoting => Player.isEmoting;
+        public bool UsingTool => Player.UsingTool;
+        public Tool CurrentTool => Player?.CurrentTool;
+        public Vector2 CurrentTile => Player.Tile;
+        public Rectangle BoundingBox => Player.GetBoundingBox();
+        public NetStringDictionary<Friendship, NetRef<Friendship>> Friendships => Player?.friendshipData;
 
-        public static Vector2 CurrentTile
-        {
-            get { return Game1.player.Tile; }
-        }
-        public static Rectangle BoundingBox
-        {
-            get { return Game1.player.GetBoundingBox(); }
-        }
-        public static NetStringDictionary<Friendship, NetRef<Friendship>> Friendships
-        {
-            get { return Game1.player?.friendshipData; }
-        }
-        public static string CurrentAnimationStartBehavior
+        public string CurrentAnimationStartBehavior
         {
             get
             {
                 string behavior = null;
-                if (Game1.player != null && Game1.player.FarmerSprite != null)
+                if (Player != null && Player.FarmerSprite != null)
                 {
-                    int animIndex = Game1.player.FarmerSprite.currentAnimationIndex;
-                    if (animIndex < Game1.player.FarmerSprite.CurrentAnimation.Count)
+                    int animIndex = Player.FarmerSprite.currentAnimationIndex;
+                    if (animIndex < Player.FarmerSprite.CurrentAnimation.Count)
                     {
                         if (
-                            Game1.player.FarmerSprite.CurrentAnimation[animIndex].frameStartBehavior
+                            Player.FarmerSprite.CurrentAnimation[animIndex].frameStartBehavior
                             != null
                         )
                         {
-                            behavior = Game1
-                                .player
+                            behavior = Player
                                 .FarmerSprite
                                 .CurrentAnimation[animIndex]
                                 .frameStartBehavior
@@ -75,29 +69,27 @@ namespace TASMod.Helpers
                 return behavior;
             }
         }
-        public static string LastAnimationEndBehavior
+        public string LastAnimationEndBehavior
         {
             get
             {
                 string behavior = null;
-                if (Game1.player != null && Game1.player.FarmerSprite != null)
+                if (Player != null && Player.FarmerSprite != null)
                 {
-                    int animIndex = Game1.player.FarmerSprite.currentAnimationIndex;
+                    int animIndex = Player.FarmerSprite.currentAnimationIndex;
                     if (
-                        animIndex < Game1.player.FarmerSprite.CurrentAnimation.Count
+                        animIndex < Player.FarmerSprite.CurrentAnimation.Count
                         && animIndex > 0
                     )
                     {
                         if (
-                            Game1
-                                .player
+                            Player
                                 .FarmerSprite
                                 .CurrentAnimation[animIndex - 1]
                                 .frameEndBehavior != null
                         )
                         {
-                            behavior = Game1
-                                .player
+                            behavior = Player
                                 .FarmerSprite
                                 .CurrentAnimation[animIndex - 1]
                                 .frameEndBehavior
@@ -110,29 +102,28 @@ namespace TASMod.Helpers
             }
         }
 
-        public static int CurrentAnimationLength
+        public int CurrentAnimationLength
         {
             get
             {
                 double interval = Math.Round(
-                    Game1.player.FarmerSprite.interval * Game1.player.FarmerSprite.intervalModifier,
+                    Player.FarmerSprite.interval * Player.FarmerSprite.intervalModifier,
                     1
                 );
                 return (int)Math.Ceiling(interval / 16);
             }
         }
-        public static int CurrentAnimationElapsed
+        public int CurrentAnimationElapsed
         {
-            get { return (int)(Game1.player.FarmerSprite.timer / 16); }
+            get { return (int)(Player.FarmerSprite.timer / 16); }
         }
-        public static bool IsHarvestingItem
+        public bool IsHarvestingItem
         {
             get
             {
-                if (Game1.player != null && Game1.player.FarmerSprite != null)
+                if (Player != null && Player.FarmerSprite != null)
                 {
-                    int animationType = (int)
-                        Reflector.GetValue(Game1.player.FarmerSprite, "currentSingleAnimation");
+                    int animationType = Player.FarmerSprite.currentSingleAnimation;
                     switch (animationType)
                     {
                         case FarmerSprite.harvestItemUp:
@@ -148,14 +139,13 @@ namespace TASMod.Helpers
             }
         }
 
-        public static bool IsSwingingSword
+        public bool IsSwingingSword
         {
             get
             {
-                if (Game1.player != null && Game1.player.FarmerSprite != null)
+                if (Player != null && Player.FarmerSprite != null)
                 {
-                    int animationType = (int)
-                        Reflector.GetValue(Game1.player.FarmerSprite, "currentSingleAnimation");
+                    int animationType = Player.FarmerSprite.currentSingleAnimation;
                     switch (animationType)
                     {
                         case FarmerSprite.swordswipeDown:
@@ -171,17 +161,17 @@ namespace TASMod.Helpers
             }
         }
 
-        public static Vector2 GetToolLocation()
+        public Vector2 GetToolLocation()
         {
-            return Game1.player.GetToolLocation();
+            return Player.GetToolLocation();
         }
 
-        public static Vector2 GetToolLocation(int dir)
+        public Vector2 GetToolLocation(int dir)
         {
-            Rectangle boundingBox = PlayerInfo.BoundingBox;
+            Rectangle boundingBox = BoundingBox;
             if (
-                Game1.player.CurrentTool != null
-                && Game1.player.CurrentTool.Name.Equals("Fishing Rod")
+                CurrentTool != null
+                && CurrentTool.Name.Equals("Fishing Rod")
             )
             {
                 switch (dir)
@@ -225,84 +215,84 @@ namespace TASMod.Helpers
                         );
                 }
             }
-            return new Vector2(Game1.player.StandingPixel.X, Game1.player.StandingPixel.Y);
+            return new Vector2(Player.StandingPixel.X, Player.StandingPixel.Y);
         }
 
-        public static int FacingDirection
+        public int FacingDirection
         {
-            get { return Game1.player.FacingDirection; }
+            get { return Player.FacingDirection; }
         }
 
-        public static int GetLastMouseFacingDirection()
-        {
-            Vector2 position = new Vector2(
-                TASInputState.mState.MouseX + Game1.viewport.X,
-                TASInputState.mState.MouseY + Game1.viewport.Y
-            );
-            if (
-                Utility.withinRadiusOfPlayer((int)position.X, (int)position.Y, 1, Game1.player)
-                && (
-                    Math.Abs(position.X - (float)Game1.player.StandingPixel.X) >= 32f
-                    || Math.Abs(position.Y - (float)Game1.player.StandingPixel.Y) >= 32f
-                )
-            )
-            {
-                return Game1.player.getGeneralDirectionTowards(position, 0, false);
-            }
-            return FacingDirection;
-        }
-
-        public static int GetMouseFacingDirection()
+        public int GetLastMouseFacingDirection()
         {
             Vector2 position = new Vector2(
-                RealInputState.mouseState.X + Game1.viewport.X,
-                RealInputState.mouseState.Y + Game1.viewport.Y
+                TASInputState.mState.MouseX + Viewport.X,
+                TASInputState.mState.MouseY + Viewport.Y
             );
             if (
-                Utility.withinRadiusOfPlayer((int)position.X, (int)position.Y, 1, Game1.player)
+                Utility.withinRadiusOfPlayer((int)position.X, (int)position.Y, 1, Player)
                 && (
-                    Math.Abs(position.X - (float)Game1.player.StandingPixel.X) >= 32f
-                    || Math.Abs(position.Y - (float)Game1.player.StandingPixel.Y) >= 32f
+                    Math.Abs(position.X - (float)Player.StandingPixel.X) >= 32f
+                    || Math.Abs(position.Y - (float)Player.StandingPixel.Y) >= 32f
                 )
             )
             {
-                return Game1.player.getGeneralDirectionTowards(position, 0, false);
+                return Player.getGeneralDirectionTowards(position, 0, false);
             }
             return FacingDirection;
         }
 
-        public static int GetProposedFacingDirection(int mouseX, int mouseY)
+        public int GetMouseFacingDirection()
         {
-            Vector2 position = new Vector2(mouseX + Game1.viewport.X, mouseY + Game1.viewport.Y);
+            Vector2 position = new Vector2(
+                RealInputState.mouseState.X + Viewport.X,
+                RealInputState.mouseState.Y + Viewport.Y
+            );
             if (
-                Utility.withinRadiusOfPlayer((int)position.X, (int)position.Y, 1, Game1.player)
+                Utility.withinRadiusOfPlayer((int)position.X, (int)position.Y, 1, Player)
                 && (
-                    Math.Abs(position.X - (float)Game1.player.StandingPixel.X) >= 32f
-                    || Math.Abs(position.Y - (float)Game1.player.StandingPixel.Y) >= 32f
+                    Math.Abs(position.X - (float)Player.StandingPixel.X) >= 32f
+                    || Math.Abs(position.Y - (float)Player.StandingPixel.Y) >= 32f
                 )
             )
             {
-                return Game1.player.getGeneralDirectionTowards(position, 0, false);
+                return Player.getGeneralDirectionTowards(position, 0, false);
             }
             return FacingDirection;
         }
 
-        public static bool CanShoot
+        public int GetProposedFacingDirection(int mouseX, int mouseY)
+        {
+            Vector2 position = new Vector2(mouseX + Viewport.X, mouseY + Viewport.Y);
+            if (
+                Utility.withinRadiusOfPlayer((int)position.X, (int)position.Y, 1, Player)
+                && (
+                    Math.Abs(position.X - (float)Player.StandingPixel.X) >= 32f
+                    || Math.Abs(position.Y - (float)Player.StandingPixel.Y) >= 32f
+                )
+            )
+            {
+                return Player.getGeneralDirectionTowards(position, 0, false);
+            }
+            return FacingDirection;
+        }
+
+        public bool CanShoot
         {
             get
             {
                 if (CurrentTool != null && CurrentTool is Slingshot slingshot)
                 {
-                    return slingshot.GetBackArmDistance(Game1.player) > 4;
+                    return slingshot.GetBackArmDistance(Player) > 4;
                 }
                 return false;
             }
         }
-        public static Vector2 PlayerCenter
+        public Vector2 PlayerCenter
         {
             get
             {
-                if (Game1.player != null)
+                if (Player != null)
                 {
                     Rectangle bb = BoundingBox;
                     return new Vector2(bb.X + 24, bb.Y + 16);
@@ -310,21 +300,32 @@ namespace TASMod.Helpers
                 return Vector2.Zero;
             }
         }
-        public static Vector2 PlayerInTile
+        public Vector2 PlayerInTile
         {
             get { return new Vector2(PlayerCenter.X % 64f, PlayerCenter.Y % 64f); }
         }
-        public static int Direction
+        public int Direction
         {
-            get { return Game1.player.FacingDirection; }
+            get { return Player.FacingDirection; }
         }
-        public static int CurrentSingleAnimation
+        public int CurrentSingleAnimation
         {
-            get { return Game1.player.FarmerSprite.CurrentSingleAnimation; }
+            get { return Player.FarmerSprite.CurrentSingleAnimation; }
         }
-        public static int CurrentAnimationIndex
+        public int CurrentAnimationIndex
         {
-            get { return Game1.player.FarmerSprite.currentAnimationIndex; }
+            get { return Player.FarmerSprite.currentAnimationIndex; }
+        }
+    }
+
+    public class InstanceCurrentPlayer
+    {
+        public static PlayerInfo Get(int index)
+        {
+            if (index < 0 || index >= GameRunner.instance.gameInstances.Count)
+                return new PlayerInfo { index = index, Player = null };
+            var farmer = Reflector.GetStaticVar(index, "Game1__player") as Farmer;
+            return new PlayerInfo { index = index, Player = farmer };
         }
     }
 }

@@ -80,12 +80,12 @@ namespace TASMod
             {
                 return false;
             }
-            ActiveInstance.Stash(0);
+            // ActiveInstance.Stash(0);
             bool flag = false;
             AppliedLogic = null;
             foreach (IAutomatedLogic logic in Automation.Values)
             {
-                if (logic.Update(out _, out _, out _))
+                if (logic.Update(0, out _, out _, out _))
                 {
                     flag = true;
                     AppliedLogic = logic.Name;
@@ -97,7 +97,7 @@ namespace TASMod
                 for (int i = 1; i <= NetworkState.NumConnections; i++)
                     flag &= GamePadInputQueue.HasInput(i) || GamePadInputQueue.HasPlayerCoroutine(i);
             }
-            ActiveInstance.Pop();
+            // ActiveInstance.Pop();
             return flag;
         }
 
@@ -113,14 +113,13 @@ namespace TASMod
                 return AppliedLogic != null;
             }
 
-            ActiveInstance.Stash(0);
             bool flag = false;
             AppliedLogic = null;
             AppliedFrame = -1;
 
             foreach (IAutomatedLogic logic in Automation.Values)
             {
-                if (logic.Update(out TASKeyboardState keys, out TASMouseState mouse, out _))
+                if (logic.Update(0, out TASKeyboardState keys, out TASMouseState mouse, out _))
                 {
                     if (keys != null)
                         TASInputState.SetKeyboard(keys);
@@ -133,7 +132,6 @@ namespace TASMod
                     break;
                 }
             }
-            ActiveInstance.Pop();
             return flag;
         }
     }

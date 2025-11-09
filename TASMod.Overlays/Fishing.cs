@@ -20,11 +20,26 @@ namespace TASMod.Overlays
 
         public override void ActiveDraw(SpriteBatch spriteBatch)
         {
-            if (CurrentMenu.Active && Game1.activeClickableMenu is BobberBar bar)
+            for (int i = 0; i < GameRunner.instance.gameInstances.Count; i++)
             {
-                SFishingGame game = new SFishingGame();
+                try
+                {
+                    DrawForInstance(i, spriteBatch);
+                }
+                catch (Exception e)
+                {
+                    ModEntry.Console.Log($"Fishing ActiveDraw Exception: {e}", StardewModdingAPI.LogLevel.Error);
+                }
+            }
+        }
+        public void DrawForInstance(int index, SpriteBatch spriteBatch)
+        {
+            var menu = InstanceCurrentMenu.Get(index); ;
+            if (menu.Active && menu.Menu is BobberBar bar)
+            {
+                SFishingGame game = new SFishingGame(index);
                 var state = game.bobberBar;
-                DrawRectLocal(spriteBatch,
+                DrawRectLocal(index, spriteBatch,
                     new Rectangle(
                         bar.xPositionOnScreen + 56,
                         bar.yPositionOnScreen + 12 + (int)state.bobberBarPos - 16,
@@ -32,7 +47,7 @@ namespace TASMod.Overlays
                         ),
                     state.bobberInBar ? Color.Green : Color.Red, 1, true
                     );
-                DrawRectLocal(spriteBatch,
+                DrawRectLocal(index, spriteBatch,
                     new Rectangle(
                         bar.xPositionOnScreen + 56,
                         bar.yPositionOnScreen + 12 + (int)state.bobberPosition,
@@ -40,7 +55,7 @@ namespace TASMod.Overlays
                         ),
                     new Color(0, 0, 196, 128), 1
                     );
-                DrawRectLocal(spriteBatch,
+                DrawRectLocal(index, spriteBatch,
                     new Rectangle(
                         bar.xPositionOnScreen + 56,
                         bar.yPositionOnScreen + 12 + (int)state.bobberTargetPosition,
@@ -50,7 +65,7 @@ namespace TASMod.Overlays
                     );
                 if (state.treasure)
                 {
-                    DrawRectLocal(spriteBatch,
+                    DrawRectLocal(index, spriteBatch,
                     new Rectangle(
                         bar.xPositionOnScreen + 56,
                         bar.yPositionOnScreen + 12 + (int)state.treasurePosition,

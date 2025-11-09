@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using StardewValley;
+using StardewValley.Menus;
 using TASMod.Helpers;
 using TASMod.Inputs;
 
@@ -15,40 +16,44 @@ namespace TASMod.Automation
         public override string Description => "advance to click off frame";
 
         public override bool ActiveUpdate(
+            int index,
             out TASKeyboardState kstate,
             out TASMouseState mstate,
             out TASGamePadState gstate
         )
         {
+            var menuInfo = InstanceCurrentMenu.Get(index);
+            var viewport = InstanceViewport.Get(index);
+            var minigame = InstanceCurrentMinigame.Get(index);
             kstate = null;
             mstate = new TASMouseState(Controller.LastFrameMouse(), false, false);
             gstate = null;
 
-            if (!CurrentMenu.Active || !CurrentMenu.IsDialogue)
+            if (!menuInfo.Active || !menuInfo.IsDialogue)
                 return false;
 
-            if (Game1.currentMinigame != null)
+            if (minigame.Minigame != null)
                 return false;
 
             // transitioning on/off screen
-            if (CurrentMenu.Transitioning)
+            if (menuInfo.Transitioning)
                 return true;
 
-            if (!CurrentMenu.IsQuestion)
+            if (!menuInfo.IsQuestion)
             {
                 // force the characters on the screen
-                if (CurrentMenu.CharacterIndexInDialogue == 0)
+                if (menuInfo.CharacterIndexInDialogue == 0)
                 {
                     mstate = new TASMouseState(
-                        (int)Globals.ViewportCenter.X,
-                        (int)Globals.ViewportCenter.Y,
+                        (int)viewport.Center.X,
+                        (int)viewport.Center.Y,
                         true,
                         false
                     );
                     return true;
                 }
                 // waiting after characters have loaded
-                if (CurrentMenu.SafetyTimer > 0)
+                if (menuInfo.SafetyTimer > 0)
                     return true;
             }
 

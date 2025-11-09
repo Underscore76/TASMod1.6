@@ -87,6 +87,7 @@ namespace TASMod.Views
             if (Game1.gameMode == 3 && target != null)
             {
                 Mouse.DrawViewport(
+                    0,
                     Game1.spriteBatch,
                     target,
                     CurrentViewport,

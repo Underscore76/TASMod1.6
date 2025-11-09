@@ -385,6 +385,8 @@ namespace TASMod.Scripting
         public Item TrySpawnChestFloorItem(int menuFrames, int unpausedRandomOffset, bool tryCursor)
         {
             // stash state
+            ActiveInstance.LoadZero();
+            var location = InstanceCurrentLocation.Get(0);
             ICue old_cue = Game1.currentSong;
             Random old_random = Game1.random.Copy();
             Random sharedRandom = RandomExtensions.SharedRandom.Copy();
@@ -432,7 +434,7 @@ namespace TASMod.Scripting
             RandomExtensions.Update();
 
             // build the mineshaft
-            MineShaft mineShaft = new MineShaft(CurrentLocation.MineLevel + 1);
+            MineShaft mineShaft = new MineShaft(location.MineLevel + 1);
             Controller.Console.Warn(
                 $"\test: b:generateContents: {Game1.random.get_Index():D4} {mineShaft.mineRandom.get_Index():D4}"
             );
@@ -484,6 +486,7 @@ namespace TASMod.Scripting
         public MineShaft SpawnNextMineShaftWithOffset(int offset)
         {
             // stash state
+            ActiveInstance.LoadZero();
             ICue old_cue = Game1.currentSong;
             Random old_random = Game1.random.Copy();
             Random sharedRandom = RandomExtensions.SharedRandom.Copy();
@@ -510,7 +513,7 @@ namespace TASMod.Scripting
             }
 
             // build the mineshaft
-            MineShaft mineShaft = new MineShaft(CurrentLocation.MineLevel + 1);
+            MineShaft mineShaft = new MineShaft(((Game1.currentLocation as MineShaft)?.mineLevel ?? 0) + 1);
             Reflector.InvokeMethod(mineShaft, "generateContents");
 
             // advance up to the add chest call
@@ -539,9 +542,9 @@ namespace TASMod.Scripting
 
         public MineShaft SpawnMineShaft(int level)
         {
-            ActiveInstance.TryLoad();
+            ActiveInstance.LoadZero();
             // stash state
-            Random old_random = ((Random)Reflector.GetStaticVar(ActiveInstance.InstanceIndex, "Game1_random")).Copy();
+            Random old_random = Game1.random.Copy();
             ICue old_cue = Game1.game1.instanceCurrentSong;
             Random sharedRandom = RandomExtensions.SharedRandom.Copy();
 
@@ -571,7 +574,7 @@ namespace TASMod.Scripting
             // reset the state
             Game1.game1.instanceCurrentSong = old_cue;
             Game1.random = old_random;
-            Reflector.SetStaticVar(ActiveInstance.InstanceIndex, "Game1_random", old_random);
+            Reflector.SetStaticVar(0, "Game1_random", old_random);
             RandomExtensions.SharedRandom = sharedRandom;
             MineShaft.lowestLevelReached = LowestMineLevel;
             MineShaft.mushroomLevelsGeneratedToday = mushroomLevelsGeneratedToday;

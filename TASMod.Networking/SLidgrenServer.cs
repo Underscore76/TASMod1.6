@@ -48,6 +48,7 @@ namespace TASMod.Networking
 
         public override void receiveMessages()
         {
+            Controller.Timing.ServerPrefix();
             SIncomingMessage inc;
             while ((inc = NetworkState.ReadServerMessage()) != null)
             {
@@ -102,6 +103,7 @@ namespace TASMod.Networking
                     introductionsSent.Add(conn);
                 }
             }
+            Controller.Timing.ServerPostfix();
         }
 
         private void sendConnectApproval(SIncomingMessage inc)

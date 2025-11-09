@@ -19,15 +19,16 @@ namespace TASMod.Helpers
     {
         public float getDefaultMovementSpeed(float temporarySpeedBuff)
         {
+            var player = InstanceCurrentPlayer.Get(ActiveInstance.InstanceIndex).Player;
             // Farmer:getMovementSpeed
             float movementMultiplier = 0.066f;
             float movementSpeed = (
-                (!Game1.player.isRidingHorse())
+                (!player.isRidingHorse())
                     ? Math.Max(
                         1f,
                         (
-                            (float)Game1.player.speed
-                            + ((Game1.player.addedSpeed + temporarySpeedBuff))
+                            (float)player.speed
+                            + ((player.addedSpeed + temporarySpeedBuff))
                         )
                             * movementMultiplier
                             * (float)Game1.currentGameTime.ElapsedGameTime.Milliseconds
@@ -35,13 +36,13 @@ namespace TASMod.Helpers
                     : Math.Max(
                         1f,
                         (
-                            (float)Game1.player.speed
+                            (float)player.speed
                             + (
                                 (
-                                    Game1.player.addedSpeed
+                                    player.addedSpeed
                                     + 4.6f
-                                    + (Game1.player.mount.ateCarrotToday ? 0.4f : 0f)
-                                    + ((Game1.player.stats.Get("Book_Horse") != 0) ? 0.5f : 0f)
+                                    + (player.mount.ateCarrotToday ? 0.4f : 0f)
+                                    + ((player.stats.Get("Book_Horse") != 0) ? 0.5f : 0f)
                                 )
                             )
                         )
@@ -57,7 +58,8 @@ namespace TASMod.Helpers
         {
             get
             {
-                if (Game1.player.stats.Get("Book_Grass") != 0)
+                var player = InstanceCurrentPlayer.Get(ActiveInstance.InstanceIndex).Player;
+                if (player.stats.Get("Book_Grass") != 0)
                 {
                     return getDefaultMovementSpeed(-0.33f);
                 }
@@ -116,11 +118,12 @@ namespace TASMod.Helpers
             return true;
         }
 
-        public void Update(Tile start, Tile end, bool useTool = true)
+        public void Update(int index, Tile start, Tile end, bool useTool = true)
         {
-            location = Game1.currentLocation;
+            var locationInfo = InstanceCurrentLocation.Get(index);
+            location = locationInfo.Location;
             useTools = useTool;
-            if (!IsValid(end))
+            if (!IsValid(index, end))
             {
                 path = null;
                 hasPath = false;
@@ -128,7 +131,7 @@ namespace TASMod.Helpers
             }
             try
             {
-                path = solver.Search(start, end, out cost, maxCost);
+                path = solver.Search(index, start, end, out cost, maxCost);
                 hasPath = path != null;
             }
             catch
@@ -137,22 +140,23 @@ namespace TASMod.Helpers
             }
         }
 
-        public void Update(int endX, int endY, bool useTool)
+        public void Update(int index, int endX, int endY, bool useTool)
         {
+            var playerInfo = InstanceCurrentPlayer.Get(index);
             Tile start = new Tile()
             {
-                X = (int)PlayerInfo.CurrentTile.X,
-                Y = (int)PlayerInfo.CurrentTile.Y
+                X = (int)playerInfo.CurrentTile.X,
+                Y = (int)playerInfo.CurrentTile.Y
             };
             Tile end = new Tile() { X = endX, Y = endY };
-            Update(start, end, useTool);
+            Update(index, start, end, useTool);
         }
 
-        public void Update(int startX, int startY, int endX, int endY, bool useTool)
+        public void Update(int index, int startX, int startY, int endX, int endY, bool useTool)
         {
             Tile start = new Tile() { X = startX, Y = startY };
             Tile end = new Tile() { X = endX, Y = endY };
-            Update(start, end, useTool);
+            Update(index, start, end, useTool);
         }
 
         public class Tile
@@ -178,7 +182,7 @@ namespace TASMod.Helpers
             }
         }
 
-        public IEnumerable<Tile> GetNeighbors(Tile tile)
+        public IEnumerable<Tile> GetNeighbors(int index, Tile tile)
         {
             List<Tile> neighbors = new List<Tile>();
             for (int i = -1; i <= 1; ++i)
@@ -188,13 +192,13 @@ namespace TASMod.Helpers
                     if (i == 0 && j == 0)
                         continue;
                     Tile newTile = new Tile() { X = tile.X + i, Y = tile.Y + j };
-                    if (!IsValid(newTile))
+                    if (!IsValid(index, newTile))
                         continue;
                     if (i != 0 && j != 0)
                     {
                         if (
-                            !IsValid(new Tile() { X = tile.X, Y = newTile.Y })
-                            || !IsValid(new Tile() { X = newTile.X, Y = tile.Y })
+                            !IsValid(index, new Tile() { X = tile.X, Y = newTile.Y })
+                            || !IsValid(index, new Tile() { X = newTile.X, Y = tile.Y })
                         )
                             continue;
                     }
@@ -204,7 +208,7 @@ namespace TASMod.Helpers
             return neighbors;
         }
 
-        public bool IsValid(Tile tile)
+        public bool IsValid(int index, Tile tile)
         {
             if (!location.isTileOnMap(tile.toVector2()))
                 return false;
@@ -274,10 +278,11 @@ namespace TASMod.Helpers
             if (location.GetFurnitureAt(tile.toVector2()) != null)
                 return false;
             // check layer properties
+            var viewport = InstanceViewport.Get(index);
             if (
                 location.isTilePassable(
                     new xTile.Dimensions.Location(tile.X, tile.Y),
-                    Game1.viewport
+                    viewport.Viewport
                 )
             )
                 return true;
@@ -288,7 +293,7 @@ namespace TASMod.Helpers
                     .map.GetLayer("Back")
                     .PickTile(
                         new xTile.Dimensions.Location(tileRect.X, tileRect.Y),
-                        Game1.viewport.Size
+                        viewport.Viewport.Size
                     );
                 if (
                     backTile == null
@@ -303,7 +308,7 @@ namespace TASMod.Helpers
             return false;
         }
 
-        public double DistanceStep(Tile start, Tile end)
+        public double DistanceStep(int index, Tile start, Tile end)
         {
             double toolCost;
             double baseWeight;
@@ -318,7 +323,7 @@ namespace TASMod.Helpers
                 baseWeight =
                     (Math.Abs(start.X - end.X) + Math.Abs(start.Y - end.Y))
                     * CardinalWeight(isGrassOrCrop);
-                toolCost = GetToolCost(location, new List<Tile> { end });
+                toolCost = GetToolCost(index, location, new List<Tile> { end });
             }
             else
             {
@@ -326,6 +331,7 @@ namespace TASMod.Helpers
                     Math.Max(Math.Abs(start.X - end.X), Math.Abs(start.Y - end.Y))
                     * DiagonalWeight(isGrassOrCrop);
                 toolCost = GetToolCost(
+                    index,
                     location,
                     new List<Tile>
                     {
@@ -338,7 +344,7 @@ namespace TASMod.Helpers
             return baseWeight + toolCost;
         }
 
-        public double DistanceHeuristic(Tile start, Tile end)
+        public double DistanceHeuristic(int index, Tile start, Tile end)
         {
             int tilesDiagonal,
                 tilesCardinal;
@@ -362,8 +368,9 @@ namespace TASMod.Helpers
         public Func<T, T, double> DistanceHeuristic;
         */
 
-        private double GetToolCost(GameLocation location, List<Tile> tiles)
+        private double GetToolCost(int index, GameLocation location, List<Tile> tiles)
         {
+            var player = InstanceCurrentPlayer.Get(index).Player;
             double weight = 0;
             foreach (var tile in tiles)
             {
@@ -374,7 +381,7 @@ namespace TASMod.Helpers
                     tile.toVector2(),
                     out TerrainFeature feature
                 );
-                if (!useTools && featureExists && !feature.isPassable(Game1.player))
+                if (!useTools && featureExists && !feature.isPassable(player))
                     return double.NaN;
                 ResourceClump clump = null;
                 foreach (ResourceClump current in location.resourceClumps)

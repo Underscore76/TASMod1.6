@@ -8,6 +8,7 @@ using StardewValley.Menus;
 using StardewValley.Tools;
 using TASMod.Console;
 using TASMod.Extensions;
+using TASMod.Helpers;
 using TASMod.System;
 
 namespace TASMod.Simulators.Fishing
@@ -21,7 +22,7 @@ namespace TASMod.Simulators.Fishing
         public SFish(string whichFish)
         {
             Dictionary<string, string> fishData = DataLoader.Fish(Game1.content);
-            if(fishData.TryGetValue(whichFish, out var value))
+            if (fishData.TryGetValue(whichFish, out var value))
             {
                 string[] array = value.Split('/');
                 if (array[1] == "trap") return;
@@ -47,7 +48,7 @@ namespace TASMod.Simulators.Fishing
                         break;
                 }
             }
-            else 
+            else
             {
                 throw new Exception("could not load fish");
             }
@@ -168,7 +169,8 @@ namespace TASMod.Simulators.Fishing
             return new SBobberBar(this);
         }
 
-        public void update(bool buttonPressed, Random random) { 
+        public void update(bool buttonPressed, Random random)
+        {
             if (everythingShakeTimer > 0f)
             {
                 random.Next(-10, 11);
@@ -372,6 +374,7 @@ namespace TASMod.Simulators.Fishing
         public int bobberBob;
         // location props
         public int numArtifactSpots;
+        public string locationName;
 
         // daytime money box
         public int moneyShakeTimer;
@@ -381,27 +384,32 @@ namespace TASMod.Simulators.Fishing
 
         public SBobberBar bobberBar;
 
-        public SFishingGame()
+        public SFishingGame(int index)
         {
+            Farmer player = InstanceCurrentPlayer.Get(index).Player;
+            GameLocation currentLocation = InstanceCurrentLocation.Get(index).Location;
+            locationName = currentLocation.Name;
             // clone from current game
-            Game1_random = Game1.random.Copy();
+            var data = InstanceData.Get(index);
+            Game1_random = data.random.Copy();
+            var dayTimeMoneyBox = data.dayTimeMoneyBox;
             CurrentFrame = TASDateTime.CurrentFrame;
             // farmer props
-            jitterStrength = Game1.player.jitterStrength;
-            jitter = Game1.player.jitter;
-            blinkTimer = Game1.player.blinkTimer;
+            jitterStrength = player.jitterStrength;
+            jitter = player.jitter;
+            blinkTimer = player.blinkTimer;
 
             // fishing props
-            bobber = (Game1.player.CurrentTool as FishingRod).bobber.Value;
-            isFishing = (Game1.player.CurrentTool as FishingRod).isFishing;
-            isNibbling = (Game1.player.CurrentTool as FishingRod).isNibbling;
-            isReeling = (Game1.player.CurrentTool as FishingRod).isReeling;
-            bobberTimeAccumulator = (Game1.player.CurrentTool as FishingRod).bobberTimeAccumulator;
-            timePerBobberBob = (Game1.player.CurrentTool as FishingRod).timePerBobberBob;
-            bobberBob = (Game1.player.CurrentTool as FishingRod).bobberBob;
+            bobber = (player.CurrentTool as FishingRod).bobber.Value;
+            isFishing = (player.CurrentTool as FishingRod).isFishing;
+            isNibbling = (player.CurrentTool as FishingRod).isNibbling;
+            isReeling = (player.CurrentTool as FishingRod).isReeling;
+            bobberTimeAccumulator = (player.CurrentTool as FishingRod).bobberTimeAccumulator;
+            timePerBobberBob = (player.CurrentTool as FishingRod).timePerBobberBob;
+            bobberBob = (player.CurrentTool as FishingRod).bobberBob;
 
             // location props
-            foreach (var obj in Game1.currentLocation.Objects.Values)
+            foreach (var obj in currentLocation.Objects.Values)
             {
                 switch (obj.QualifiedItemId)
                 {
@@ -413,13 +421,13 @@ namespace TASMod.Simulators.Fishing
             }
 
             // daytime money box
-            moneyShakeTimer = Game1.dayTimeMoneyBox.moneyShakeTimer;
-            timeShakeTimer = Game1.dayTimeMoneyBox.timeShakeTimer;
-            questPulseTimer = Game1.dayTimeMoneyBox.questPulseTimer;
-            whenToPulseTimer = Game1.dayTimeMoneyBox.whenToPulseTimer;
+            moneyShakeTimer = dayTimeMoneyBox.moneyShakeTimer;
+            timeShakeTimer = dayTimeMoneyBox.timeShakeTimer;
+            questPulseTimer = dayTimeMoneyBox.questPulseTimer;
+            whenToPulseTimer = dayTimeMoneyBox.whenToPulseTimer;
 
             // bobber bar
-            bobberBar = new SBobberBar(Game1.activeClickableMenu as BobberBar);
+            bobberBar = new SBobberBar(InstanceCurrentMenu.Get(index).Menu as BobberBar);
         }
 
         public SFishingGame(SFishingGame game)
@@ -478,7 +486,7 @@ namespace TASMod.Simulators.Fishing
         public void UpdateOther(bool buttonPress)
         {
             // check for music
-            switch (Game1.currentLocation.Name)
+            switch (locationName)
             {
                 case "Beach":
                     Game1_random.Next();
@@ -496,7 +504,7 @@ namespace TASMod.Simulators.Fishing
                 case "Secret Woods":
                     throw new NotImplementedException();
                 default:
-                    throw new NotImplementedException($"{Game1.currentLocation.Name}");
+                    throw new NotImplementedException($"{locationName}");
             }
         }
 

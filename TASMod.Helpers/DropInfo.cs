@@ -19,7 +19,7 @@ namespace TASMod.Helpers
             {
                 return Game1.objectData[index].Name;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return "unknown";
             }

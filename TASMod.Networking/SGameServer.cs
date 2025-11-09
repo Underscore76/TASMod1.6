@@ -152,10 +152,12 @@ namespace TASMod.Networking
             {
                 server.setPrivacy(privacy);
             }
+#pragma warning disable AvoidImplicitNetFieldCast // Netcode types shouldn't be implicitly converted
             if (Game1.netWorldState != null && Game1.netWorldState.Value != null)
             {
                 Game1.netWorldState.Value.ServerPrivacy = privacy;
             }
+#pragma warning restore AvoidImplicitNetFieldCast // Netcode types shouldn't be implicitly converted
         }
 
         public void stopServer()
@@ -278,10 +280,12 @@ namespace TASMod.Networking
 
         public void initializeHost()
         {
+#pragma warning disable AvoidImplicitNetFieldCast // Netcode types shouldn't be implicitly converted
             if (Game1.serverHost == null)
             {
                 Game1.serverHost = new NetFarmerRoot();
             }
+#pragma warning restore AvoidImplicitNetFieldCast // Netcode types shouldn't be implicitly converted
             Game1.serverHost.Value = Game1.player;
             using (List<Server>.Enumerator enumerator = servers.GetEnumerator())
             {

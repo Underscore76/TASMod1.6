@@ -56,6 +56,7 @@ namespace TASMod.Networking
 
         protected override void receiveMessagesImpl()
         {
+            Controller.Timing.ClientPrefix(Game1.game1.instanceIndex);
             SIncomingMessage inc;
             while ((inc = NetworkState.ReadClientMessage(connectionId)) != null)
             {
@@ -89,6 +90,7 @@ namespace TASMod.Networking
                         break;
                 }
             }
+            Controller.Timing.ClientPostfix(Game1.game1.instanceIndex);
         }
 
         private void parseDataMessageFromServer(SIncomingMessage inc)

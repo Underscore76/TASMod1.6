@@ -26,24 +26,38 @@ namespace TASMod.Overlays
 
         public override void ActiveDraw(SpriteBatch spriteBatch)
         {
-            if (CurrentLocation.Active)
+            for (int i = 0; i < GameRunner.instance.gameInstances.Count; i++)
+            {
+                try
+                {
+                    DrawForInstance(i, spriteBatch);
+                }
+                catch (Exception e)
+                {
+                    ModEntry.Console.Log($"TileOutlines ActiveDraw Exception: {e}", StardewModdingAPI.LogLevel.Error);
+                }
+            }
+        }
+        public void DrawForInstance(int index, SpriteBatch spriteBatch)
+        {
+            var location = InstanceCurrentLocation.Get(index);
+            if (location.Active)
             {
                 foreach (
-                    KeyValuePair<Vector2, Object> current in Game1.currentLocation.Objects.Pairs
+                    KeyValuePair<Vector2, Object> current in location.Location.Objects.Pairs
                 )
                 {
-                    DrawTileOutline(spriteBatch, current.Key, ObjectColor);
+                    DrawTileOutline(index, spriteBatch, current.Key, ObjectColor);
                 }
                 foreach (
-                    KeyValuePair<Vector2, TerrainFeature> current in Game1
-                        .currentLocation
+                    KeyValuePair<Vector2, TerrainFeature> current in location.Location
                         .terrainFeatures
                         .Pairs
                 )
                 {
-                    DrawTileOutline(spriteBatch, current.Key, TerrainFeatureColor);
+                    DrawTileOutline(index, spriteBatch, current.Key, TerrainFeatureColor);
                 }
-                foreach (LargeTerrainFeature current in Game1.currentLocation.largeTerrainFeatures)
+                foreach (LargeTerrainFeature current in location.Location.largeTerrainFeatures)
                 {
                     if (current is Bush bush)
                     {
@@ -64,22 +78,22 @@ namespace TASMod.Overlays
                                 scale = new Vector2(1, 1);
                                 break;
                         }
-                        DrawTileOutline(spriteBatch, current.Tile, LargeTerrainFeatureColor, scale);
+                        DrawTileOutline(index, spriteBatch, current.Tile, LargeTerrainFeatureColor, scale);
                     }
                 }
 
-                if (Game1.currentLocation is MineShaft mineShaft)
+                if (location.Location is MineShaft mineShaft)
                 {
                     foreach (ResourceClump current in mineShaft.resourceClumps)
                     {
-                        DrawTileOutline(spriteBatch, current.Tile, ResourceClumpColor, 2f);
+                        DrawTileOutline(index, spriteBatch, current.Tile, ResourceClumpColor, 2f);
                     }
                 }
-                if (Game1.currentLocation is Farm farm)
+                if (location.Location is Farm farm)
                 {
                     foreach (ResourceClump current in farm.resourceClumps)
                     {
-                        DrawTileOutline(spriteBatch, current.Tile, ResourceClumpColor, 2f);
+                        DrawTileOutline(index, spriteBatch, current.Tile, ResourceClumpColor, 2f);
                     }
                 }
             }

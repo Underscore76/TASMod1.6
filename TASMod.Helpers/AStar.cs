@@ -17,14 +17,14 @@ namespace TASMod.Helpers
             public Location Parent;
         }
 
-        public Func<T, IEnumerable<T>> GetNeighbors = null;
-        public Func<T, T, double> DistanceStep;
-        public Func<T, T, double> DistanceHeuristic;
+        public Func<int, T, IEnumerable<T>> GetNeighbors = null;
+        public Func<int, T, T, double> DistanceStep;
+        public Func<int, T, T, double> DistanceHeuristic;
 
         public AStar(
-            Func<T, IEnumerable<T>> neighbors,
-            Func<T, T, double> distStep,
-            Func<T, T, double> distHeuristic
+            Func<int, T, IEnumerable<T>> neighbors,
+            Func<int, T, T, double> distStep,
+            Func<int, T, T, double> distHeuristic
         )
         {
             GetNeighbors = neighbors;
@@ -32,7 +32,7 @@ namespace TASMod.Helpers
             DistanceHeuristic = distHeuristic;
         }
 
-        public List<T> Search(T _start, T _end, out double cost, int max_evals = -1)
+        public List<T> Search(int index, T _start, T _end, out double cost, int max_evals = -1)
         {
             cost = 0;
             Location current = null;
@@ -61,7 +61,7 @@ namespace TASMod.Helpers
                 if (current.state.Equals(target.state))
                     break;
 
-                var neighbors = BuildNeighbors(current, target);
+                var neighbors = BuildNeighbors(index, current, target);
                 foreach (var neighbor in neighbors)
                 {
                     // we've already closed this node
@@ -104,17 +104,17 @@ namespace TASMod.Helpers
             return solution;
         }
 
-        private List<Location> BuildNeighbors(Location current, Location target)
+        private List<Location> BuildNeighbors(int index, Location current, Location target)
         {
             List<Location> locs = new List<Location>();
             T state = current.state;
-            foreach (T neighbor in GetNeighbors(state))
+            foreach (T neighbor in GetNeighbors(index, state))
             {
                 Location newNode = new Location() { state = neighbor };
-                newNode.G = DistanceStep(current.state, newNode.state) + current.G;
+                newNode.G = DistanceStep(index, current.state, newNode.state) + current.G;
                 if (double.IsNaN(newNode.G))
                     continue;
-                newNode.H = DistanceHeuristic(newNode.state, target.state);
+                newNode.H = DistanceHeuristic(index, newNode.state, target.state);
                 locs.Add(newNode);
             }
             return locs;

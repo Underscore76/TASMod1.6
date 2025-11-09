@@ -90,6 +90,16 @@ namespace TASMod.Overlays.Widgets
                 ImGui.Text(hit.NumQuartz.ToString());
                 ImGui.TableSetColumnIndex(2);
 
+                if (index == 0)
+                {
+                    ImGui.TableNextRow();
+                    ImGui.TableSetColumnIndex(0);
+                    ImGui.Text("Offset");
+                    ImGui.TableSetColumnIndex(1);
+                    ImGui.Text(hit.NeededRandom.ToString());
+                    ImGui.TableSetColumnIndex(2);
+                }
+
                 ImGui.EndTable();
                 ImGui.Unindent();
             }

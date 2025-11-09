@@ -196,19 +196,19 @@ namespace TASMod.Helpers
             return areaOfEffect;
         }
 
-        public static int GetNumberOfSwingFrames(MeleeWeapon tool, int index)
+        public static int GetNumberOfSwingFrames(PlayerInfo player, MeleeWeapon tool, int index)
         {
-            float swipeSpeed = 400 - tool.speed.Value * 40 - Game1.player.addedSpeed * 40; // setFarmerAnimating
-            swipeSpeed *= 1f - Game1.player.buffs.WeaponSpeedMultiplier; // setFarmerAnimating
+            float swipeSpeed = 400 - tool.speed.Value * 40 - player.Player.addedSpeed * 40; // setFarmerAnimating
+            swipeSpeed *= 1f - player.Player.buffs.WeaponSpeedMultiplier; // setFarmerAnimating
             swipeSpeed /= ((tool.type.Value == 2) ? 5 : 8); // setFarmerAnimating
             float animationInterval = swipeSpeed * 1.3f; // doSwipe
             float milliseconds = GetBaseSwingMilliseconds(index, (int)animationInterval);
             if (
-                PlayerInfo.IsSwingingSword
-                && Game1.player.FarmerSprite.currentAnimationIndex == index
+                player.IsSwingingSword
+                && player.FarmerSprite.currentAnimationIndex == index
             )
             {
-                milliseconds -= Game1.player.FarmerSprite.timer;
+                milliseconds -= player.FarmerSprite.timer;
             }
             return ((int)milliseconds + 15) / 16;
         }

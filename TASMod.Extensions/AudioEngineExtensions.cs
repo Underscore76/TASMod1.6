@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework.Audio;
 using StardewValley;
 using StardewValley.BellsAndWhistles;
 using StardewValley.GameData;
+using TASMod.Patches;
 
 namespace TASMod.Extensions
 {
@@ -66,6 +67,11 @@ namespace TASMod.Extensions
             //     footstepCategory.Clear();
             // }
             engine.Update();
+            // SoundEffect_Constructor.Reset();
+            // engine.Update();
+            // engine.Update();
+            // engine.Update();
+            // engine.Update();
         }
 
         public static Stopwatch GetStopwatch(this AudioEngine engine)

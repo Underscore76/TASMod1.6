@@ -25,48 +25,57 @@ namespace TASMod.Overlays
 
         public override void ActiveDraw(SpriteBatch spriteBatch)
         {
+            var location = InstanceCurrentLocation.Get(ActiveInstance.InstanceIndex);
+            if (!location.Active)
+                return;
+            var player = InstanceCurrentPlayer.Get(ActiveInstance.InstanceIndex);
+            var viewport = InstanceViewport.Get(ActiveInstance.InstanceIndex);
+            var options = InstanceOptions.Get(ActiveInstance.InstanceIndex);
+            var screenFade = InstanceScreenFade.Get(ActiveInstance.InstanceIndex);
+            var instanceData = InstanceData.Get(ActiveInstance.InstanceIndex);
+
             MouseState mouseState = XMouse.GetState();
             Vector2 actualCoords = new Vector2(mouseState.X, mouseState.Y);
-            Vector2 coords = new Vector2(mouseState.X - ActiveInstance.Window.X, mouseState.Y - ActiveInstance.Window.Y);
-            Vector2 zoomedCoords = coords * (1f / Game1.options.zoomLevel);
+            Vector2 coords = new Vector2(mouseState.X - viewport.Window.X, mouseState.Y - viewport.Window.Y);
+            Vector2 zoomedCoords = coords * (1f / options.zoomLevel);
 
-            int mouseTileX = (int)(zoomedCoords.X + Game1.viewport.X) / Game1.tileSize;
-            int mouseTileY = (int)(zoomedCoords.Y + Game1.viewport.Y) / Game1.tileSize;
+            int mouseTileX = (int)(zoomedCoords.X + viewport.X) / Game1.tileSize;
+            int mouseTileY = (int)(zoomedCoords.Y + viewport.Y) / Game1.tileSize;
 
             // open the door for extra data to be written down the line
             List<string> data = new List<string>();
             data.Add(string.Format("({0},{1})", mouseTileX, mouseTileY));
-            data.Add(string.Format("StepsTaken: {0}", Game1.stats.StepsTaken));
-            data.Add(string.Format("Tick: {0}", Game1.gameTimeInterval));
-            data.Add(string.Format("RNG: {0}", Game1.random.get_Index()));
-            if (Game1.fadeToBlack)
+            data.Add(string.Format("StepsTaken: {0}", player.Player.stats.StepsTaken));
+            data.Add(string.Format("Tick: {0}", Reflector.GetStaticVar(0, "Game1_gameTimeInterval") ?? 0));
+            data.Add(string.Format("RNG: {0}", instanceData.random.get_Index()));
+            if (screenFade.FadeToBlack)
             {
                 data.Add("FadeToBlack");
             }
-            if (!Game1.player.CanMove)
+            if (!player.CanMove)
             {
                 data.Add("PlayerCanMove: false");
             }
-            if (CurrentLocation.mineRandom != null && CurrentLocation.MineLevel > 120)
+            if (location.Active && location.mineRandom != null && location.MineLevel > 120)
             {
                 data.Add(
                     string.Format(
                         "shaft: {0:0.000}",
-                        CurrentLocation.mineRandom.Copy().NextDouble()
+                        location.mineRandom.Copy().NextDouble()
                     )
                 );
             }
-            if (PlayerInfo.CanShoot)
+            if (player.CanShoot)
             {
                 data.Add("slingshot");
             }
 
-            if (CurrentLocation.Active)
+            if (location.Active)
             {
                 Vector2 mouseTile = new Vector2(mouseTileX, mouseTileY);
-                if (Game1.currentLocation.objects.ContainsKey(mouseTile))
+                if (location.Location.objects.ContainsKey(mouseTile))
                 {
-                    var obj = Game1.currentLocation.objects[mouseTile];
+                    var obj = location.Location.objects[mouseTile];
                     switch (obj.Name)
                     {
                         default:
@@ -74,9 +83,9 @@ namespace TASMod.Overlays
                             break;
                     }
                 }
-                else if (Game1.currentLocation.terrainFeatures.ContainsKey(mouseTile))
+                else if (location.Location.terrainFeatures.ContainsKey(mouseTile))
                 {
-                    var tf = Game1.currentLocation.terrainFeatures[mouseTile];
+                    var tf = location.Location.terrainFeatures[mouseTile];
                     switch (tf.GetType().Name)
                     {
                         case "HoeDirt":
@@ -111,6 +120,7 @@ namespace TASMod.Overlays
                 }
             }
             DrawText(
+                ActiveInstance.InstanceIndex,
                 spriteBatch,
                 data,
                 actualCoords + offset,

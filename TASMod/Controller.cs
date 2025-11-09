@@ -36,6 +36,7 @@ namespace TASMod
         public static RecordingManager Recording = null;
         public static PathFinder PathFinder = null;
         public static ViewController ViewController = null;
+        public static PerformanceTiming Timing = new PerformanceTiming();
 
         public static TASMouseState LastFrameMouse() => Recording.LastFrameMouse();
 
@@ -151,7 +152,8 @@ namespace TASMod
 
         public static bool Draw()
         {
-            ActiveInstance.TryLoad(); // attempts to load the correct instance for probing state
+            // ActiveInstance.TryLoad(); // attempts to load the correct instance for probing state
+            ActiveInstance.LoadZero();
             bool tmp = TASSpriteBatch.Active;
             TASSpriteBatch.Active = true;
             if (Game1.spriteBatch.inBeginEndPair())
@@ -193,11 +195,22 @@ namespace TASMod
             RealMouse = new TASMouseState(RealInputState.mouseState);
             RealKeyboard = new TASKeyboardState(RealInputState.keyboardState);
 
+            if (ViewController.CurrentView == TASView.Base && RealInputState.LeftMouseReleased())
+            {
+                for (int i = 0; i < GameRunner.instance.gameInstances.Count; i++)
+                {
+                    var viewport = InstanceViewport.Get(i);
+                    if (viewport.Window.Contains(RealMouse.MouseX, RealMouse.MouseY))
+                    {
+                        ActiveInstance.InstanceIndex = i;
+                        break;
+                    }
+                }
+            }
             if (Console.IsOpen)
                 return false;
             if (ViewController.CurrentView != TASView.Base)
                 return false;
-
             bool capture = Overlays.HandleInput(RealMouse, RealKeyboard);
             if (capture)
                 return false;

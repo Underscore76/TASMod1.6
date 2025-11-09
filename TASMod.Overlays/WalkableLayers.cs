@@ -28,13 +28,15 @@ namespace TASMod.Overlays
 
         public override void ActiveUpdate()
         {
-            if (CurrentLocation.Active)
+            var location = InstanceCurrentLocation.Get(ActiveInstance.InstanceIndex);
+            if (location.Active)
             {
-                Rectangle visibleArea = GetVisibleArea();
+                var viewport = InstanceViewport.Get(ActiveInstance.InstanceIndex).Viewport;
+                Rectangle visibleArea = GetVisibleArea(viewport);
                 if (visibleArea != LastVisibleArea)
                 {
                     VisibleTiles = GetTiles(visibleArea).ToArray();
-                    TileGroups = GetGroups(Game1.currentLocation, VisibleTiles);
+                    TileGroups = GetGroups(viewport, location.Location, VisibleTiles);
                     LastVisibleArea = visibleArea;
                 }
             }
@@ -42,6 +44,7 @@ namespace TASMod.Overlays
 
         public override void ActiveDraw(SpriteBatch spriteBatch)
         {
+            var CurrentLocation = InstanceCurrentLocation.Get(ActiveInstance.InstanceIndex);
             if (CurrentLocation.Active && TileGroups != null)
             {
                 foreach (TileGroup tileGroup in TileGroups)
@@ -50,16 +53,16 @@ namespace TASMod.Overlays
                     {
                         foreach (TileData tile in tileGroup.Tiles)
                         {
-                            DrawFilledTile(spriteBatch, tile.Position, tileGroup.DrawColor * 0.85f);
+                            DrawFilledTile(ActiveInstance.InstanceIndex, spriteBatch, tile.Position, tileGroup.DrawColor * 0.85f);
                         }
                     }
                 }
             }
         }
 
-        private TileGroup[] GetGroups(GameLocation location, IEnumerable<Vector2> visibleTiles)
+        private TileGroup[] GetGroups(xTile.Dimensions.Rectangle viewport, GameLocation location, IEnumerable<Vector2> visibleTiles)
         {
-            TileData[] tiles = GetTiles(location, visibleTiles).ToArray();
+            TileData[] tiles = GetTiles(viewport, location, visibleTiles).ToArray();
             //TileData[] warpTiles = tiles.Where(p => p.Type == "warp").ToArray();
             //TileData[] passableTiles = tiles.Where(p => p.Type == "passable").ToArray();
             TileData[] impassableTiles = tiles.Where(p => p.Type == "impassable").ToArray();
@@ -73,6 +76,7 @@ namespace TASMod.Overlays
         }
 
         private IEnumerable<TileData> GetTiles(
+            xTile.Dimensions.Rectangle viewport,
             GameLocation location,
             IEnumerable<Vector2> visibleTiles
         )
@@ -109,9 +113,9 @@ namespace TASMod.Overlays
                     Game1.tileSize
                 );
                 string type = "";
-                if (IsWarp(location, tile, tilePixels, buildingDoors))
+                if (IsWarp(viewport, location, tile, tilePixels, buildingDoors))
                     type = "warp";
-                else if (IsPassable(location, tile, tilePixels))
+                else if (IsPassable(viewport, location, tile, tilePixels))
                     type = "passable";
                 else
                     type = "impassable";
@@ -140,6 +144,7 @@ namespace TASMod.Overlays
         };
 
         private bool IsWarp(
+            xTile.Dimensions.Rectangle viewport,
             GameLocation location,
             Vector2 tile,
             Rectangle tilePixels,
@@ -153,7 +158,7 @@ namespace TASMod.Overlays
             // check tile actions
             Tile buildingTile = location
                 .map.GetLayer("Buildings")
-                .PickTile(new Location(tilePixels.X, tilePixels.Y), Game1.viewport.Size);
+                .PickTile(new Location(tilePixels.X, tilePixels.Y), viewport.Size);
             if (
                 buildingTile != null
                 && buildingTile.Properties.TryGetValue("Action", out PropertyValue action)
@@ -164,7 +169,7 @@ namespace TASMod.Overlays
             // check tile touch actions
             Tile backTile = location
                 .map.GetLayer("Back")
-                .PickTile(new Location(tilePixels.X, tilePixels.Y), Game1.viewport.Size);
+                .PickTile(new Location(tilePixels.X, tilePixels.Y), viewport.Size);
             if (
                 backTile != null
                 && backTile.Properties.TryGetValue("TouchAction", out PropertyValue touchAction)
@@ -199,10 +204,10 @@ namespace TASMod.Overlays
             return false;
         }
 
-        private bool IsPassable(GameLocation location, Vector2 tile, Rectangle tilePixels)
+        private bool IsPassable(xTile.Dimensions.Rectangle viewport, GameLocation location, Vector2 tile, Rectangle tilePixels)
         {
             // check layer properties
-            if (location.isTilePassable(new Location((int)tile.X, (int)tile.Y), Game1.viewport))
+            if (location.isTilePassable(new Location((int)tile.X, (int)tile.Y), viewport))
                 return true;
 
             // allow bridges
@@ -213,7 +218,7 @@ namespace TASMod.Overlays
             {
                 Tile backTile = location
                     .map.GetLayer("Back")
-                    .PickTile(new Location(tilePixels.X, tilePixels.Y), Game1.viewport.Size);
+                    .PickTile(new Location(tilePixels.X, tilePixels.Y), viewport.Size);
                 if (
                     backTile == null
                     || !backTile.TileIndexProperties.TryGetValue(
@@ -264,19 +269,14 @@ namespace TASMod.Overlays
             return false;
         }
 
-        public static Rectangle GetVisibleArea()
+        public static Rectangle GetVisibleArea(xTile.Dimensions.Rectangle viewport)
         {
             return new Rectangle(
-                x: Game1.viewport.X / Game1.tileSize - 1,
-                y: Game1.viewport.Y / Game1.tileSize - 1,
-                width: (int)(Game1.viewport.Width / (decimal)Game1.tileSize) + 2, // extend off-screen slightly to avoid edges popping in
-                height: (int)(Game1.viewport.Height / (decimal)Game1.tileSize) + 2
+                x: viewport.X / Game1.tileSize - 1,
+                y: viewport.Y / Game1.tileSize - 1,
+                width: (int)(viewport.Width / (decimal)Game1.tileSize) + 2, // extend off-screen slightly to avoid edges popping in
+                height: (int)(viewport.Height / (decimal)Game1.tileSize) + 2
             );
-        }
-
-        public static IEnumerable<Vector2> GetVisibleTiles()
-        {
-            return GetTiles(GetVisibleArea());
         }
 
         public static IEnumerable<Vector2> GetTiles(Rectangle area)

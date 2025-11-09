@@ -23,6 +23,7 @@ namespace TASMod.Automation
         };
 
         public override bool ActiveUpdate(
+            int index,
             out TASKeyboardState kstate,
             out TASMouseState mstate,
             out TASGamePadState gstate
@@ -31,18 +32,19 @@ namespace TASMod.Automation
             kstate = null;
             mstate = new TASMouseState(Controller.LastFrameMouse(), false, false);
             gstate = null;
-
+            var menuInfo = InstanceCurrentMenu.Get(index);
+            var playerInfo = InstanceCurrentPlayer.Get(index);
             // only want to advance if can't move in a non-tool scenario
-            if (!PlayerInfo.Active || PlayerInfo.CanMove || PlayerInfo.UsingTool)
+            if (!playerInfo.Active || playerInfo.CanMove || playerInfo.UsingTool)
                 return false;
             // we can't move cause other stuff is going on
-            if (CurrentMenu.Active)
+            if (menuInfo.Active)
                 return false;
-            if (PlayerInfo.IsEmoting || PlayerInfo.FreezePause)
+            if (playerInfo.IsEmoting || playerInfo.FreezePause)
                 return true;
-            string behavior = PlayerInfo.LastAnimationEndBehavior;
+            string behavior = playerInfo.LastAnimationEndBehavior;
             if (behavior == null)
-                behavior = PlayerInfo.CurrentAnimationStartBehavior;
+                behavior = playerInfo.CurrentAnimationStartBehavior;
             if (behavior != null)
             {
                 if (ValidStrings.Contains(behavior))

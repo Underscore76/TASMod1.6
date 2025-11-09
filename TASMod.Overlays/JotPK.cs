@@ -1,3 +1,4 @@
+// TODO: this only works for single player for now
 using System;
 using System.Collections.Generic;
 using ImGuiNET;
@@ -169,6 +170,7 @@ namespace TASMod.Overlays
 
         public override void ActiveDraw(SpriteBatch spriteBatch)
         {
+            int index = ActiveInstance.InstanceIndex;
             if (Game1.currentMinigame is null || Game1.currentMinigame is not AbigailGame)
                 return;
 
@@ -185,12 +187,12 @@ namespace TASMod.Overlays
                     AbigailGame.TileSize,
                     AbigailGame.TileSize
                 );
-                DrawRectLocal(spriteBatch, rect, EnemyColor);
-                DrawCenteredTextInRectLocal(spriteBatch, rect, monster.health.ToString(), Color.White);
+                DrawRectLocal(index, spriteBatch, rect, EnemyColor);
+                DrawCenteredTextInRectLocal(index, spriteBatch, rect, monster.health.ToString(), Color.White);
                 var center = AbigailGame.topLeftScreenCoordinate + monster.position.Center.ToVector2();
                 var movement = monster.acceleration;
                 var next = center + movement;
-                DrawLineLocal(spriteBatch, center, next, EnemyMovementColor, 1);
+                DrawLineLocal(index, spriteBatch, center, next, EnemyMovementColor, 1);
             }
             foreach (var powerup in AbigailGame.powerups)
             {
@@ -201,7 +203,7 @@ namespace TASMod.Overlays
                     AbigailGame.TileSize,
                     AbigailGame.TileSize
                 );
-                DrawRectLocal(spriteBatch, rect, ItemColor);
+                DrawRectLocal(index, spriteBatch, rect, ItemColor);
             }
             foreach (var bullet in game.bullets)
             {
@@ -210,7 +212,7 @@ namespace TASMod.Overlays
                     (int)AbigailGame.topLeftScreenCoordinate.X,
                     (int)AbigailGame.topLeftScreenCoordinate.Y
                 );
-                DrawRectLocal(spriteBatch, rect, Color.White);
+                DrawRectLocal(index, spriteBatch, rect, Color.White);
             }
             {
                 var rect = game.playerBoundingBox;
@@ -218,11 +220,11 @@ namespace TASMod.Overlays
                     (int)AbigailGame.topLeftScreenCoordinate.X,
                     (int)AbigailGame.topLeftScreenCoordinate.Y
                 );
-                DrawRectLocal(spriteBatch, rect, PlayerColor);
+                DrawRectLocal(index, spriteBatch, rect, PlayerColor);
             }
             foreach (var line in GetShotLines(game))
             {
-                DrawLineLocal(spriteBatch,
+                DrawLineLocal(index, spriteBatch,
                     AbigailGame.topLeftScreenCoordinate + line.Item1,
                     AbigailGame.topLeftScreenCoordinate + line.Item2,
                     PlayerBulletColor, 1);
@@ -233,43 +235,45 @@ namespace TASMod.Overlays
         {
             if (Game1.currentMinigame is null || Game1.currentMinigame is not AbigailGame)
                 return;
-            try{
-
-            if (ImGui.CollapsingHeader("AbigailGame"))
+            try
             {
-                var game = (AbigailGame)Game1.currentMinigame;
-                ImGui.SeparatorText("Timers");
-                ImGui.Text($"Wave Timer: {AbigailGame.waveTimer}");
-                ImGui.Text($"Shot Timer: {game.shotTimer - 16}");
-                ImGui.Text($"Confusion Timer: {AbigailGame.monsterConfusionTimer}");
-                ImGui.Text($"Zombie Timer: {AbigailGame.zombieModeTimer}");
-                foreach(var powerup in AbigailGame.powerups)
+
+                if (ImGui.CollapsingHeader("AbigailGame"))
                 {
-                    if (Items.ContainsKey(powerup.which))
+                    var game = (AbigailGame)Game1.currentMinigame;
+                    ImGui.SeparatorText("Timers");
+                    ImGui.Text($"Wave Timer: {AbigailGame.waveTimer}");
+                    ImGui.Text($"Shot Timer: {game.shotTimer - 16}");
+                    ImGui.Text($"Confusion Timer: {AbigailGame.monsterConfusionTimer}");
+                    ImGui.Text($"Zombie Timer: {AbigailGame.zombieModeTimer}");
+                    foreach (var powerup in AbigailGame.powerups)
                     {
-                        ImGui.Text($"Ground {Items[powerup.which]}: {powerup.position} {powerup.duration}");
+                        if (Items.ContainsKey(powerup.which))
+                        {
+                            ImGui.Text($"Ground {Items[powerup.which]}: {powerup.position} {powerup.duration}");
+                        }
                     }
+                    foreach (var kvp in game.activePowerups)
+                    {
+                        ImGui.Text($"Active {Items[kvp.Key]}: {kvp.Value}");
+                    }
+                    ImGui.SeparatorText("Enemy Drops");
+                    foreach (var type in EnemyTypes)
+                    {
+                        if (game.monsterChances[type.Item2].X == 0)
+                            continue;
+                        ImGui.Text($"{type.Item1}: {getLootIfKilledNextFrame(type.Item2)}");
+                    }
+                    if (game.spawnQueue.Length < 4)
+                        return;
+                    ImGui.SeparatorText("Spawn Queue");
+                    ImGui.Text($"Spawn NORTH: {game.spawnQueue[0].Count}");
+                    ImGui.Text($"Spawn EAST: {game.spawnQueue[1].Count}");
+                    ImGui.Text($"Spawn SOUTH: {game.spawnQueue[2].Count}");
+                    ImGui.Text($"Spawn WEST: {game.spawnQueue[3].Count}");
                 }
-                foreach(var kvp in game.activePowerups)
-                {
-                    ImGui.Text($"Active {Items[kvp.Key]}: {kvp.Value}");
-                }
-                ImGui.SeparatorText("Enemy Drops");
-                foreach (var type in EnemyTypes)
-                {
-                    if (game.monsterChances[type.Item2].X == 0)
-                        continue;
-                    ImGui.Text($"{type.Item1}: {getLootIfKilledNextFrame(type.Item2)}");
-                }
-                if (game.spawnQueue.Length < 4)
-                    return;
-                ImGui.SeparatorText("Spawn Queue");
-                ImGui.Text($"Spawn NORTH: {game.spawnQueue[0].Count}");
-                ImGui.Text($"Spawn EAST: {game.spawnQueue[1].Count}");
-                ImGui.Text($"Spawn SOUTH: {game.spawnQueue[2].Count}");
-                ImGui.Text($"Spawn WEST: {game.spawnQueue[3].Count}");
             }
-            } catch (Exception e)
+            catch (Exception e)
             {
                 ModEntry.Console.Log(e.ToString(), StardewModdingAPI.LogLevel.Error);
                 ImGui.Text(e.ToString());

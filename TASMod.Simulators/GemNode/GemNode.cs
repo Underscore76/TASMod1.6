@@ -17,6 +17,10 @@ namespace TASMod.Simulators.GemNode
         public Vector2 Tile;
         public List<string> CurrentGems = new List<string>();
         public List<string> LadderGems = new List<string>();
+        public override string ToString()
+        {
+            return $"Tile: {Tile}, CurrentGems: [{string.Join(",", CurrentGems)}], LadderGems: [{string.Join(",", LadderGems)}]";
+        }
     }
 
     public class GemNode
@@ -27,7 +31,7 @@ namespace TASMod.Simulators.GemNode
 
         public static GemNodeHit Current()
         {
-            return Estimate(Game1.game1.instanceIndex);
+            return Estimate(ActiveInstance.InstanceIndex);
         }
 
         public static GemNodeHit Estimate(int index)
@@ -56,10 +60,17 @@ namespace TASMod.Simulators.GemNode
 
         public static GemNodeHit EstimateIndex(int index)
         {
-            Farmer farmer = Reflector.GetStaticVar(index, "Game1__player") as Farmer;
-            Random random = (Reflector.GetStaticVar(index, "Game1_random") as Random).Copy();
-            GameLocation loc = GameRunner.instance.gameInstances[index].instanceGameLocation;
-            return EstimateFarmer(random, loc, farmer);
+            var player = InstanceCurrentPlayer.Get(index).Player;
+            var location = InstanceCurrentLocation.Get(index).Location;
+            var random = InstanceData.Get(index).random.Copy();
+            return EstimateFarmer(random, location, player);
+        }
+
+        public static GemNodeHit EstimateNext(GameLocation location)
+        {
+            var player = InstanceCurrentPlayer.Get(0).Player;
+            var random = InstanceData.Get(0).random.Copy();
+            return EstimateFarmer(random, location, player);
         }
 
         public static GemNodeHit EstimateFarmer(Random random, GameLocation loc, Farmer farmer)
@@ -71,8 +82,8 @@ namespace TASMod.Simulators.GemNode
             {
                 if (obj.Value.ItemId == "44") // Gem Node
                 {
-                    string gemType = GetGemType((int)obj.Key.X, (int)obj.Key.Y, farmer, (loc as MineShaft).mineLevel, false);
-                    string ladderGemType = GetGemType((int)obj.Key.X, (int)obj.Key.Y, farmer, (loc as MineShaft).mineLevel, true);
+                    string gemType = GetGemType((int)obj.Key.X, (int)obj.Key.Y, farmer, loc as MineShaft, false);
+                    string ladderGemType = GetGemType((int)obj.Key.X, (int)obj.Key.Y, farmer, loc as MineShaft, true);
                     hit.Tile = obj.Key;
                     hit.CurrentGems.Add(gemType);
                     hit.LadderGems.Add(ladderGemType);
@@ -81,15 +92,15 @@ namespace TASMod.Simulators.GemNode
             return hit;
         }
 
-        public static string GetGemType(int x, int y, Farmer who, int mineLevel, bool hasLadderSpawned)
+        public static string GetGemType(int x, int y, Farmer who, MineShaft loc, bool hasLadderSpawned)
         {
-            Random r = Utility.CreateDaySaveRandom(x * 1000, y, mineLevel);
+            Random r = Utility.CreateDaySaveRandom(x * 1000, y, loc.mineLevel);
             r.NextDouble();
             if (!hasLadderSpawned)
             {
                 r.NextDouble();
             }
-            return minesRocks.BreakStone("44", x, y, who, r).Aggregate((a, b) => a + "," + b);
+            return minesRocks.BreakStone("44", x, y, who, loc, r).Aggregate((a, b) => a + "," + b);
         }
     }
 }
