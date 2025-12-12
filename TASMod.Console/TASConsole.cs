@@ -24,6 +24,7 @@ namespace TASMod.Console
         public Texture2D solidColor;
         public static ConsoleInputHandler handler;
         public Dictionary<string, IConsoleCommand> Commands;
+        public Overlays.Mouse consoleMouse = new(Color.Wheat);
 
         public List<string> GetCommands()
         {
@@ -35,6 +36,7 @@ namespace TASMod.Console
 
         public float fontSize = 1f;
         private const int LEFTPAD = 5;
+        private const int RIGHTPAD = 16;
         private const int TABSTOP = 2;
         private char[] SplitTokens = { ' ', '\t', '.', ',', '(', ')', ':', ';', '=' };
 
@@ -50,9 +52,10 @@ namespace TASMod.Console
         private Rectangle historyRect;
         public int historyRectRows;
         public List<ConsoleTextElement> historyLog;
-        public int historyIndex;
         public int historyTail;
         public bool followLogUpdate;
+        public LinkedList<string> entryLog;
+        public int entryIndex;
 
         public float openHeight = 0f;
         public float openHeightTarget = 0f;
@@ -70,12 +73,26 @@ namespace TASMod.Console
         public void Close()
         {
             if (IsOpen)
+            {
                 openHeightTarget = 0;
+                isScrollbarDragging = false;
+                isScrollbarHovering = false;
+            }
         }
 
         public bool IsSelecting;
         public int SelectStart = -1;
         public int SelectEnd = -1;
+
+        // Scrollbar state
+        private bool isScrollbarDragging = false;
+        private bool isScrollbarHovering = false;
+        private int scrollbarDragStartY = 0;
+        private int scrollbarDragStartTail = 0;
+        private int scrollbarWidth = 16;
+        private int scrollbarThumbHeight = 0;
+        private Rectangle scrollbarRect;
+        private Rectangle scrollbarThumbRect;
 
         public TASConsole()
         {
@@ -115,20 +132,24 @@ namespace TASMod.Console
             }
             Aliases = new Dictionary<string, string>();
             ActiveSubscribers = new Stack<string>();
+
+            LoadConsoleState();
         }
 
         public void Update()
         {
             if (IsOpenMax)
             {
-                if (RealInputState.ScrollWheelTriggered())
+                if (RealInputState.ScrollWheelTriggered() && !isScrollbarDragging && !Controller.FastAdvance)
                 {
                     if (historyLog.Count > historyRectRows)
                     {
                         int dir = RealInputState.ScrollWheelDiff();
-                        if (dir < 0) {
+                        if (dir < 0)
+                        {
                             // up?
-                            for (historyTail++;historyTail < historyLog.Count; historyTail++) {
+                            for (historyTail++; historyTail < historyLog.Count; historyTail++)
+                            {
                                 if (historyTail >= historyLog.Count) continue;
                                 if (historyLog[historyTail].Type == ConsoleTextElementType.Warn && !ShowWarnings) continue;
                                 if (historyLog[historyTail].Type == ConsoleTextElementType.Error && !ShowErrors) continue;
@@ -136,9 +157,12 @@ namespace TASMod.Console
 
                                 break;
                             }
-                        } else {
+                        }
+                        else
+                        {
                             // down
-                            for (historyTail--;historyTail > 0; historyTail--) {
+                            for (historyTail--; historyTail > 0; historyTail--)
+                            {
                                 if (historyTail >= historyLog.Count) continue;
                                 if (historyLog[historyTail].Type == ConsoleTextElementType.Warn && !ShowWarnings) continue;
                                 if (historyLog[historyTail].Type == ConsoleTextElementType.Error && !ShowErrors) continue;
@@ -164,16 +188,88 @@ namespace TASMod.Console
                         historyTail = historyLog.Count;
                     }
                 }
+                // add dragging support for clicking on the side to the right of the historyRect.Width
+
+                // Handle scrollbar mouse interactions
+                var mouseState = RealInputState.mouseState;
+                var oldMouseState = RealInputState.oldMouseState;
+
+                // Check for hover state
+                if (historyLog.Count > historyRectRows)
+                {
+                    isScrollbarHovering = scrollbarThumbRect.Contains(mouseState.X, mouseState.Y);
+                }
+                else
+                {
+                    isScrollbarHovering = false;
+                }
+
+                if (RealInputState.LeftMouseClicked())
+                {
+                    if (scrollbarThumbRect.Contains(mouseState.X, mouseState.Y))
+                    {
+                        isScrollbarDragging = true;
+                        scrollbarDragStartY = mouseState.Y;
+                        scrollbarDragStartTail = historyTail;
+                    }
+                }
+                else if (RealInputState.LeftMouseReleased())
+                {
+                    isScrollbarDragging = false;
+                }
+
+                if (isScrollbarDragging && historyLog.Count > historyRectRows)
+                {
+                    int mouseDelta = mouseState.Y - scrollbarDragStartY;
+                    float scrollableHeight = scrollbarRect.Height - scrollbarThumbHeight;
+                    if (scrollableHeight > 0)
+                    {
+                        float scrollPercent = (float)mouseDelta / scrollableHeight;
+                        int maxScroll = historyLog.Count - historyRectRows;
+                        int newTail = scrollbarDragStartTail + (int)(scrollPercent * maxScroll);
+                        historyTail = Math.Max(historyRectRows, Math.Min(historyLog.Count, newTail));
+                    }
+                }
             }
             openHeight += Math.Sign(openHeightTarget - openHeight) * openRate;
             openHeight = Math.Min(openHeightMax, Math.Max(openHeight, 0));
 
-            historyRect.Width = Game1.graphics.GraphicsDevice.Viewport.Width;
+            historyRect.Width = Game1.graphics.GraphicsDevice.Viewport.Width - RIGHTPAD;
             historyRect.Height = (int)(openHeight * Game1.graphics.GraphicsDevice.Viewport.Height);
             historyRectRows = historyRect.Height / consoleFont.LineSpacing;
             entryRect.Width = Game1.graphics.GraphicsDevice.Viewport.Width;
             entryRect.Height = consoleFont.LineSpacing * 3 / 2;
             entryRect.Y = historyRect.Height;
+
+            // Calculate scrollbar dimensions
+            scrollbarRect = new Rectangle(
+                Game1.graphics.GraphicsDevice.Viewport.Width - scrollbarWidth,
+                0,
+                scrollbarWidth,
+                historyRect.Height
+            );
+
+            // Calculate scrollbar thumb dimensions
+            if (historyLog.Count > historyRectRows)
+            {
+                float thumbRatio = (float)historyRectRows / historyLog.Count;
+                scrollbarThumbHeight = Math.Max(20, (int)(scrollbarRect.Height * thumbRatio));
+
+                float scrollPosition = (float)(historyTail - historyRectRows) / (historyLog.Count - historyRectRows);
+                int thumbY = (int)(scrollPosition * (scrollbarRect.Height - scrollbarThumbHeight));
+
+                scrollbarThumbRect = new Rectangle(
+                    scrollbarRect.X,
+                    scrollbarRect.Y + thumbY,
+                    scrollbarRect.Width,
+                    scrollbarThumbHeight
+                );
+            }
+            else
+            {
+                scrollbarThumbHeight = scrollbarRect.Height;
+                scrollbarThumbRect = scrollbarRect;
+            }
         }
 
         public void Draw()
@@ -290,7 +386,7 @@ namespace TASMod.Console
             int renderCursorPosition = cursorPosition;
             if (entryText.Length > 0)
             {
-                for (int i = 0; i < Math.Min(cursorPosition,entryText.Length); i++)
+                for (int i = 0; i < Math.Min(cursorPosition, entryText.Length); i++)
                 {
                     if (entryText[i] == '\t')
                     {
@@ -356,6 +452,80 @@ namespace TASMod.Console
                     0
                 );
             }
+
+            // Draw scrollbar track
+            spriteBatch.Draw(
+                solidColor,
+                scrollbarRect,
+                null,
+                new Color(60, 60, 60, 200),
+                0,
+                Vector2.Zero,
+                SpriteEffects.None,
+                0.99f
+            );
+            // Draw scrollbar if needed
+            if (historyLog.Count > historyRectRows)
+            {
+                // Draw entry markers on scrollbar
+                Color entryMarkerColor = new Color(180, 180, 100, 200); // Yellow-ish markers
+                for (int i = 0; i < historyLog.Count; i++)
+                {
+                    if (historyLog[i].Entry)
+                    {
+                        // Calculate the position of this entry on the scrollbar
+                        float entryPosition = (float)i / historyLog.Count;
+                        int markerY = scrollbarRect.Y + (int)(entryPosition * scrollbarRect.Height);
+
+                        // Draw a small horizontal line
+                        Rectangle markerRect = new Rectangle(
+                            scrollbarRect.X,
+                            markerY,
+                            scrollbarRect.Width,
+                            2 // 2 pixel height for visibility
+                        );
+
+                        spriteBatch.Draw(
+                            solidColor,
+                            markerRect,
+                            null,
+                            entryMarkerColor,
+                            0,
+                            Vector2.Zero,
+                            SpriteEffects.None,
+                            0.9999f
+                        );
+                    }
+                }
+
+                // Draw scrollbar thumb
+                Color thumbColor;
+                if (isScrollbarDragging)
+                {
+                    thumbColor = new Color(140, 140, 140, 255); // Brightest when dragging
+                }
+                else if (isScrollbarHovering)
+                {
+                    thumbColor = new Color(120, 120, 120, 255); // Medium when hovering
+                }
+                else
+                {
+                    thumbColor = new Color(100, 100, 100, 255); // Default state
+                }
+
+                spriteBatch.Draw(
+                    solidColor,
+                    scrollbarThumbRect,
+                    null,
+                    thumbColor,
+                    0,
+                    Vector2.Zero,
+                    SpriteEffects.None,
+                    0.999f
+                );
+            }
+
+            consoleMouse.ActiveDraw(spriteBatch);
             spriteBatch.End();
         }
 
@@ -431,11 +601,53 @@ namespace TASMod.Console
         public void PushEntry(string entry)
         {
             historyLog.Add(new ConsoleTextElement(entry, true, color: textEntryColor));
+            if (entryLog.Count == 0 || entryLog.Last.Value != entry)
+            {
+                entryLog.AddLast(entry);
+            }
+        }
+
+        public void SaveConsoleState()
+        {
+            string filePath = Path.Combine(
+                Constants.BasePath, "console_history.txt"
+            );
+            using (StreamWriter file = new StreamWriter(filePath, false))
+            {
+                foreach (var entry in entryLog)
+                {
+                    file.WriteLine(entry);
+                }
+            }
+        }
+
+        public void LoadConsoleState()
+        {
+            string filePath = Path.Combine(
+                Constants.BasePath, "console_history.txt"
+            );
+            if (entryLog == null)
+                entryLog = new LinkedList<string>();
+            if (!File.Exists(filePath))
+                return;
+            entryLog.Clear();
+            using (StreamReader file = File.OpenText(filePath))
+            {
+                string line;
+                while ((line = file.ReadLine()) != null)
+                {
+                    entryLog.AddLast(line);
+                }
+            }
         }
 
         public void PushEntry(string entry, Color color)
         {
             historyLog.Add(new ConsoleTextElement(entry, true, color: color));
+            if (entryLog.Count == 0 || entryLog.Last.Value != entry)
+            {
+                entryLog.AddLast(entry);
+            }
         }
 
         public void PushResult(string result)
@@ -462,7 +674,7 @@ namespace TASMod.Console
 
         public void ResetHistoryPointers()
         {
-            historyIndex = historyLog.Count;
+            entryIndex = entryLog.Count;
             historyTail = historyLog.Count;
         }
 
@@ -673,43 +885,32 @@ namespace TASMod.Console
                 cursorPosition = entryText.Length;
                 return;
             }
-            while (--historyIndex >= 0 && historyLog.Count != 0)
+            if (--entryIndex >= 0 && entryLog.Count != 0)
             {
-                if (historyLog[historyIndex].Entry)
-                {
-                    entryText = historyLog[historyIndex].Text;
-                    cursorPosition = entryText.Length;
-                    return;
-                }
+                entryText = entryLog.ElementAt(entryIndex);
+                cursorPosition = entryText.Length;
+                return;
             }
             ResetEntry();
-            historyIndex = historyLog.Count;
+            entryIndex = entryLog.Count;
         }
 
         public void ForwardHistory()
         {
-            while (++historyIndex < historyLog.Count)
+            if (++entryIndex < entryLog.Count)
             {
-                if (historyLog[historyIndex].Entry)
-                {
-                    entryText = historyLog[historyIndex].Text;
-                    cursorPosition = entryText.Length;
-                    return;
-                }
+                entryText = entryLog.ElementAt(entryIndex);
+                cursorPosition = entryText.Length;
+                return;
             }
             ResetEntry();
-            historyIndex = historyLog.Count;
+            entryIndex = entryLog.Count;
         }
 
         public void Clear()
         {
             ResetEntry();
-            // allow retaining command history but make them invisible
-            historyLog = new List<ConsoleTextElement>(historyLog.Where(t => t.Entry));
-            for (int i = 0; i < historyLog.Count; ++i)
-            {
-                historyLog[i].Visible = false;
-            }
+            historyLog.Clear();
             ResetHistoryPointers();
         }
 

@@ -322,6 +322,10 @@ namespace TASMod.Helpers
     {
         public static PlayerInfo Get(int index)
         {
+            // if (GameRunner.instance.gameInstances.Count == 1)
+            // {
+            //     return new PlayerInfo { index = index, Player = Game1.player };
+            // }
             if (index < 0 || index >= GameRunner.instance.gameInstances.Count)
                 return new PlayerInfo { index = index, Player = null };
             var farmer = Reflector.GetStaticVar(index, "Game1__player") as Farmer;

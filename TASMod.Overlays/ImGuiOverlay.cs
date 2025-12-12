@@ -110,9 +110,8 @@ namespace TASMod.Overlays
                 {
                     ControllerWindow.Draw(i);
                 }
+                DrawPlayerStatusWindow();
             }
-
-            DrawPlayerStatusWindow();
 
             if (imguiTarget == null || imguiTarget.Width != Game1.graphics.PreferredBackBufferWidth || imguiTarget.Height != Game1.graphics.PreferredBackBufferHeight)
             {

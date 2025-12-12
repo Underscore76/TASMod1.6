@@ -99,6 +99,20 @@ namespace TASMod.Overlays.Widgets
                     ImGui.TableSetColumnIndex(4);
                     ImGui.Text((hit.IndexNeededVoidBook - hit.IndexAtVoidBook).ToString());
 
+                    ImGui.TableNextRow();
+                    ImGui.TableSetColumnIndex(0);
+                    ImGui.Text("Drops");
+                    ImGui.TableSetColumnIndex(1);
+                    string dropsText = string.Join(", ", hit.DroppedItems);
+                    ImGui.TextWrapped(dropsText);
+                    ImGui.TableSetColumnIndex(2);
+                    ImGui.Text(hit.IndexAtExtraDrop.ToString());
+                    ImGui.TableSetColumnIndex(3);
+                    ImGui.Text(hit.IndexNeededExtraDrop.ToString());
+                    ImGui.TableSetColumnIndex(4);
+                    ImGui.Text((hit.IndexNeededExtraDrop - hit.IndexAtExtraDrop).ToString());
+
+
                     ImGui.EndTable();
                 }
                 if (ImGui.CollapsingHeader("Gem Nodes"))

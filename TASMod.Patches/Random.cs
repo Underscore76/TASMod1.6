@@ -145,7 +145,8 @@ namespace TASMod.Patches
                     "NextBytes",
                     new Type[] { typeof(byte[]) }
                 ),
-                postfix: new HarmonyMethod(this.GetType(), nameof(this.Postfix))
+                postfix: new HarmonyMethod(this.GetType(), nameof(this.Postfix)),
+                prefix: new HarmonyMethod(this.GetType(), nameof(this.Prefix))
             );
         }
 
@@ -159,6 +160,11 @@ namespace TASMod.Patches
             {
                 __instance.IncrementCounter(buffer.Length);
             }
+        }
+        public static bool Prefix(Random __instance)
+        {
+            RandomExtensions.PushTrace(__instance, (int)TASDateTime.CurrentFrame, Game1.game1.instanceIndex);
+            return true;
         }
     }
 }

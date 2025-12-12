@@ -5,6 +5,7 @@ using StardewValley.BellsAndWhistles;
 using StardewValley.Menus;
 using Microsoft.Xna.Framework;
 using TASMod.Extensions;
+using TASMod.System;
 
 namespace TASMod.Helpers
 {
@@ -12,6 +13,10 @@ namespace TASMod.Helpers
     {
         public static Options Get(int index)
         {
+            if (GameRunner.instance.gameInstances.Count == 1)
+            {
+                return Game1.options;
+            }
             var options = GameRunner.instance.gameInstances[index].instanceOptions;
             return options;
         }
@@ -27,9 +32,33 @@ namespace TASMod.Helpers
         {
             InstanceData data = new InstanceData();
             data.index = index;
-            data.random = (Reflector.GetStaticVar(index, "Game1_random") as Random).Copy();
+            if (GameRunner.instance.gameInstances.Count == 1)
+            {
+                data.random = Game1.random.Copy();
+                data.dayTimeMoneyBox = Game1.dayTimeMoneyBox;
+                return data;
+            }
+            var random = (Reflector.GetStaticVar(index, "Game1_random") as Random);
+            if (random != null)
+            {
+                data.random = random.Copy();
+            }
             data.dayTimeMoneyBox = Reflector.GetStaticVar(index, "Game1_dayTimeMoneyBox") as DayTimeMoneyBox;
+
             return data;
+        }
+
+        public static long getNewID(int index)
+        {
+            var player = InstanceCurrentPlayer.Get(index).Player;
+            var latestID = (Reflector.GetStaticVar(index, "Game1_multiplayer") as Multiplayer).latestID;
+            ulong seqNum = ((latestID & 0xFF) + 1) & 0xFF;
+            ulong nodeID = (ulong)player.UniqueMultiplayerID;
+            nodeID = (nodeID >> 32) ^ (nodeID & 0xFFFFFFFFu);
+            nodeID = ((nodeID >> 16) ^ (nodeID & 0xFFFF)) & 0xFFFF;
+            ulong timestamp = (ulong)(TASDateTime.NextFrameUtcNow.Ticks / 10000);
+            latestID = (timestamp << 24) | (nodeID << 8) | seqNum;
+            return (long)latestID;
         }
     }
 }

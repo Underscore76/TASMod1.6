@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using StardewValley;
+using TASMod.Helpers;
 
 namespace TASMod.Extensions
 {
@@ -104,7 +105,7 @@ namespace TASMod.Extensions
 
         public static void PushTrace(Random r, int frame, int playerIndex)
         {
-            if (r == Game1.random)
+            if (Controller.PushStackTrace && r == Game1.random)
             {
                 if (!StackTraces.ContainsKey(frame))
                 {

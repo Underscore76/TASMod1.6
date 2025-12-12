@@ -22,8 +22,11 @@ namespace TASMod.Simulators.EnemyKill
         public int IndexAtSpawnRare = 0;
         public int IndexNeededVoidBook = 0;
         public int IndexAtVoidBook = 0;
+        public int IndexAtExtraDrop = 0;
+        public int IndexNeededExtraDrop = 0;
         public bool VoidBook = false;
         public bool Ladder = false;
+        public List<string> DroppedItems = new List<string>();
         public EnemyHit()
         {
         }
@@ -172,6 +175,14 @@ namespace TASMod.Simulators.EnemyKill
             {
                 return GreenSlime_takeDamage(Game1_random, slime, damage, xTrajectory, yTrajectory, isBomb, addedPrecision, who);
             }
+            if (monster is SquidKid squidKid)
+            {
+                return SquidKid_takeDamage(Game1_random, squidKid, damage, xTrajectory, yTrajectory, isBomb, addedPrecision, who);
+            }
+            if (monster is Serpent serpent)
+            {
+                return Serpent_takeDamage(Game1_random, serpent, damage, xTrajectory, yTrajectory, isBomb, addedPrecision, who);
+            }
             return Monster_baseTakeDamage(Game1_random, monster, damage, xTrajectory, yTrajectory, isBomb, addedPrecision, "");
         }
 
@@ -221,6 +232,47 @@ namespace TASMod.Simulators.EnemyKill
             }
         }
 
+        public static int Serpent_takeDamage(Random Game1_random, Serpent serpent, int damage, int xTrajectory, int yTrajectory, bool isBomb, double addedPrecision, Farmer who)
+        {
+            void localDeathAnimation(Random Game1_random, Serpent serpent)
+            {
+                // seems to be the same between normal/royal
+                Game1_random.Next();
+            }
+            int actualDamage = Math.Max(1, damage - serpent.resilience.Value);
+            if (Game1_random.NextDouble() < serpent.missChance.Value - serpent.missChance.Value * addedPrecision)
+            {
+                actualDamage = -1;
+            }
+            else
+            {
+                localDeathAnimation(Game1_random, serpent);
+            }
+            Game1_random.Next(); // this.addedSpeed = Game1.random.Next(-1, 1);
+            return actualDamage;
+        }
+
+        public static int SquidKid_takeDamage(Random Game1_random, SquidKid squidKid, int damage, int xTrajectory, int yTrajectory, bool isBomb, double addedPrecision, Farmer who)
+        {
+            void localDeathAnimation(Random Game1_random, SquidKid squidKid)
+            {
+                // Utility.makeTemporarySpriteJuicier
+                Game1_random.Next(); Game1_random.Next(); Game1_random.Next();
+                Game1_random.Next(); Game1_random.Next(); Game1_random.Next();
+                Game1_random.Next(); Game1_random.Next(); Game1_random.Next();
+                Game1_random.Next(); Game1_random.Next(); Game1_random.Next();
+            }
+            int actualDamage = Math.Max(1, damage - squidKid.resilience.Value);
+            if (Game1_random.NextDouble() < squidKid.missChance.Value - squidKid.missChance.Value * addedPrecision)
+            {
+                actualDamage = -1;
+            }
+            else
+            {
+                localDeathAnimation(Game1_random, squidKid);
+            }
+            return actualDamage;
+        }
         public static int GreenSlime_takeDamage(Random Game1_random, GreenSlime slime, int damage, int xTrajectory, int yTrajectory, bool isBomb, double addedPrecision, Farmer who)
         {
             int actualDamage = Math.Max(1, damage - slime.resilience.Value);
@@ -335,8 +387,24 @@ namespace TASMod.Simulators.EnemyKill
         public static void MineShaft_MonsterDrop(EnemyHit hit, Random Game1_random, Monster monster, int x, int y, Farmer who)
         {
             // default GameLocation:MonsterDrop
+            if (monster is Serpent serpent)
+            {
+                hit.IndexAtExtraDrop = Game1_random.get_Index();
+                if (Game1_random.NextDouble() < 0.002)
+                {
+                    hit.DroppedItems.Add("485");
+                    Game1_random.Next(); // ItemRegistry.Create
+                }
+                else
+                {
+                    Random copy = Game1_random.Copy();
+                    while (copy.NextDouble() >= 0.002) { }
+                    hit.IndexNeededExtraDrop = copy.get_Index();
+                }
+            }
+            hit.DroppedItems.AddRange(monster.objectsToDrop);
             // drop the items
-            for (int i = 0; i < monster.objectsToDrop.Count; i++)
+            for (int i = 0; i < hit.DroppedItems.Count; i++)
             {
                 // Debris:InitializeChunks
                 Game1_random.Next();

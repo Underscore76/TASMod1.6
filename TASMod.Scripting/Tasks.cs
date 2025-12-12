@@ -48,7 +48,7 @@ namespace TASMod.Scripting
             }
             StagedTasks[playerIndex].Insert(0, new FrameTask { Type = type, Tile = tile });
         }
-        public static void Push(int playerIndex, string type, Vector2 tile)
+        public static void PushRight(int playerIndex, string type, Vector2 tile)
         {
             if (!StagedTasks.ContainsKey(playerIndex))
             {
@@ -64,7 +64,7 @@ namespace TASMod.Scripting
             }
             return 0;
         }
-        public static FrameTask Pop(int playerIndex)
+        public static FrameTask PopLeft(int playerIndex)
         {
             if (Count(playerIndex) > 0)
             {
@@ -74,11 +74,30 @@ namespace TASMod.Scripting
             }
             return null;
         }
+        public static FrameTask PopRight(int playerIndex)
+        {
+            if (Count(playerIndex) > 0)
+            {
+                var index = StagedTasks[playerIndex].Count - 1;
+                var task = StagedTasks[playerIndex][index];
+                StagedTasks[playerIndex].RemoveAt(index);
+                return task;
+            }
+            return null;
+        }
         public static FrameTask Peek(int playerIndex)
         {
             if (Count(playerIndex) > 0)
             {
                 return StagedTasks[playerIndex][0];
+            }
+            return null;
+        }
+        public static FrameTask Get(int playerIndex, int taskIndex)
+        {
+            if (Count(playerIndex) > taskIndex)
+            {
+                return StagedTasks[playerIndex][taskIndex];
             }
             return null;
         }

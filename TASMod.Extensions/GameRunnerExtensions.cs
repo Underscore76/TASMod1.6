@@ -7,6 +7,7 @@ using StardewModdingAPI;
 using StardewValley;
 using TASMod.Monogame.Framework;
 using TASMod.Networking;
+using TASMod.Simulators.Fishing;
 using TASMod.System;
 using TASMod.Views;
 
@@ -27,6 +28,7 @@ namespace TASMod.Extensions
             for (int i = numInstances - 1; i >= 0; i--)
             {
                 GameRunner.LoadInstance(runner.gameInstances[i]);
+                Game1.Multiplayer.latestID = 0;
                 if (Game1.server != null) { Game1.server = null; }
                 if (Game1.client != null) { Game1.client = null; }
                 runner.gameInstances[i].exitEvent(null, null);
@@ -164,8 +166,12 @@ namespace TASMod.Extensions
                     if (counter++ >= Controller.FramesBetweenRender)
                         break;
                 }
-                catch
+                catch (Exception e)
                 {
+                    ModEntry.Console.Log($"Exception during Fast Run: {e}", LogLevel.Error);
+                    ModEntry.Console.Log($"Exiting the game due to exception.", LogLevel.Error);
+                    ModEntry.Console.Log($"At Frame: {TASDateTime.CurrentFrame}", LogLevel.Error);
+                    ModEntry.Console.Log(e.StackTrace, LogLevel.Error);
                     Game1.game1.Exit();
                     Environment.Exit(1);
                 }

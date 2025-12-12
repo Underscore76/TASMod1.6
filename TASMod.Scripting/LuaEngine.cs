@@ -177,6 +177,11 @@ namespace TASMod.Scripting
             HasBooted = true;
         }
 
+        public static void GarbageCollect()
+        {
+            LuaState.State.GarbageCollector(KeraLua.LuaGC.Collect, 0);
+        }
+
         public static string FormatError(string message, Exception innerException)
         {
             string err = message;

@@ -57,6 +57,8 @@ namespace TASMod
         public static bool SkipSave = true;
         public static bool ResetGame;
         public static bool BlockOverlays = true;
+        public static bool DebugMode = false;
+        public static bool PushStackTrace = false;
 
         public static TASMouseState RealMouse { get; private set; } = new TASMouseState();
         public static TASKeyboardState RealKeyboard { get; private set; } = new TASKeyboardState();

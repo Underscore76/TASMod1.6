@@ -13,9 +13,14 @@ namespace TASMod.Overlays
         public override string Description => "display the real mouse over the screen";
 
         public Texture2D Cursor;
-        public Color MouseColor = Color.Black;
-        public Mouse() : base()
+        public Color MouseColor;
+        public Mouse() : this(Color.Black)
         {
+            Priority = 1000;
+        }
+        public Mouse(Color color) : base()
+        {
+            MouseColor = color;
             Priority = 1000;
         }
 

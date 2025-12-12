@@ -9,6 +9,7 @@ using TASMod.Inputs;
 using TASMod.Patches;
 using TASMod.Scripting;
 using System.Collections.Generic;
+using StardewValley;
 
 namespace TASMod.Overlays.Widgets
 {
@@ -24,6 +25,7 @@ namespace TASMod.Overlays.Widgets
             ImGui.Begin($"Controller {index}");
             if (ImGui.IsWindowFocused())
             {
+                // if (index < GameRunner.instance.gameInstances.Count)
                 ActiveInstance.InstanceIndex = index;
             }
             TASGamePadState con = TASInputState.GetTASGamePadState(index);

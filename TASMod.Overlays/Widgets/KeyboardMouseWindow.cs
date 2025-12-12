@@ -3,6 +3,7 @@ using ImGuiVector2 = System.Numerics.Vector2;
 using ImGuiVector4 = System.Numerics.Vector4;
 using TASMod.Patches;
 using TASMod.Inputs;
+using StardewValley;
 
 namespace TASMod.Overlays.Widgets
 {
@@ -19,6 +20,7 @@ namespace TASMod.Overlays.Widgets
             ImGui.Begin($"Controller {index}");
             if (ImGui.IsWindowFocused())
             {
+                // if (index < GameRunner.instance.gameInstances.Count)
                 ActiveInstance.InstanceIndex = index;
             }
 

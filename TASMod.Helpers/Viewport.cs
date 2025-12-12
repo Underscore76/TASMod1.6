@@ -22,6 +22,8 @@ namespace TASMod.Helpers
             {
                 if (Controller.ViewController.CurrentView == TASMod.Views.TASView.Map)
                     return new Rectangle(0, 0, Game1.graphics.GraphicsDevice.Viewport.Width, Game1.graphics.GraphicsDevice.Viewport.Height);
+                // if (GameRunner.instance.gameInstances.Count == 1)
+                //     return new Rectangle(0, 0, Game1.graphics.GraphicsDevice.Viewport.Width, Game1.graphics.GraphicsDevice.Viewport.Height);
                 return GameRunner.instance.gameInstances[index].localMultiplayerWindow;
             }
         }
@@ -30,6 +32,10 @@ namespace TASMod.Helpers
     {
         public static ViewportInfo Get(int index)
         {
+            // if (GameRunner.instance.gameInstances.Count == 1)
+            // {
+            //     return new ViewportInfo { index = index, Viewport = Game1.viewport };
+            // }
             var viewport = (xTile.Dimensions.Rectangle)Reflector.GetStaticVar(index, "Game1_viewport");
             return new ViewportInfo { index = index, Viewport = viewport };
         }

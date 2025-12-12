@@ -57,9 +57,9 @@ namespace TASMod.Patches
             __instance.showPlacementTileForGamepad = true;
             __instance.hardwareCursor = false;
             __instance.musicVolumeLevel = 0.1f;
-            __instance.ambientVolumeLevel = 0.3f;
-            __instance.footstepVolumeLevel = 0.75f;
-            __instance.soundVolumeLevel = 1f;
+            __instance.ambientVolumeLevel = 0.4f;
+            __instance.footstepVolumeLevel = 0.6f;
+            __instance.soundVolumeLevel = 0.6f;
             __instance.preferredResolutionX = Game1
                 .graphics.GraphicsDevice.Adapter.SupportedDisplayModes.Last()
                 .Width;
