@@ -27,6 +27,12 @@ using TASMod.Networking;
 
 namespace TASMod
 {
+    public enum TASMode
+    {
+        Edit,
+        Replay,
+    }
+
     public class Controller
     {
         public static TASConsole Console = null;
@@ -60,6 +66,10 @@ namespace TASMod
         public static bool DebugMode = false;
         public static bool PushStackTrace = false;
 
+        public static bool IsPaused = false;
+        public static int PauseFrame = -1;
+        public static TASMode GameMode = TASMode.Edit;
+
         public static TASMouseState RealMouse { get; private set; } = new TASMouseState();
         public static TASKeyboardState RealKeyboard { get; private set; } = new TASKeyboardState();
 
@@ -87,22 +97,40 @@ namespace TASMod
             return Recording.HasUpdate() || Automation.HasUpdate();
         }
 
-        public static bool Update()
+        public static bool ReplayUpdate()
         {
-            // handle initial game launch
-            if (LaunchManager.Update())
-                return true;
-
-            // update inputs and basic rendering
-            RealInputState.Update();
-            // Console.Warn($"RealInputState: {RealInputState.mouseState} {Mouse.GetState()}");
-            Console.Update();
-            if (BlockOverlays)
+            UpdateRealInput();
+            if (ViewController.CurrentView != TASView.Base)
             {
-                Overlays.Update();
+                return false;
             }
-            TASInputState.Active = false;
+            if (!Console.IsOpen)
+            {
+                if (RealInputState.KeyTriggered(Keys.P))
+                {
+                    IsPaused = !IsPaused;
+                    return false;
+                }
+            }
+            if (ResetGame)
+            {
+                IsPaused = false;
+                return false;
+            }
+            if (!IsPaused)
+            {
+                if (PauseFrame == (int)TASDateTime.CurrentFrame)
+                {
+                    IsPaused = true;
+                    return false;
+                }
+                return Recording.Update();
+            }
+            return false;
+        }
 
+        public static bool EditUpdate()
+        {
             // check if there is frame data to process
             if (Recording.Update())
             {
@@ -148,7 +176,31 @@ namespace TASMod
                 Recording.PushMultiplayerFrame();
                 return true;
             }
+            return false;
+        }
 
+        public static bool Update()
+        {
+            // handle initial game launch
+            if (LaunchManager.Update())
+                return true;
+
+            // update inputs and basic rendering
+            RealInputState.Update();
+            // Console.Warn($"RealInputState: {RealInputState.mouseState} {Mouse.GetState()}");
+            Console.Update();
+            if (BlockOverlays)
+            {
+                Overlays.Update();
+            }
+            TASInputState.Active = false;
+            switch (GameMode)
+            {
+                case TASMode.Edit:
+                    return EditUpdate();
+                case TASMode.Replay:
+                    return ReplayUpdate();
+            }
             return false;
         }
 
@@ -192,7 +244,7 @@ namespace TASMod
             TASSpriteBatch.Active = tmp;
         }
 
-        private static bool HandleRealInput()
+        private static void UpdateRealInput()
         {
             RealMouse = new TASMouseState(RealInputState.mouseState);
             RealKeyboard = new TASKeyboardState(RealInputState.keyboardState);
@@ -209,6 +261,12 @@ namespace TASMod
                     }
                 }
             }
+        }
+
+        private static bool HandleRealInput()
+        {
+            UpdateRealInput();
+
             if (Console.IsOpen)
                 return false;
             if (ViewController.CurrentView != TASView.Base)

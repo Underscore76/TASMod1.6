@@ -157,13 +157,18 @@ namespace TASMod.Extensions
             {
                 try
                 {
+                    if ((int)TASDateTime.CurrentFrame + 2 > Controller.PauseFrame && Controller.GameMode == TASMode.Replay)
+                    {
+                        counter = 0;
+                        break;
+                    }
                     //ModEntry.Console.Log($"Reset {TASDateTime.CurrentFrame}", LogLevel.Error);
                     //runner.Step();
                     GameTime gameTime = TASDateTime.CurrentGameTime;
                     runner.InvokeUpdate(gameTime);
                     runner.InvokeDraw(gameTime);
                     runner.EventLoop();
-                    if (counter++ >= Controller.FramesBetweenRender)
+                    if (counter++ >= Controller.FramesBetweenRender && (Controller.GameMode == TASMode.Edit || !Controller.IsPaused))
                         break;
                 }
                 catch (Exception e)
