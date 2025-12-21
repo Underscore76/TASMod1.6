@@ -44,11 +44,16 @@ namespace TASMod.Simulators.EnemyKill
 
         public static EnemyHit Estimate(int index)
         {
-            if (TASDateTime.CurrentFrame == (uint)Controller.State.Count)
+            int targetFrame = Controller.State.Count;
+            if (Controller.GameMode == TASMode.Replay)
             {
-                if (CurrentFrame != Controller.State.Count)
+                targetFrame = (int)TASDateTime.CurrentFrame;
+            }
+            if (TASDateTime.CurrentFrame == (uint)targetFrame)
+            {
+                if (CurrentFrame != targetFrame)
                 {
-                    CurrentFrame = Controller.State.Count;
+                    CurrentFrame = targetFrame;
                     for (int i = 0; i < 4; i++)
                     {
                         try

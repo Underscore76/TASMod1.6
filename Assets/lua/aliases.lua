@@ -89,38 +89,3 @@ end
 function dumpconsole()
     Controller.Console:WriteToRandomFile()
 end
-
---- pause the game (on a specific frame if desired)
---- @param frame number|nil @frame to pause on (default: nil)
-function pause(frame)
-    Controller.GameMode = TASMode.Replay
-    Controller.IsPaused = true
-    if frame == nil then
-        Controller.PauseFrame = -1
-    else
-        Controller.PauseFrame = frame
-    end
-end
-
---- run the game until the specified frame
---- @param frame number @frame to run to
-function runto(frame)
-    if frame == nil then
-        print("ERROR: runto requires a frame number")
-        return
-    end
-    Controller.GameMode = TASMode.Replay
-    Controller.IsPaused = false
-    Controller.PauseFrame = frame
-end
-
---- unpause the game
-function unpause()
-    Controller.IsPaused = false
-    Controller.PauseFrame = -1
-end
-
---- switch to edit mode
-function edit()
-    Controller.GameMode = TASMode.Edit
-end

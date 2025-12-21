@@ -106,10 +106,12 @@ namespace TASMod
             }
             if (!Console.IsOpen)
             {
-                if (RealInputState.KeyTriggered(Keys.P))
+                if (ScriptInterface._instance != null)
                 {
-                    IsPaused = !IsPaused;
-                    return false;
+                    if (ScriptInterface._instance.ReceiveKeys(RealInputState.GetTriggeredKeys()))
+                    {
+                        return false;
+                    }
                 }
             }
             if (ResetGame)
@@ -126,6 +128,7 @@ namespace TASMod
                 }
                 return Recording.Update();
             }
+
             return false;
         }
 
