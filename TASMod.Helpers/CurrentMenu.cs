@@ -50,10 +50,10 @@ namespace TASMod.Helpers
     {
         public static MenuInfo Get(int index)
         {
-            // if (GameRunner.instance.gameInstances.Count == 1)
-            // {
-            //     return new MenuInfo { Menu = Game1.activeClickableMenu };
-            // }
+            if (GameRunner.instance.gameInstances.Count == 1)
+            {
+                return new MenuInfo { Menu = Game1.activeClickableMenu };
+            }
             if (index < 0 || index >= GameRunner.instance.gameInstances.Count)
                 return new MenuInfo { Menu = null };
             var menu = Reflector.GetStaticVar(index, "Game1__activeClickableMenu") as IClickableMenu;

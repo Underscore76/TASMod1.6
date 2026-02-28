@@ -20,11 +20,11 @@ namespace TASMod.Helpers
         public static ScreenFadeInfo Get(int index)
         {
             ScreenFade screenFade;
-            // if (GameRunner.instance.gameInstances.Count == 1)
-            // {
-            //     screenFade = Reflector.GetStaticValue<Game1, ScreenFade>("screenFade");
-            //     return new ScreenFadeInfo { ScreenFade = screenFade };
-            // }
+            if (GameRunner.instance.gameInstances.Count == 1)
+            {
+                screenFade = Reflector.GetStaticValue<Game1, ScreenFade>("screenFade");
+                return new ScreenFadeInfo { ScreenFade = screenFade };
+            }
             screenFade = Reflector.GetStaticVar(index, "Game1_screenFade") as ScreenFade;
             return new ScreenFadeInfo { ScreenFade = screenFade };
         }

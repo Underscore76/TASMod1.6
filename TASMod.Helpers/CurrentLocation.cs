@@ -168,10 +168,10 @@ namespace TASMod.Helpers
     {
         public static LocationInfo Get(int index)
         {
-            // if (GameRunner.instance.gameInstances.Count == 1)
-            // {
-            //     return new LocationInfo { index = index, Location = Game1.currentLocation };
-            // }
+            if (GameRunner.instance.gameInstances.Count == 1)
+            {
+                return new LocationInfo { index = index, Location = Game1.currentLocation };
+            }
             if (index < 0 || index >= GameRunner.instance.gameInstances.Count)
                 return new LocationInfo { index = index, Location = null };
             var location = GameRunner.instance.gameInstances[index]?.instanceGameLocation;
