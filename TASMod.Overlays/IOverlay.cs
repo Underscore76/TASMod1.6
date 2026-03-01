@@ -87,8 +87,8 @@ namespace TASMod.Overlays
         public Rectangle TransformToLocal(int index, Rectangle global)
         {
             var viewport = InstanceViewport.Get(index);
-            var options = GameRunner.instance.gameInstances[index].instanceOptions;
-            var window = GameRunner.instance.gameInstances[index].localMultiplayerWindow;
+            var options = InstanceOptions.Get(index);
+            var window = viewport.Window;
             Rectangle local = new Rectangle(
                 (int)((global.X - viewport.X) * options.zoomLevel),
                 (int)((global.Y - viewport.Y) * options.zoomLevel),

@@ -34,23 +34,21 @@ namespace TASMod.Overlays
         }
         public void DrawForInstance(int index, SpriteBatch spriteBatch)
         {
-            var menu = InstanceCurrentMenu.Get(index); ;
+            var menu = InstanceCurrentMenu.Get(index);
             if (menu.Active && menu.Menu is BobberBar bar)
             {
-                SFishingGame game = new SFishingGame(index);
-                var state = game.bobberBar;
                 DrawRectLocal(index, spriteBatch,
                     new Rectangle(
                         bar.xPositionOnScreen + 56,
-                        bar.yPositionOnScreen + 12 + (int)state.bobberBarPos - 16,
-                        52, state.bobberBarHeight - 28
+                        bar.yPositionOnScreen + 12 + (int)bar.bobberBarPos - 16,
+                        52, bar.bobberBarHeight - 28
                         ),
-                    state.bobberInBar ? Color.Green : Color.Red, 1, true
+                    bar.bobberInBar ? Color.Green : Color.Red, 1, true
                     );
                 DrawRectLocal(index, spriteBatch,
                     new Rectangle(
                         bar.xPositionOnScreen + 56,
-                        bar.yPositionOnScreen + 12 + (int)state.bobberPosition,
+                        bar.yPositionOnScreen + 12 + (int)bar.bobberPosition,
                         52, 1
                         ),
                     new Color(0, 0, 196, 128), 1
@@ -58,17 +56,17 @@ namespace TASMod.Overlays
                 DrawRectLocal(index, spriteBatch,
                     new Rectangle(
                         bar.xPositionOnScreen + 56,
-                        bar.yPositionOnScreen + 12 + (int)state.bobberTargetPosition,
+                        bar.yPositionOnScreen + 12 + (int)bar.bobberTargetPosition,
                         52, 1
                         ),
                     new Color(196, 0, 0, 128), 1
                     );
-                if (state.treasure)
+                if (bar.treasure)
                 {
                     DrawRectLocal(index, spriteBatch,
                     new Rectangle(
                         bar.xPositionOnScreen + 56,
-                        bar.yPositionOnScreen + 12 + (int)state.treasurePosition,
+                        bar.yPositionOnScreen + 12 + (int)bar.treasurePosition,
                         52, 1
                         ),
                     new Color(196, 196, 0, 128), 1

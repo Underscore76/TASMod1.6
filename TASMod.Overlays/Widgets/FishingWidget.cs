@@ -29,15 +29,14 @@ namespace TASMod.Overlays.Widgets
             if (ImGui.CollapsingHeader("Fishing"))
             {
                 ImGui.Indent();
-                SBobberBar state = new SBobberBar(bar);
                 ImGui.SeparatorText("Fish State");
-                ImGui.Text($"Pos: {state.bobberPosition}");
-                ImGui.Text($"Target: {state.bobberTargetPosition}");
-                ImGui.Text($"Speed: {state.bobberSpeed}");
+                ImGui.Text($"Pos: {bar.bobberPosition}");
+                ImGui.Text($"Target: {bar.bobberTargetPosition}");
+                ImGui.Text($"Speed: {bar.bobberSpeed}");
                 ImGui.SeparatorText("Bar State");
-                ImGui.Text($"Pos: {state.bobberBarPos}");
-                ImGui.Text($"Height: {state.bobberBarPos + state.bobberBarHeight}");
-                ImGui.Text($"Speed: {state.bobberBarSpeed}");
+                ImGui.Text($"Pos: {bar.bobberBarPos}");
+                ImGui.Text($"Height: {bar.bobberBarPos + bar.bobberBarHeight}");
+                ImGui.Text($"Speed: {bar.bobberBarSpeed}");
                 ImGui.Unindent();
             }
         }

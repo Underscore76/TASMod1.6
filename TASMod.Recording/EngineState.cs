@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using TASMod.Overlays;
 
 namespace TASMod.Recording
 {
@@ -8,6 +9,7 @@ namespace TASMod.Recording
         public Dictionary<string, string> Aliases;
         public Dictionary<string, bool> OverlayState;
         public Dictionary<string, bool> LogicState;
+        public bool MultiplayerShowControllers;
 
         public EngineState()
         {
@@ -22,6 +24,7 @@ namespace TASMod.Recording
             {
                 LogicState.Add(logic.Key, logic.Value.Active);
             }
+            MultiplayerShowControllers = ImGuiOverlay.ShowControllers;
         }
 
         public void UpdateGame()
@@ -37,6 +40,7 @@ namespace TASMod.Recording
                 if (AutomationManager.ContainsKey(logic.Key))
                     AutomationManager.Get(logic.Key).Active = logic.Value;
             }
+            ImGuiOverlay.ShowControllers = MultiplayerShowControllers;
         }
     }
 }
