@@ -17,14 +17,23 @@ namespace TASMod.Overlays.Widgets
             ImGui.SetNextWindowBgAlpha(0.9f);
             ImGui.PushStyleVar(ImGuiStyleVar.WindowRounding, 5.0f);
             ImGui.PushStyleVar(ImGuiStyleVar.FrameRounding, 3.0f);
-            ImGui.Begin($"Controller {index}");
+            if (!ImGui.Begin($"Controller {index}"))
+            {
+                ImGui.End();
+                ImGui.PopStyleVar(2);
+                return;
+            }
             if (ImGui.IsWindowFocused())
             {
                 // if (index < GameRunner.instance.gameInstances.Count)
                 ActiveInstance.InstanceIndex = index;
             }
 
-            if (AutomationManager.AppliedLogic != null)
+            if (AutomationManager.ExecutingLogic != null)
+            {
+                ImGui.TextColored(new ImGuiVector4(1f, 0.8f, 0.2f, 1f), $"~ Executing: {AutomationManager.ExecutingLogic}");
+            }
+            else if (AutomationManager.AppliedLogic != null)
             {
                 ImGui.TextColored(new ImGuiVector4(0, 1, 0, 1), $"+ Queued: {AutomationManager.AppliedLogic}");
             }

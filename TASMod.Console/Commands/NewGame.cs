@@ -123,6 +123,7 @@ namespace TASMod.Console.Commands
                 default:
                     throw new Exception("shouldn't get here...");
             }
+            Write(input);
             Write(MenuLine());
         }
     }

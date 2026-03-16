@@ -10,11 +10,21 @@ namespace TASMod
 {
     public class Reflector
     {
-        public static Dictionary<string, FieldInfo> FieldInfos = new Dictionary<string, FieldInfo>();
-        public static Dictionary<string, PropertyInfo> PropertyInfos = new Dictionary<string, PropertyInfo>();
-        public static Dictionary<string, MethodInfo> MethodInfos = new Dictionary<string, MethodInfo>();
-        public static Dictionary<string, List<string>> FieldsInTypeInfos = new Dictionary<string, List<string>>();
-        public static Dictionary<string, Type> RemoteAssemblyTypes = new Dictionary<string, Type>();
+        [ThreadStatic]
+        private static Dictionary<string, FieldInfo> _fieldInfos;
+        private static Dictionary<string, FieldInfo> FieldInfos => _fieldInfos ??= new Dictionary<string, FieldInfo>();
+        [ThreadStatic]
+        private static Dictionary<string, PropertyInfo> _propertyInfos;
+        private static Dictionary<string, PropertyInfo> PropertyInfos => _propertyInfos ??= new Dictionary<string, PropertyInfo>();
+        [ThreadStatic]
+        private static Dictionary<string, MethodInfo> _methodInfos;
+        private static Dictionary<string, MethodInfo> MethodInfos => _methodInfos ??= new Dictionary<string, MethodInfo>();
+        [ThreadStatic]
+        private static Dictionary<string, List<string>> _fieldsInTypeInfos;
+        private static Dictionary<string, List<string>> FieldsInTypeInfos => _fieldsInTypeInfos ??= new Dictionary<string, List<string>>();
+        [ThreadStatic]
+        private static Dictionary<string, Type> _remoteAssemblyTypes;
+        private static Dictionary<string, Type> RemoteAssemblyTypes => _remoteAssemblyTypes ??= new Dictionary<string, Type>();
         public const BindingFlags AllFlags = (BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static);
         public const BindingFlags HiddenFlags = (BindingFlags.NonPublic | BindingFlags.Instance);
 
@@ -257,10 +267,11 @@ namespace TASMod
             {
                 Type type = obj.GetType();
                 dynamic castObj = Convert.ChangeType(obj, type);
-                return Reflector.GetValue(castObj, field);
+                return Reflector.GetValue(castObj, field, AllFlags);
             }
-            catch
+            catch (Exception e)
             {
+                Controller.Console.Alert("Failed to get dynamic cast field " + field + ": " + e.ToString());
                 return null;
             }
         }
@@ -275,7 +286,9 @@ namespace TASMod
 
         public static void SetStaticVar(int index, string key, object value)
         {
-            var obj = GameRunner.instance.gameInstances[index].staticVarHolder;
+            var obj = GameRunner.instance.gameInstances[index]?.staticVarHolder;
+            if (obj == null)
+                return;
             SetValue(obj, key, value);
         }
     }

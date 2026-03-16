@@ -44,7 +44,11 @@ namespace TASMod.Overlays
 
         public void EngineLayout()
         {
-            ImGui.Begin("Engine");
+            if (!ImGui.Begin("Engine"))
+            {
+                ImGui.End();
+                return;
+            }
             if (ImGui.CollapsingHeader("Config"))
             {
                 if (ImGui.DragFloat("Window Scale", ref FontScale, 0.005f, 1, 2, "%.2f", ImGuiSliderFlags.AlwaysClamp))
@@ -112,6 +116,8 @@ namespace TASMod.Overlays
                 }
                 DrawPlayerStatusWindow();
             }
+            ObjectViewerWindow.Draw();
+            FishingSolverWindow.Draw();
 
             if (imguiTarget == null || imguiTarget.Width != Game1.graphics.PreferredBackBufferWidth || imguiTarget.Height != Game1.graphics.PreferredBackBufferHeight)
             {

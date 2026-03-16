@@ -63,6 +63,8 @@ namespace TASMod.Scripting
             LuaState.DoString("import ('TASMod.Simulators.GemNode')");
             LuaState.DoString("import ('TASMod.Simulators.TreeHit')");
             LuaState.DoString("import ('TASMod.Simulators.EnemyKill')");
+            LuaState.DoString("import ('TASMod.Simulators.FishingMinigame')");
+            LuaState.DoString("import ('TASMod.Overlays.Widgets')");
         }
 
         public static void LoadAllFiles()

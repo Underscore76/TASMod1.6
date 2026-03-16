@@ -10,7 +10,7 @@ namespace TASMod.Console.Commands
     {
         public override string Name => "lua";
         public override string Description => "open up the lua repl";
-        public override string SubscriberPrefix => "lua $ ";
+        public override string SubscriberPrefix => $"lua {(Console.followLogUpdate ? "> " : "$ ")}";
         public List<string> CommandString;
         public Stack<string> Openings;
         private Dictionary<string, string[]> Keywords;

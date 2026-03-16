@@ -1,8 +1,10 @@
 // public virtual bool answerDialogueAction(string questionAndAnswer, string[] questionParams)
 
+using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using HarmonyLib;
+using Microsoft.Xna.Framework;
 using StardewValley;
 using StardewValley.Locations;
 using StardewValley.Menus;
@@ -64,67 +66,88 @@ namespace TASMod.Patches
         }
     }
 
-    // public class GameLocation_DayUpdate : IPatch
-    // {
-    //     public override string Name => "GameLocation.DayUpdate";
-    //     public static bool IsEnabled = false;
+    public class GameLocation__TestCornersTiles : IPatch
+    {
+        public override string Name => "GameLocation._TestCornersTiles";
 
-    //     public override void Patch(Harmony harmony)
-    //     {
-    //         harmony.Patch(
-    //             original: AccessTools.Method(typeof(GameLocation), "DayUpdate"),
-    //             prefix: new HarmonyMethod(this.GetType(), nameof(this.Prefix)),
-    //             postfix: new HarmonyMethod(this.GetType(), nameof(this.Postfix))
-    //         );
-    //     }
+        public override void Patch(Harmony harmony)
+        {
+            harmony.Patch(
+                original: AccessTools.Method(typeof(GameLocation), "_TestCornersTiles"),
+                prefix: new HarmonyMethod(this.GetType(), nameof(this.Prefix)),
+                postfix: new HarmonyMethod(this.GetType(), nameof(this.Postfix))
+            );
+        }
 
-    //     public static bool Prefix(ref GameLocation __instance)
-    //     {
-    //         if (IsEnabled && __instance.Name == "Forest")
-    //         {
-    //             Controller.Console.Alert($"{__instance.Name}\tprefix\t{Game1.random.ToString()}");
-    //         }
-    //         return true;
-    //     }
+        public static bool Prefix()
+        {
+            return false;
+        }
 
-    //     public static void Postfix(ref GameLocation __instance)
-    //     {
-    //         if (IsEnabled && __instance.Name == "Forest")
-    //         {
-    //             Controller.Console.Alert($"{__instance.Name}\tpostfix\t{Game1.random.ToString()}");
-    //         }
-    //     }
-    // }
+        public static void Postfix(Vector2 top_right, Vector2 top_left, Vector2 bottom_right, Vector2 bottom_left, Vector2 top_mid, Vector2 bottom_mid, Vector2? player_top_right, Vector2? player_top_left, Vector2? player_bottom_right, Vector2? player_bottom_left, Vector2? player_top_mid, Vector2? player_bottom_mid, bool bigger_than_tile, Func<Vector2, bool> action, out bool __result)
+        {
+            Span<Vector2> visitedCollisionTiles = stackalloc Vector2[6];
+            int visitedCount = 0;
 
-    // public class Utility_recursiveFindOpenTiles : IPatch
-    // {
-    //     public override string Name => "Utility.recursiveFindOpenTiles";
-    //     public static bool IsEnabled = false;
+            if (TryVisitTile(top_right, player_top_right, visitedCollisionTiles, ref visitedCount, action))
+            {
+                __result = true;
+                return;
+            }
 
-    //     public override void Patch(Harmony harmony)
-    //     {
-    //         harmony.Patch(
-    //             original: AccessTools.Method(typeof(Utility), "recursiveFindOpenTiles"),
-    //             prefix: new HarmonyMethod(this.GetType(), nameof(this.Prefix)),
-    //             postfix: new HarmonyMethod(this.GetType(), nameof(this.Postfix))
-    //         );
-    //     }
+            if (TryVisitTile(top_left, player_top_left, visitedCollisionTiles, ref visitedCount, action))
+            {
+                __result = true;
+                return;
+            }
 
-    //     public static bool Prefix(ref GameLocation l)
-    //     {
-    //         if (IsEnabled && l.Name == "Forest")
-    //         {
-    //             Controller.Console.Alert($"recursiveFindOpenTiles\tprefix\t{Game1.random.ToString()}");
-    //         }
-    //         return true;
-    //     }
+            if (TryVisitTile(bottom_left, player_bottom_left, visitedCollisionTiles, ref visitedCount, action))
+            {
+                __result = true;
+                return;
+            }
 
-    //     public static void Postfix(ref GameLocation l)
-    //     {
-    //         if (IsEnabled && l.Name == "Forest")
-    //         {
-    //             Controller.Console.Alert($"recursiveFindOpenTiles\tpostfix\t{Game1.random.ToString()}");
-    //         }
-    //     }
-    // }
+            if (TryVisitTile(bottom_right, player_bottom_right, visitedCollisionTiles, ref visitedCount, action))
+            {
+                __result = true;
+                return;
+            }
+
+            if (bigger_than_tile)
+            {
+                if (TryVisitTile(top_mid, player_top_mid, visitedCollisionTiles, ref visitedCount, action))
+                {
+                    __result = true;
+                    return;
+                }
+
+                if (TryVisitTile(bottom_mid, player_bottom_mid, visitedCollisionTiles, ref visitedCount, action))
+                {
+                    __result = true;
+                    return;
+                }
+            }
+
+            __result = false;
+        }
+
+        private static bool TryVisitTile(Vector2 tile, Vector2? playerTile, Span<Vector2> visitedCollisionTiles, ref int visitedCount, Func<Vector2, bool> action)
+        {
+            if (playerTile == tile)
+            {
+                return false;
+            }
+
+            for (int i = 0; i < visitedCount; i++)
+            {
+                if (visitedCollisionTiles[i] == tile)
+                {
+                    return false;
+                }
+            }
+
+            visitedCollisionTiles[visitedCount++] = tile;
+            return action(tile);
+        }
+    }
 }

@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using StardewValley;
@@ -51,44 +52,57 @@ namespace TASMod.Extensions
         }
 
         internal static ConditionalWeakTable<Random, Holder> RandomData;
-
+        private static readonly ConditionalWeakTable<Random, Holder>.CreateValueCallback HolderFactory =
+            _ => new Holder();
+        [ThreadStatic]
+        private static Random LastDataRandom;
+        [ThreadStatic]
+        private static Holder LastDataHolder;
+        [ThreadStatic]
+        private static bool SuppressTrackingForCurrentThread;
+        private static Type Net5ImplType;
+        private static Type Net6ImplType;
+        private static Type CompatPrngType;
+        private static Func<object> CreateNet6Impl;
         static RandomExtensions()
         {
+            Net5ImplType = Type.GetType(Net5_ImplTypeName)!;
             RandomData = new ConditionalWeakTable<Random, Holder>();
             ImplInfo = typeof(Random).GetField(
                 ImplName,
                 BindingFlags.Instance | BindingFlags.NonPublic
             )!;
-            PrngInfo = Type.GetType(Net5_ImplTypeName)!
+            PrngInfo = Net5ImplType
                 .GetField(Net5_Impl_CompatPrng, BindingFlags.Instance | BindingFlags.NonPublic)!;
-            Type compatPrngType = Type.GetType(Net5_CompatPrngTypeName)!;
-            seedArrayInfo = compatPrngType.GetField(
+            CompatPrngType = Type.GetType(Net5_CompatPrngTypeName);
+            seedArrayInfo = CompatPrngType.GetField(
                 CompatPrng_SeedArrayName,
                 BindingFlags.Instance | BindingFlags.NonPublic
             )!;
-            inextInfo = compatPrngType.GetField(
+            inextInfo = CompatPrngType.GetField(
                 CompatPrng_InextName,
                 BindingFlags.Instance | BindingFlags.NonPublic
             )!;
-            inextpInfo = compatPrngType.GetField(
+            inextpInfo = CompatPrngType.GetField(
                 CompatPrng_InextpName,
                 BindingFlags.Instance | BindingFlags.NonPublic
             )!;
 
-            Type xoroshiroType = Type.GetType(Net6_ImplTypeName)!;
-            S0Info = xoroshiroType.GetField(
+            Net6ImplType = Type.GetType(Net6_ImplTypeName);
+            CreateNet6Impl = BuildFactory(Net6ImplType);
+            S0Info = Net6ImplType.GetField(
                 Net6_S0Name,
                 BindingFlags.Instance | BindingFlags.NonPublic
             )!;
-            S1Info = xoroshiroType.GetField(
+            S1Info = Net6ImplType.GetField(
                 Net6_S1Name,
                 BindingFlags.Instance | BindingFlags.NonPublic
             )!;
-            S2Info = xoroshiroType.GetField(
+            S2Info = Net6ImplType.GetField(
                 Net6_S2Name,
                 BindingFlags.Instance | BindingFlags.NonPublic
             )!;
-            S3Info = xoroshiroType.GetField(
+            S3Info = Net6ImplType.GetField(
                 Net6_S3Name,
                 BindingFlags.Instance | BindingFlags.NonPublic
             )!;
@@ -101,6 +115,20 @@ namespace TASMod.Extensions
         {
             SharedRandom = new Random(SharedSeed);
             StackTraces.Clear();
+        }
+
+        public static bool IsTrackingEnabledForCurrentThread => !SuppressTrackingForCurrentThread;
+
+        public static bool SetTrackingEnabledForCurrentThread(bool enabled)
+        {
+            bool previous = !SuppressTrackingForCurrentThread;
+            SuppressTrackingForCurrentThread = !enabled;
+            if (enabled)
+            {
+                LastDataRandom = null;
+                LastDataHolder = null;
+            }
+            return previous;
         }
 
         public static void PushTrace(Random r, int frame, int playerIndex)
@@ -126,7 +154,12 @@ namespace TASMod.Extensions
 
         public static void InitData(this Random random)
         {
-            var data = RandomData.GetOrCreateValue(random);
+            if (!IsTrackingEnabledForCurrentThread)
+            {
+                return;
+            }
+
+            var data = GetData(random);
             data.IsNet6 = true;
             data.Seed = 0;
             data.Index = 0;
@@ -134,10 +167,32 @@ namespace TASMod.Extensions
 
         public static void InitData(this Random random, int seed)
         {
-            var data = RandomData.GetOrCreateValue(random);
+            if (!IsTrackingEnabledForCurrentThread)
+            {
+                return;
+            }
+
+            var data = GetData(random);
             data.IsNet6 = false;
             data.Seed = seed;
             data.Index = 0;
+        }
+
+        private static Holder GetData(Random random)
+        {
+            if (ReferenceEquals(random, LastDataRandom))
+            {
+                return LastDataHolder;
+            }
+
+            if (!RandomData.TryGetValue(random, out Holder data))
+            {
+                data = RandomData.GetValue(random, HolderFactory);
+            }
+
+            LastDataRandom = random;
+            LastDataHolder = data;
+            return data;
         }
 
         public static bool IsNet6(this Random random)
@@ -194,10 +249,6 @@ namespace TASMod.Extensions
 
         private static void CloneNet5(this Random random, Random other)
         {
-            other.SetImpl(
-                Activator.CreateInstance(Type.GetType(Net5_ImplTypeName)!, new object[] { 0 })!
-            );
-
             object otherImpl = other.GetImpl();
             TypedReference otherImplRef = __makeref(otherImpl);
             object otherPrng = PrngInfo.GetValueDirect(otherImplRef)!;
@@ -211,14 +262,21 @@ namespace TASMod.Extensions
             inextpInfo.SetValue(otherPrng, inextpInfo.GetValue(currPrng));
             PrngInfo.SetValueDirect(otherImplRef, otherPrng);
 
-            other.set_Index(random.get_Index());
-            other.set_Seed(random.get_Seed());
+            if (!IsTrackingEnabledForCurrentThread)
+            {
+                return;
+            }
+
+            Holder src = GetData(random);
+            Holder dst = GetData(other);
+            dst.Index = src.Index;
+            dst.Seed = src.Seed;
+            dst.IsNet6 = false;
         }
 
         static void CloneNet6(this Random random, Random other)
         {
-            other.SetImpl(Activator.CreateInstance(Type.GetType(Net6_ImplTypeName)!));
-
+            other.SetImpl(CreateNet6Impl());
             object oldImpl = random.GetImpl();
             object newImpl = other.GetImpl();
 
@@ -227,8 +285,42 @@ namespace TASMod.Extensions
             S2Info.SetValue(newImpl, S2Info.GetValue(oldImpl));
             S3Info.SetValue(newImpl, S3Info.GetValue(oldImpl));
 
-            other.set_Index(random.get_Index());
-            other.set_Seed(random.get_Seed());
+            if (!IsTrackingEnabledForCurrentThread)
+            {
+                return;
+            }
+
+            Holder src = GetData(random);
+            Holder dst = GetData(other);
+            dst.Index = src.Index;
+            dst.Seed = src.Seed;
+            dst.IsNet6 = true;
+        }
+
+        private static Func<object> BuildFactory(Type type)
+        {
+            ConstructorInfo ctor = type.GetConstructor(
+                BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
+                binder: null,
+                types: Type.EmptyTypes,
+                modifiers: null
+            );
+
+            if (ctor == null)
+            {
+                return () => Activator.CreateInstance(type)!;
+            }
+
+            try
+            {
+                NewExpression newExpr = Expression.New(ctor);
+                UnaryExpression castExpr = Expression.Convert(newExpr, typeof(object));
+                return Expression.Lambda<Func<object>>(castExpr).Compile();
+            }
+            catch
+            {
+                return () => ctor.Invoke(null)!;
+            }
         }
 
         public static void CloneOver(this Random random, Random other)
@@ -245,38 +337,48 @@ namespace TASMod.Extensions
 
         public static int IncrementCounter(this Random random)
         {
-            Holder data = RandomData.GetOrCreateValue(random);
+            if (!IsTrackingEnabledForCurrentThread)
+            {
+                return 0;
+            }
+
+            Holder data = GetData(random);
             return ++data.Index;
         }
 
         public static int IncrementCounter(this Random random, int n)
         {
-            Holder data = RandomData.GetOrCreateValue(random);
+            if (!IsTrackingEnabledForCurrentThread)
+            {
+                return 0;
+            }
+
+            Holder data = GetData(random);
             data.Index += n;
             return data.Index;
         }
 
         public static void set_Index(this Random random, int index)
         {
-            Holder data = RandomData.GetOrCreateValue(random);
+            Holder data = GetData(random);
             data.Index = index;
         }
 
         public static int get_Index(this Random random)
         {
-            Holder data = RandomData.GetOrCreateValue(random);
+            Holder data = GetData(random);
             return data.Index;
         }
 
         public static void set_Seed(this Random random, int seed)
         {
-            Holder data = RandomData.GetOrCreateValue(random);
+            Holder data = GetData(random);
             data.Seed = seed;
         }
 
         public static int get_Seed(this Random random)
         {
-            Holder data = RandomData.GetOrCreateValue(random);
+            Holder data = GetData(random);
             return data.Seed;
         }
 

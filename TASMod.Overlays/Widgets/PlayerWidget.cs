@@ -12,9 +12,17 @@ namespace TASMod.Overlays.Widgets
             {
                 if (GameRunner.instance == null || GameRunner.instance.gameInstances.Count <= index)
                     return;
-                Farmer farmer = Reflector.GetValue(
+                Farmer farmer;
+                if (GameRunner.instance.gameInstances.Count > 1)
+                {
+                    farmer = Reflector.GetValue(
                     GameRunner.instance.gameInstances[index].staticVarHolder,
                     "Game1__player") as Farmer;
+                }
+                else
+                {
+                    farmer = Game1.player;
+                }
                 if (farmer == null)
                     return;
                 ImGui.Text($"Tile: {farmer.Tile.X},{farmer.Tile.Y}");

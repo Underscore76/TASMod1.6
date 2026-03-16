@@ -10,6 +10,7 @@ using StardewValley;
 using StardewValley.TerrainFeatures;
 using TASMod.Extensions;
 using TASMod.Helpers;
+using TASMod.Inputs;
 using XMouse = Microsoft.Xna.Framework.Input.Mouse;
 
 namespace TASMod.Overlays
@@ -34,7 +35,7 @@ namespace TASMod.Overlays
             var screenFade = InstanceScreenFade.Get(ActiveInstance.InstanceIndex);
             var instanceData = InstanceData.Get(ActiveInstance.InstanceIndex);
 
-            MouseState mouseState = XMouse.GetState();
+            MouseState mouseState = RealInputState.mouseState;//XMouse.GetState();
             Vector2 actualCoords = new Vector2(mouseState.X, mouseState.Y);
             Vector2 coords = new Vector2(mouseState.X - viewport.Window.X, mouseState.Y - viewport.Window.Y);
             Vector2 zoomedCoords = coords * (1f / options.zoomLevel);
@@ -46,7 +47,14 @@ namespace TASMod.Overlays
             List<string> data = new List<string>();
             data.Add(string.Format("({0},{1})", mouseTileX, mouseTileY));
             data.Add(string.Format("StepsTaken: {0}", player.Player.stats.StepsTaken));
-            data.Add(string.Format("Tick: {0}", Reflector.GetStaticVar(0, "Game1_gameTimeInterval") ?? 0));
+            if (GameRunner.instance.gameInstances.Count > 1)
+            {
+                data.Add(string.Format("Tick: {0}", Reflector.GetStaticVar(0, "Game1_gameTimeInterval") ?? 0));
+            }
+            else
+            {
+                data.Add(string.Format("Tick: {0}", Game1.gameTimeInterval));
+            }
             data.Add(string.Format("RNG: {0}", instanceData.random.get_Index()));
             if (screenFade.FadeToBlack)
             {

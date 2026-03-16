@@ -1,0 +1,2 @@
+Frame	3676
+Player	0	Traces	12

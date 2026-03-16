@@ -48,6 +48,11 @@ namespace TASMod.Automation
             return ActiveUpdate(index, out kstate, out mstate, out gstate);
         }
 
+        public virtual bool IsExecuting(int index)
+        {
+            return false;
+        }
+
         public void Log(string message, LogLevel level)
         {
             if (ModEntry.Console != null)

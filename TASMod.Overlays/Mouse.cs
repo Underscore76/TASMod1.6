@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using StardewValley;
 using StardewValley.GameData.HomeRenovations;
+using TASMod.Inputs;
 using XMouse = Microsoft.Xna.Framework.Input.Mouse;
 
 namespace TASMod.Overlays
@@ -55,7 +56,7 @@ namespace TASMod.Overlays
         {
             BuildCursor();
 
-            MouseState mouseState = XMouse.GetState();
+            MouseState mouseState = RealInputState.mouseState;//XMouse.GetState();
             Vector2 coords = new Vector2(mouseState.X, mouseState.Y);
             //(int)((float)mouseState.X / (1f / Game1.options.zoomLevel)),
             //(int)((float)mouseState.Y / (1f / Game1.options.zoomLevel))

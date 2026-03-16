@@ -25,6 +25,7 @@ namespace TASMod.Console
         public static ConsoleInputHandler handler;
         public Dictionary<string, IConsoleCommand> Commands;
         public Overlays.Mouse consoleMouse = new(Color.Wheat);
+        public string nextFrameCommand = null;
 
         public List<string> GetCommands()
         {
@@ -140,8 +141,9 @@ namespace TASMod.Console
         {
             if (IsOpenMax)
             {
-                if (RealInputState.ScrollWheelTriggered() && !isScrollbarDragging && !Controller.FastAdvance)
+                if (RealInputState.ScrollWheelTriggered() && !isScrollbarDragging && TASSpriteBatch.Active)
                 {
+                    followLogUpdate = false;
                     if (historyLog.Count > historyRectRows)
                     {
                         int dir = RealInputState.ScrollWheelDiff();
@@ -269,6 +271,13 @@ namespace TASMod.Console
             {
                 scrollbarThumbHeight = scrollbarRect.Height;
                 scrollbarThumbRect = scrollbarRect;
+            }
+
+            if (nextFrameCommand != null)
+            {
+                string cmd = nextFrameCommand;
+                nextFrameCommand = null;
+                PushCommand(cmd);
             }
         }
 
@@ -565,6 +574,12 @@ namespace TASMod.Console
             return false;
         }
 
+        public void RunOnNextUpdate(string command)
+        {
+            // Implementation for running a command on the next update
+            nextFrameCommand = command;
+        }
+
         public void PushCommand(string command)
         {
             if (HandleSubscribers(command))
@@ -652,7 +667,7 @@ namespace TASMod.Console
 
         public void PushResult(string result)
         {
-            followLogUpdate = historyTail == historyLog.Count;
+            // followLogUpdate = historyTail == historyLog.Count;
             if (followLogUpdate)
                 historyTail++;
             historyLog.Add(new ConsoleTextElement(result, false, color: textHistoryColor));
@@ -660,7 +675,7 @@ namespace TASMod.Console
 
         public void PushResult(string result, ConsoleTextElementType type, Color color)
         {
-            followLogUpdate = historyTail == historyLog.Count;
+            // followLogUpdate = historyTail == historyLog.Count;
             if (followLogUpdate)
                 historyTail++;
             historyLog.Add(new ConsoleTextElement(result, false, type: type, color: color));

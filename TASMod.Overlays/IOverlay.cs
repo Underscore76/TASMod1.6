@@ -71,7 +71,7 @@ namespace TASMod.Overlays
 
         public void Draw()
         {
-            if (Active)
+            if (Active && TASSpriteBatch.Active)
             {
                 if (Game1.spriteBatch.inBeginEndPair())
                     ActiveDraw(Game1.spriteBatch);

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Reflection;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using StardewValley;
@@ -14,9 +15,15 @@ namespace TASMod.Extensions
         public static void Clear(this AudioCategory category)
         {
             List<Cue> cues = (List<Cue>)Reflector.GetValue(category, "_sounds");
-            for (int i = 0; i < cues.Count; i++)
+            if (cues == null || cues.Count == 0)
             {
-                cues[i].Stop(AudioStopOptions.Immediate);
+                return;
+            }
+
+            List<Cue> snapshot = new List<Cue>(cues);
+            for (int i = 0; i < snapshot.Count; i++)
+            {
+                snapshot[i]?.Stop(AudioStopOptions.Immediate);
             }
         }
 
@@ -33,45 +40,82 @@ namespace TASMod.Extensions
 
         public static void Reset(this AudioEngine engine)
         {
-            if (Game1.currentSong != null)
+            PauseOpenALManager(() =>
             {
-                Game1.currentSong.Stop(AudioStopOptions.Immediate);
+                if (Game1.currentSong != null)
+                {
+                    Game1.currentSong.Stop(AudioStopOptions.Immediate);
+                }
+                engine.GetStopwatch().Reset();
+
+                var dict =
+                    (Dictionary<MusicContext, KeyValuePair<string, bool>>)
+                        Reflector.GetValue(Game1.game1, "_instanceRequestedMusicTracks");
+                dict?.Clear();
+
+                AmbientLocationSoundsClear();
+                Utility.killAllStaticLoopingSoundCues();
+
+                ModEntry.Console.Log("Clearing music category", StardewModdingAPI.LogLevel.Warn);
+                AudioCategory musicCategory = (AudioCategory)
+                    Reflector.GetValue(Game1.musicCategory, "audioCategory");
+                musicCategory?.Clear();
+
+                engine.Update();
+            });
+        }
+
+        private static void PauseOpenALManager(global::System.Action action)
+        {
+            if (action == null)
+            {
+                return;
             }
-            engine.GetStopwatch().Reset();
 
-            var dict =
-                (Dictionary<MusicContext, KeyValuePair<string, bool>>)
-                    Reflector.GetValue(Game1.game1, "_instanceRequestedMusicTracks");
-            dict.Clear();
+            global::System.Type managerType = typeof(AudioEngine).Assembly.GetType(
+                "Microsoft.Xna.Framework.Audio.OpenALSoundEffectInstanceManager"
+            );
+            if (managerType == null)
+            {
+                action();
+                return;
+            }
 
-            AmbientLocationSoundsClear();
-            Utility.killAllStaticLoopingSoundCues();
+            FieldInfo pausedField = managerType.GetField(
+                "paused",
+                BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public
+            );
+            FieldInfo pauseMutexField = managerType.GetField(
+                "pauseMutex",
+                BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public
+            );
 
-            // Reflector.GetValue(engine, "_activeCues");
+            if (pausedField == null || pauseMutexField == null)
+            {
+                action();
+                return;
+            }
 
-            // {
-            ModEntry.Console.Log("Clearing music category", StardewModdingAPI.LogLevel.Warn);
-            AudioCategory musicCategory = (AudioCategory)Reflector.GetValue(Game1.musicCategory, "audioCategory");
-            musicCategory.Clear();
+            object pauseMutex = pauseMutexField.GetValue(null);
+            if (pauseMutex == null)
+            {
+                action();
+                return;
+            }
 
-            //     ModEntry.Console.Log("Clearing sound category", StardewModdingAPI.LogLevel.Warn);
-            //     AudioCategory soundCategory = (AudioCategory)Reflector.GetValue(Game1.soundCategory, "audioCategory");
-            //     soundCategory.Clear();
-
-            //     ModEntry.Console.Log("Clearing ambient category", StardewModdingAPI.LogLevel.Warn);
-            //     AudioCategory ambientCategory = (AudioCategory)Reflector.GetValue(Game1.ambientCategory, "audioCategory");
-            //     ambientCategory.Clear();
-
-            //     ModEntry.Console.Log("Clearing footstep category", StardewModdingAPI.LogLevel.Warn);
-            //     AudioCategory footstepCategory = (AudioCategory)Reflector.GetValue(Game1.footstepCategory, "audioCategory");
-            //     footstepCategory.Clear();
-            // }
-            engine.Update();
-            // SoundEffect_Constructor.Reset();
-            // engine.Update();
-            // engine.Update();
-            // engine.Update();
-            // engine.Update();
+            lock (pauseMutex)
+            {
+                bool wasPaused = (bool)pausedField.GetValue(null);
+                pausedField.SetValue(null, true);
+                try
+                {
+                    action();
+                }
+                finally
+                {
+                    pausedField.SetValue(null, wasPaused);
+                }
+            }
         }
 
         public static Stopwatch GetStopwatch(this AudioEngine engine)

@@ -19,6 +19,7 @@ namespace TASMod
         public static IEnumerable<IAutomatedLogic> Items => Automation.Values;
         public static IEnumerable<KeyValuePair<string, IAutomatedLogic>> Pairs => Automation;
         public static string AppliedLogic = null;
+        public static string ExecutingLogic = null;
         public static int AppliedFrame = -1;
 
         public static bool ContainsKey(string logicName) => Automation.ContainsKey(logicName);
@@ -83,6 +84,7 @@ namespace TASMod
             // ActiveInstance.Stash(0);
             bool flag = false;
             AppliedLogic = null;
+            ExecutingLogic = null;
             foreach (IAutomatedLogic logic in Automation.Values)
             {
                 if (logic.Update(0, out _, out _, out _))
@@ -90,6 +92,11 @@ namespace TASMod
                     flag = true;
                     AppliedLogic = logic.Name;
                     break;
+                }
+
+                if (ExecutingLogic == null && logic.IsExecuting(0))
+                {
+                    ExecutingLogic = logic.Name;
                 }
             }
             if (flag)
@@ -115,6 +122,7 @@ namespace TASMod
 
             bool flag = false;
             AppliedLogic = null;
+            ExecutingLogic = null;
             AppliedFrame = -1;
 
             foreach (IAutomatedLogic logic in Automation.Values)
@@ -130,6 +138,11 @@ namespace TASMod
                     AppliedLogic = logic.Name;
                     AppliedFrame = (int)TASDateTime.CurrentFrame;
                     break;
+                }
+
+                if (ExecutingLogic == null && logic.IsExecuting(0))
+                {
+                    ExecutingLogic = logic.Name;
                 }
             }
             return flag;
