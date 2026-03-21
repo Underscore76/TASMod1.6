@@ -18,8 +18,17 @@ namespace TASMod.Patches
                 original: AccessTools.Method(
                     "StardewModdingAPI.Framework.Input.SInputState:GetMouseState"
                 ),
+                prefix: new HarmonyMethod(this.GetType(), nameof(this.Prefix)),
                 postfix: new HarmonyMethod(this.GetType(), nameof(this.Postfix))
             );
+        }
+        public static bool Prefix()
+        {
+            if (TASInputState.Active && (Game1.playerOneIndex == PlayerIndex.One || Game1.playerOneIndex == (PlayerIndex)(-1)))
+            {
+                return false;
+            }
+            return true;
         }
 
         public static void Postfix(ref MouseState __result)
@@ -41,10 +50,19 @@ namespace TASMod.Patches
                 original: AccessTools.Method(
                     "StardewModdingAPI.Framework.Input.SInputState:GetKeyboardState"
                 ),
+                prefix: new HarmonyMethod(this.GetType(), nameof(this.Prefix)),
                 postfix: new HarmonyMethod(this.GetType(), nameof(this.Postfix))
             );
         }
 
+        public static bool Prefix()
+        {
+            if (TASInputState.Active && (Game1.playerOneIndex == PlayerIndex.One || Game1.playerOneIndex == (PlayerIndex)(-1)))
+            {
+                return false;
+            }
+            return true;
+        }
         public static void Postfix(ref KeyboardState __result)
         {
             if (TASInputState.Active && (Game1.playerOneIndex == PlayerIndex.One || Game1.playerOneIndex == (PlayerIndex)(-1)))
@@ -64,8 +82,18 @@ namespace TASMod.Patches
                 original: AccessTools.Method(
                     "StardewModdingAPI.Framework.Input.SInputState:GetGamePadState"
                 ),
+                prefix: new HarmonyMethod(this.GetType(), nameof(this.Prefix)),
                 postfix: new HarmonyMethod(this.GetType(), nameof(this.Postfix))
             );
+        }
+
+        public static bool Prefix()
+        {
+            if (TASInputState.Active && Game1.playerOneIndex != (PlayerIndex)(-1))
+            {
+                return false;
+            }
+            return true;
         }
 
         public static void Postfix(ref GamePadState __result)
