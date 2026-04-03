@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using HarmonyLib;
 using StardewValley;
 using TASMod.Extensions;
@@ -121,7 +122,10 @@ namespace TASMod.Patches
             {
                 return true;
             }
-
+            if (Game1.game1 is null || Thread.CurrentThread.IsThreadPoolThread)
+            {
+                return true;
+            }
             RandomExtensions.PushTrace(__instance, (int)TASDateTime.CurrentFrame, Game1.game1.instanceIndex);
             return true;
         }
@@ -143,6 +147,10 @@ namespace TASMod.Patches
         public static bool Prefix(Random __instance)
         {
             if (!RandomExtensions.IsTrackingEnabledForCurrentThread)
+            {
+                return true;
+            }
+            if (Game1.game1 is null || Thread.CurrentThread.IsThreadPoolThread)
             {
                 return true;
             }
@@ -198,6 +206,10 @@ namespace TASMod.Patches
         public static bool Prefix(Random __instance)
         {
             if (!RandomExtensions.IsTrackingEnabledForCurrentThread)
+            {
+                return true;
+            }
+            if (Game1.game1 is null || Thread.CurrentThread.IsThreadPoolThread)
             {
                 return true;
             }

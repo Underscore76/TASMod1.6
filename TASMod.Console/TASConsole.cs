@@ -97,6 +97,15 @@ namespace TASMod.Console
 
         public TASConsole()
         {
+            try
+            {
+                ExternalLogger.Init(Environment.ProcessId);
+            }
+            catch (Exception ex)
+            {
+                ModEntry.Console.Log($"Failed to initialize ExternalLogger: {ex}", StardewModdingAPI.LogLevel.Error);
+            }
+
             handler = new ConsoleInputHandler(GameRunner.instance.Window, this);
             solidColor = new Texture2D(
                 Game1.graphics.GraphicsDevice,
@@ -616,10 +625,12 @@ namespace TASMod.Console
         public void PushEntry(string entry)
         {
             historyLog.Add(new ConsoleTextElement(entry, true, color: textEntryColor));
+            ExternalLogger.TryQueueMessage(entry, "Command");
             if (entryLog.Count == 0 || entryLog.Last.Value != entry)
             {
                 entryLog.AddLast(entry);
             }
+
         }
 
         public void SaveConsoleState()
@@ -659,6 +670,7 @@ namespace TASMod.Console
         public void PushEntry(string entry, Color color)
         {
             historyLog.Add(new ConsoleTextElement(entry, true, color: color));
+            ExternalLogger.TryQueueMessage(entry, "Command");
             if (entryLog.Count == 0 || entryLog.Last.Value != entry)
             {
                 entryLog.AddLast(entry);
@@ -671,6 +683,7 @@ namespace TASMod.Console
             if (followLogUpdate)
                 historyTail++;
             historyLog.Add(new ConsoleTextElement(result, false, color: textHistoryColor));
+            ExternalLogger.TryQueueMessage(result, "Trace");
         }
 
         public void PushResult(string result, ConsoleTextElementType type, Color color)
@@ -679,6 +692,30 @@ namespace TASMod.Console
             if (followLogUpdate)
                 historyTail++;
             historyLog.Add(new ConsoleTextElement(result, false, type: type, color: color));
+            switch (type)
+            {
+                case ConsoleTextElementType.Error:
+                    if (ShowErrors)
+                    {
+                        ExternalLogger.TryQueueMessage(result, type.ToString());
+                    }
+                    break;
+                case ConsoleTextElementType.Debug:
+                    if (DebugMode)
+                    {
+                        ExternalLogger.TryQueueMessage(result, type.ToString());
+                    }
+                    break;
+                case ConsoleTextElementType.Warn:
+                    if (ShowWarnings)
+                    {
+                        ExternalLogger.TryQueueMessage(result, type.ToString());
+                    }
+                    break;
+                default:
+                    ExternalLogger.TryQueueMessage(result, "Trace");
+                    break;
+            }
         }
 
         public void ResetEntry()
