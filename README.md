@@ -47,9 +47,11 @@ advance({text="howdy"})
 
 * Global frame stack
     * `current_frame()` - returns the current frame actual frame
-    * `push(f)` - pushes a frame onto the frame stack
-    * `push()` or `gcf()` - pushes the current frame onto the frame stack
-    * `f = pop()` - pops a frame off the frame stack
+    * `fs_push(f)` - pushes a frame onto the frame stack
+    * `fs_push()` or `gcf()` - pushes the current frame onto the frame stack
+    * `f = fs_pop()` - pops a frame off the frame stack
+    * `f = fs_peek()` - peek at the top frame on the frame stack without popping it
+    * `fs_items()` - get a table of the current items in the frame stack
     * `rw()` - rewinds to the frame on the top of the frame stack
     * `brw()` - blocking rewind to the frame on the top of the frame stack
     * `frame_stack_clear()` - clears the frame stack
