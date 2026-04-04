@@ -1,4 +1,4 @@
--- clickables: a module for finding clickable objects in menus
+---clickables: a module for finding clickable objects in menus
 
 local intro_click_map = require('core.data.click_maps')
 local clickables = {}
@@ -10,7 +10,7 @@ function clickables.get_object_by_name(name)
     if intro_click_map[name] ~= nil then
         name = intro_click_map[name]
     end
-    for i=0,items.Count-1
+    for i = 0, items.Count - 1
     do
         if items[i].Name == name then
             return items[i]

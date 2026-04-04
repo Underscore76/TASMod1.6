@@ -72,6 +72,28 @@ namespace TASMod.Helpers
             }
             return true;
         }
+        private static Dictionary<string, Tuple<Vector2, int>> TrashCans = new()
+        {
+            {"Jodi  ", new Tuple<Vector2, int>(new Vector2(13, 86), 0)},
+            {"Emily ", new Tuple<Vector2, int>(new Vector2(19, 89), 1)},
+            {"Lewis ", new Tuple<Vector2, int>(new Vector2(56, 85), 2)},
+            {"Museum", new Tuple<Vector2, int>(new Vector2(108, 91), 3)},
+            {"Clint ", new Tuple<Vector2, int>(new Vector2(97, 80), 4)},
+            {"Saloon", new Tuple<Vector2, int>(new Vector2(47, 70), 5)},
+            {"Alex  ", new Tuple<Vector2, int>(new Vector2(52, 63), 6)},
+            {"Joja  ", new Tuple<Vector2, int>(new Vector2(110, 56), 7)}
+        };
+
+
+        public static List<(string, string)> GetTrashCans()
+        {
+            List<(string, string)> trash = new();
+            foreach (var can in TrashCans)
+            {
+
+            }
+            return trash;
+        }
     }
 
 

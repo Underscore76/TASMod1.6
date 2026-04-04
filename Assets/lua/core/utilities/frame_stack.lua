@@ -1,7 +1,7 @@
--- Desc: frame stack utility
--- defines a utility stack class for working with frames
--- allows pushing and popping frames from the stack
--- and fast resetting the game to the frame on top of the stack
+---Desc: frame stack utility
+---defines a utility stack class for working with frames
+---allows pushing and popping frames from the stack
+---and fast resetting the game to the frame on top of the stack
 
 local fs = {
     _X = {}

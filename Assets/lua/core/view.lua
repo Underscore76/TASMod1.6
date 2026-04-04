@@ -1,3 +1,4 @@
+--- defines functions for controlling toggling map view and base view
 local view = {}
 
 ---swaps between different view states (base, map)

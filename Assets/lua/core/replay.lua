@@ -1,3 +1,4 @@
+--- defines functions for controlling replay mode
 local replay = {}
 local keybinds = require('core.keybinds')
 

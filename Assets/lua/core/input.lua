@@ -1,4 +1,4 @@
--- `input`: defines some basic click functions for interacting with the game
+--- `input`: defines some basic click functions for interacting with the game
 
 local clickables = require("core.clickables")
 
@@ -10,18 +10,18 @@ local input = {}
 ---@param right boolean @true if you want to right click
 function input.click_point(point, left, right)
     local mouse = {
-        X=point.X,
-        Y=point.Y,
-        left=false,
-        right=false
+        X = point.X,
+        Y = point.Y,
+        left = false,
+        right = false
     }
     local last_mouse = Controller.LastFrameMouse()
-    if last_mouse.X ~= mouse.X or last_mouse.Y ~= mouse.Y  or (last_mouse.LeftMouseClicked and left) or (last_mouse.RightMouseClicked and right) then
-        advance({mouse=mouse})
+    if last_mouse.X ~= mouse.X or last_mouse.Y ~= mouse.Y or (last_mouse.LeftMouseClicked and left) or (last_mouse.RightMouseClicked and right) then
+        advance({ mouse = mouse })
     end
-    mouse.left=left
-    mouse.right=right
-    advance({mouse=mouse})
+    mouse.left = left
+    mouse.right = right
+    advance({ mouse = mouse })
 end
 
 ---click the center of a rectangle

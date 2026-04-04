@@ -1,4 +1,4 @@
---defines the core engine interface for dealing with frame
+---defines the core engine interface for dealing with frame
 local engine = {}
 
 ---attempt to wait until all logic has halted
