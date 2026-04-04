@@ -42,7 +42,7 @@
   <li><a href="../modules/aliases.html">aliases</a></li>
   <li><a href="../modules/core.clickables.html">core.clickables</a></li>
   <li><a href="../modules/core.collections.deque.html">core.collections.deque</a></li>
-  <li><a href="../modules/core.collections.stack.html">core.collections.stack</a></li>
+  <li><strong>core.collections.stack</strong></li>
   <li><a href="../modules/core.common.html">core.common</a></li>
   <li><a href="../modules/core.console.html">core.console</a></li>
   <li><a href="../modules/core.engine.html">core.engine</a></li>
@@ -54,35 +54,47 @@
   <li><a href="../modules/core.scripts.startup.html">core.scripts.startup</a></li>
   <li><a href="../modules/core.utilities.frame_stack.html">core.utilities.frame_stack</a></li>
   <li><a href="../modules/core.view.html">core.view</a></li>
-  <li><strong>prelaunch</strong></li>
+  <li><a href="../modules/prelaunch.html">prelaunch</a></li>
 </ul>
 
 </div>
 
 <div id="content">
 
-<h1>Module <code>prelaunch</code></h1>
-<p>file is run at generation of the lua state to setup core library overrides</p>
+<h1>Module <code>core.collections.stack</code></h1>
+<p>A simple stack implementation in Lua</p>
 <p></p>
 
 
 <h2><a href="#Functions">Functions</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" nowrap><a href="#dump">dump (obj)</a></td>
-	<td class="summary">dump a lua object to the in-game console</td>
+	<td class="name" nowrap><a href="#Stack.new">Stack.new ()</a></td>
+	<td class="summary">initialize a new stack</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#print">print (...)</a></td>
-	<td class="summary">variadic function to dump a set of items to the console</td>
+	<td class="name" nowrap><a href="#Stack:push">Stack:push (value)</a></td>
+	<td class="summary">push a value onto the stack</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#printf">printf (format_str, ...)</a></td>
-	<td class="summary">print contents based on a format string specification</td>
+	<td class="name" nowrap><a href="#Stack:peek">Stack:peek ()</a></td>
+	<td class="summary">pull the top value from the stack without removing it</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#require">require (label)</a></td>
-	<td class="summary">load additional module by name, overridden to allow reloading</td>
+	<td class="name" nowrap><a href="#Stack:pop">Stack:pop ()</a></td>
+	<td class="summary">pop the top value off the stack</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Stack:empty">Stack:empty ()</a></td>
+	<td class="summary">check if the stack is empty</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Stack:size">Stack:size ()</a></td>
+	<td class="summary">check the size of the stack</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Stack:print">Stack:print ()</a></td>
+	<td class="summary">prints the stack contents to the console</td>
 	</tr>
 </table>
 
@@ -94,17 +106,36 @@
 
     <dl class="function">
     <dt>
-    <a name = "dump"></a>
-    <strong>dump (obj)</strong>
+    <a name = "Stack.new"></a>
+    <strong>Stack.new ()</strong>
     </dt>
     <dd>
-    dump a lua object to the in-game console
+    initialize a new stack
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+        table new stack object
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Stack:push"></a>
+    <strong>Stack:push (value)</strong>
+    </dt>
+    <dd>
+    push a value onto the stack
 
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">obj</span>
-         any object to dump
+        <li><span class="parameter">value</span>
+         any
         </li>
     </ul>
 
@@ -114,19 +145,13 @@
 
 </dd>
     <dt>
-    <a name = "print"></a>
-    <strong>print (...)</strong>
+    <a name = "Stack:peek"></a>
+    <strong>Stack:peek ()</strong>
     </dt>
     <dd>
-    variadic function to dump a set of items to the console
+    pull the top value from the stack without removing it
 
 
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">...</span>
-         any set of objects to dump
-        </li>
-    </ul>
 
 
 
@@ -134,22 +159,13 @@
 
 </dd>
     <dt>
-    <a name = "printf"></a>
-    <strong>printf (format_str, ...)</strong>
+    <a name = "Stack:pop"></a>
+    <strong>Stack:pop ()</strong>
     </dt>
     <dd>
-    print contents based on a format string specification
+    pop the top value off the stack
 
 
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">format_str</span>
-         string string to input values into
-        </li>
-        <li><span class="parameter">...</span>
-         any set of objects to dump
-        </li>
-    </ul>
 
 
 
@@ -157,19 +173,51 @@
 
 </dd>
     <dt>
-    <a name = "require"></a>
-    <strong>require (label)</strong>
+    <a name = "Stack:empty"></a>
+    <strong>Stack:empty ()</strong>
     </dt>
     <dd>
-    load additional module by name, overridden to allow reloading
+    check if the stack is empty
 
 
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">label</span>
-         string name of module to load
-        </li>
-    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        boolean true if the stack is empty, false otherwise
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Stack:size"></a>
+    <strong>Stack:size ()</strong>
+    </dt>
+    <dd>
+    check the size of the stack
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+        number the number of items in the stack
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Stack:print"></a>
+    <strong>Stack:print ()</strong>
+    </dt>
+    <dd>
+    prints the stack contents to the console
+
+
 
 
 
@@ -183,7 +231,7 @@
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/lunarmodules/LDoc">LDoc 1.5.0</a></i>
-<i style="float:right;">Last updated 2026-04-04 10:23:25 </i>
+<i style="float:right;">Last updated 2026-04-04 10:26:05 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

@@ -1,7 +1,7 @@
 -- ldoc configuration file
 file = "Assets/lua"
 project = "TASMod 1.6"
-dir = "luadocs/"
+dir = "docs/lua"
 description = [[
     TAS Mod 1.6 Lua Documentation
 ]]

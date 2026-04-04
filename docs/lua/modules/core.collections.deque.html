@@ -41,7 +41,7 @@
 <ul class="nowrap">
   <li><a href="../modules/aliases.html">aliases</a></li>
   <li><a href="../modules/core.clickables.html">core.clickables</a></li>
-  <li><a href="../modules/core.collections.deque.html">core.collections.deque</a></li>
+  <li><strong>core.collections.deque</strong></li>
   <li><a href="../modules/core.collections.stack.html">core.collections.stack</a></li>
   <li><a href="../modules/core.common.html">core.common</a></li>
   <li><a href="../modules/core.console.html">core.console</a></li>
@@ -52,7 +52,7 @@
   <li><a href="../modules/core.replay.html">core.replay</a></li>
   <li><a href="../modules/core.scripts.newgame.html">core.scripts.newgame</a></li>
   <li><a href="../modules/core.scripts.startup.html">core.scripts.startup</a></li>
-  <li><strong>core.utilities.frame_stack</strong></li>
+  <li><a href="../modules/core.utilities.frame_stack.html">core.utilities.frame_stack</a></li>
   <li><a href="../modules/core.view.html">core.view</a></li>
   <li><a href="../modules/prelaunch.html">prelaunch</a></li>
 </ul>
@@ -61,43 +61,40 @@
 
 <div id="content">
 
-<h1>Module <code>core.utilities.frame_stack</code></h1>
-<p>Desc: frame stack utility
-defines a utility stack class for working with frames
-allows pushing and popping frames from the stack
-and fast resetting the game to the frame on top of the stack</p>
+<h1>Module <code>core.collections.deque</code></h1>
+<p>A simple double-ended queue implementation in Lua</p>
 <p></p>
 
 
 <h2><a href="#Functions">Functions</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" nowrap><a href="#fs.last">fs.last ()</a></td>
-	<td class="summary">get the last frame on the stack</td>
+	<td class="name" nowrap><a href="#Deque.new">Deque.new ()</a></td>
+	<td class="summary">initialize a new queue</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#fs.print">fs.print ()</a></td>
-	<td class="summary">print the frame stack</td>
+	<td class="name" nowrap><a href="#Deque:pushleft">Deque:pushleft (value)</a></td>
+	<td class="summary">push a value to the left end of the queue</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#fs.push">fs.push (f)</a></td>
-	<td class="summary">push a frame to the stack</td>
+	<td class="name" nowrap><a href="#Deque:pushright">Deque:pushright (value)</a></td>
+	<td class="summary">push a value to the right end of the queue</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#fs.pop">fs.pop ()</a></td>
-	<td class="summary">pop a frame from the stack</td>
+	<td class="name" nowrap><a href="#Deque:popleft">Deque:popleft ()</a></td>
+	<td class="summary">pop a value from the left end of the queue</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#fs.clear">fs.clear ()</a></td>
-	<td class="summary">clear the frame stack</td>
+	<td class="name" nowrap><a href="#Deque:popright">Deque:popright ()</a></td>
+	<td class="summary">pop a value from the right end of the queue</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#fs.rw">fs.rw ()</a></td>
-	<td class="summary">fast reset the game to the last frame on the stack (NON-BLOCKING)</td>
+	<td class="name" nowrap><a href="#Deque:empty">Deque:empty ()</a></td>
+	<td class="summary">check if the queue is empty</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#fs.brw">fs.brw ()</a></td>
-	<td class="summary">fast reset the game to the last frame on the stack (BLOCKING)</td>
+	<td class="name" nowrap><a href="#Deque:size">Deque:size ()</a></td>
+	<td class="summary">check the size of the queue</td>
 	</tr>
 </table>
 
@@ -109,18 +106,18 @@ and fast resetting the game to the frame on top of the stack</p>
 
     <dl class="function">
     <dt>
-    <a name = "fs.last"></a>
-    <strong>fs.last ()</strong>
+    <a name = "Deque.new"></a>
+    <strong>Deque.new ()</strong>
     </dt>
     <dd>
-    get the last frame on the stack
+    initialize a new queue
 
 
 
     <h3>Returns:</h3>
     <ol>
 
-        number last frame number
+        table new queue object
     </ol>
 
 
@@ -128,38 +125,58 @@ and fast resetting the game to the frame on top of the stack</p>
 
 </dd>
     <dt>
-    <a name = "fs.print"></a>
-    <strong>fs.print ()</strong>
+    <a name = "Deque:pushleft"></a>
+    <strong>Deque:pushleft (value)</strong>
     </dt>
     <dd>
-    print the frame stack
-
-
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "fs.push"></a>
-    <strong>fs.push (f)</strong>
-    </dt>
-    <dd>
-    push a frame to the stack
+    push a value to the left end of the queue
 
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">f</span>
-         number|nil frame to push (defaults current frame)
+        <li><span class="parameter">value</span>
+         any
         </li>
     </ul>
 
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Deque:pushright"></a>
+    <strong>Deque:pushright (value)</strong>
+    </dt>
+    <dd>
+    push a value to the right end of the queue
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">value</span>
+         any
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Deque:popleft"></a>
+    <strong>Deque:popleft ()</strong>
+    </dt>
+    <dd>
+    pop a value from the left end of the queue
+
+
+
     <h3>Returns:</h3>
     <ol>
 
-        number pushed frame number added to the stack
+        any value popped from the left end of the queue
     </ol>
 
 
@@ -167,18 +184,18 @@ and fast resetting the game to the frame on top of the stack</p>
 
 </dd>
     <dt>
-    <a name = "fs.pop"></a>
-    <strong>fs.pop ()</strong>
+    <a name = "Deque:popright"></a>
+    <strong>Deque:popright ()</strong>
     </dt>
     <dd>
-    pop a frame from the stack
+    pop a value from the right end of the queue
 
 
 
     <h3>Returns:</h3>
     <ol>
 
-        number|nil popped frame number removed from the stack
+        any value popped from the right end of the queue
     </ol>
 
 
@@ -186,42 +203,38 @@ and fast resetting the game to the frame on top of the stack</p>
 
 </dd>
     <dt>
-    <a name = "fs.clear"></a>
-    <strong>fs.clear ()</strong>
+    <a name = "Deque:empty"></a>
+    <strong>Deque:empty ()</strong>
     </dt>
     <dd>
-    clear the frame stack
+    check if the queue is empty
 
 
 
+    <h3>Returns:</h3>
+    <ol>
+
+        boolean true if the queue is empty, false otherwise
+    </ol>
 
 
 
 
 </dd>
     <dt>
-    <a name = "fs.rw"></a>
-    <strong>fs.rw ()</strong>
+    <a name = "Deque:size"></a>
+    <strong>Deque:size ()</strong>
     </dt>
     <dd>
-    fast reset the game to the last frame on the stack (NON-BLOCKING)
+    check the size of the queue
 
 
 
+    <h3>Returns:</h3>
+    <ol>
 
-
-
-
-</dd>
-    <dt>
-    <a name = "fs.brw"></a>
-    <strong>fs.brw ()</strong>
-    </dt>
-    <dd>
-    fast reset the game to the last frame on the stack (BLOCKING)
-
-
-
+        number the number of items in the queue
+    </ol>
 
 
 
@@ -234,7 +247,7 @@ and fast resetting the game to the frame on top of the stack</p>
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/lunarmodules/LDoc">LDoc 1.5.0</a></i>
-<i style="float:right;">Last updated 2026-04-04 10:23:25 </i>
+<i style="float:right;">Last updated 2026-04-04 10:26:05 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>
