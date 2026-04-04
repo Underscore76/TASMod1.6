@@ -49,17 +49,19 @@ namespace TASMod.Overlays
 
         public override void ActiveUpdate()
         {
-            if (!(Game1.currentLocation is Farm)) return;
+            var currentLocation = InstanceCurrentLocation.Get(ActiveInstance.InstanceIndex).Location;
+            var player = InstanceCurrentPlayer.Get(ActiveInstance.InstanceIndex).Player;
+            if (!(currentLocation is Farm)) return;
 
-            if (LastObjectCount == Game1.currentLocation.Objects.Length) return;
+            if (LastObjectCount == currentLocation.Objects.Length) return;
 
-            LastObjectCount = Game1.currentLocation.Objects.Length;
+            LastObjectCount = currentLocation.Objects.Length;
             Drops.Clear();
-            foreach (var obj in Game1.currentLocation.Objects.Values)
+            foreach (var obj in currentLocation.Objects.Values)
             {
                 if (obj.ItemId == "343" || obj.ItemId == "450")
                 {
-                    List<ObjectDrop> drops = OnStoneDestroyed(obj);
+                    List<ObjectDrop> drops = OnStoneDestroyed(player, obj);
                     if (drops.Count > 0)
                     {
                         Drops.Add(obj.TileLocation, drops);
@@ -70,22 +72,23 @@ namespace TASMod.Overlays
 
         public override void ActiveDraw(SpriteBatch spriteBatch)
         {
-            if (!(Game1.currentLocation is Farm)) return;
+            var currentLocation = InstanceCurrentLocation.Get(ActiveInstance.InstanceIndex).Location;
+            if (!(currentLocation is Farm)) return;
 
             foreach (var kvp in Drops)
             {
                 Vector2 tile = kvp.Key;
                 List<ObjectDrop> drops = kvp.Value;
                 string text = string.Join(", ", drops);
-                float scale = FitTextInTile(text);
-                DrawTextAtTile(spriteBatch, text, tile, Color.White, Color.Black, scale);
+                float scale = FitTextInTile(ActiveInstance.InstanceIndex, text);
+                DrawTextAtTile(ActiveInstance.InstanceIndex, spriteBatch, text, tile, Color.White, Color.Black, scale);
             }
         }
 
-        public List<ObjectDrop> OnStoneDestroyed(Object stone)
+        public List<ObjectDrop> OnStoneDestroyed(Farmer player, Object stone)
         {
             List<ObjectDrop> items = new();
-            Farmer who = Game1.player;
+            Farmer who = player;
             string stoneId = stone.ItemId;
             int x = (int)stone.TileLocation.X;
             int y = (int)stone.TileLocation.Y;
@@ -93,20 +96,20 @@ namespace TASMod.Overlays
             {
                 Random r = Utility.CreateDaySaveRandom(x * 2000, y);
                 double geodeChanceMultiplier = ((who != null && who.hasBuff("dwarfStatue_4")) ? 1.25 : 1.0);
-                if (r.NextDouble() < 0.035 * geodeChanceMultiplier && Game1.stats.DaysPlayed > 1)
+                if (r.NextDouble() < 0.035 * geodeChanceMultiplier && player.stats.DaysPlayed > 1)
                 {
-                    string text = "(O)" + (535 + ((Game1.stats.DaysPlayed > 60 && r.NextDouble() < 0.2) ? 1 : ((Game1.stats.DaysPlayed > 120 && r.NextDouble() < 0.2) ? 2 : 0)));
+                    string text = "(O)" + (535 + ((player.stats.DaysPlayed > 60 && r.NextDouble() < 0.2) ? 1 : ((player.stats.DaysPlayed > 120 && r.NextDouble() < 0.2) ? 2 : 0)));
                     items.Add(new(text));
                 }
                 int burrowerMultiplier = ((who == null || !who.professions.Contains(21)) ? 1 : 2);
                 double addedCoalChance = ((who != null && who.hasBuff("dwarfStatue_2")) ? 0.03 : 0.0);
-                if (r.NextDouble() < 0.035 * (double)burrowerMultiplier + addedCoalChance && Game1.stats.DaysPlayed > 1)
+                if (r.NextDouble() < 0.035 * (double)burrowerMultiplier + addedCoalChance && player.stats.DaysPlayed > 1)
                 {
-                    items.Add(new("coal"));
+                    items.Add(new("Coal"));
                 }
-                if (r.NextDouble() < 0.01 && Game1.stats.DaysPlayed > 1)
+                if (r.NextDouble() < 0.01 && player.stats.DaysPlayed > 1)
                 {
-                    items.Add(new("stone"));
+                    items.Add(new("Stone"));
                 }
             }
             items.AddRange(breakStone(stoneId, x, y, who, Utility.CreateDaySaveRandom(x * 4000, y)));
@@ -149,7 +152,7 @@ namespace TASMod.Overlays
                                         break;
                                     case "25":
                                         items.Add(new("(O)719", r.Next(2, 5)));
-                                        if (Game1.currentLocation is IslandLocation && r.NextDouble() < 0.1)
+                                        if (who.currentLocation is IslandLocation && r.NextDouble() < 0.1)
                                         {
                                             items.Add(new("Nut"));
                                         }
@@ -478,7 +481,7 @@ namespace TASMod.Overlays
                     items.Add(new("(O)74"));
                 }
             }
-            if ((Game1.currentLocation.IsOutdoors || Game1.currentLocation.treatAsOutdoors.Value) && experience == 0)
+            if ((who.currentLocation.IsOutdoors || who.currentLocation.treatAsOutdoors.Value) && experience == 0)
             {
                 double chanceModifier = farmerDailyLuck / 2.0 + (double)farmerMiningLevel * 0.005 + (double)farmerLuckLevel * 0.001;
                 Random ran = Utility.CreateDaySaveRandom(x * 1000, y);
@@ -504,7 +507,7 @@ namespace TASMod.Overlays
                     items.Add(new("(O)382"));
                 }
             }
-            if (who != null && Game1.currentLocation.HasUnlockedAreaSecretNotes(who) && r.NextDouble() < 0.0075)
+            if (who != null && who.currentLocation.HasUnlockedAreaSecretNotes(who) && r.NextDouble() < 0.0075)
             {
                 items.Add(new("SecretNote"));
 

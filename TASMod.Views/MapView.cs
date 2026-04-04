@@ -1,3 +1,4 @@
+// TODO: fix for new viewport reset
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -29,6 +30,7 @@ namespace TASMod.Views
         public float Scale;
         public float MaxScale;
         public float OldZoomLevel;
+        public float OldZoomModifier;
         public int scrollSpeed = 16;
         public ulong lastFrame;
         public RenderTarget2D target;
@@ -85,6 +87,7 @@ namespace TASMod.Views
             if (Game1.gameMode == 3 && target != null)
             {
                 Mouse.DrawViewport(
+                    0,
                     Game1.spriteBatch,
                     target,
                     CurrentViewport,
@@ -116,6 +119,7 @@ namespace TASMod.Views
 
         public void Enter()
         {
+            OldZoomModifier = Game1.game1.zoomModifier;
             OldZoomLevel = Game1.options.baseZoomLevel;
             Game1.game1.zoomModifier = Game1.options.baseZoomLevel;
             OldViewport = Game1.viewport;
@@ -129,7 +133,7 @@ namespace TASMod.Views
         {
             Game1.viewport = OldViewport;
             Game1.options.baseZoomLevel = OldZoomLevel;
-            Game1.game1.zoomModifier = 1;
+            Game1.game1.zoomModifier = OldZoomModifier;
             if (stashedLocation != null)
             {
                 Game1.currentLocation = stashedLocation;

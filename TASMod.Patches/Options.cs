@@ -35,17 +35,18 @@ namespace TASMod.Patches
             __instance.dialogueTyping = true;
             __instance.rumble = true;
             __instance.fullscreen = false;
-            __instance.pinToolbarToggle = false;
+            __instance.pinToolbarToggle = true;
             __instance.baseZoomLevel = 1f;
             __instance.localCoopBaseZoomLevel = 1f;
+            __instance.localCoopDesiredUIScale = 1.25f;
             if (Game1.options == __instance)
             {
                 Game1.forceSnapOnNextViewportUpdate = true;
             }
             __instance.zoomButtons = true;
-            __instance.pauseWhenOutOfFocus = true;
-            __instance.screenFlash = true;
-            __instance.snowTransparency = 1f;
+            __instance.pauseWhenOutOfFocus = false;
+            __instance.screenFlash = false;
+            __instance.snowTransparency = 0f;
             __instance.invertScrollDirection = false;
             __instance.ambientOnlyToggle = false;
             __instance.showAdvancedCraftingInformation = true;
@@ -56,9 +57,9 @@ namespace TASMod.Patches
             __instance.showPlacementTileForGamepad = true;
             __instance.hardwareCursor = false;
             __instance.musicVolumeLevel = 0.1f;
-            __instance.ambientVolumeLevel = 0.3f;
-            __instance.footstepVolumeLevel = 0.75f;
-            __instance.soundVolumeLevel = 1f;
+            __instance.ambientVolumeLevel = 0.4f;
+            __instance.footstepVolumeLevel = 0.6f;
+            __instance.soundVolumeLevel = 0.6f;
             __instance.preferredResolutionX = Game1
                 .graphics.GraphicsDevice.Adapter.SupportedDisplayModes.Last()
                 .Width;

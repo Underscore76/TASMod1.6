@@ -20,40 +20,53 @@ namespace TASMod.Overlays
 
         public override void ActiveDraw(SpriteBatch spriteBatch)
         {
-            if (CurrentMenu.Active && Game1.activeClickableMenu is BobberBar bar)
+            for (int i = 0; i < GameRunner.instance.gameInstances.Count; i++)
             {
-                SFishingGame game = new SFishingGame();
-                var state = game.bobberBar;
-                DrawRectLocal(spriteBatch,
+                try
+                {
+                    DrawForInstance(i, spriteBatch);
+                }
+                catch (Exception e)
+                {
+                    ModEntry.Console.Log($"Fishing ActiveDraw Exception: {e}", StardewModdingAPI.LogLevel.Error);
+                }
+            }
+        }
+        public void DrawForInstance(int index, SpriteBatch spriteBatch)
+        {
+            var menu = InstanceCurrentMenu.Get(index);
+            if (menu.Active && menu.Menu is BobberBar bar)
+            {
+                DrawRectLocal(index, spriteBatch,
                     new Rectangle(
                         bar.xPositionOnScreen + 56,
-                        bar.yPositionOnScreen + 12 + (int)state.bobberBarPos - 16,
-                        52, state.bobberBarHeight - 28
+                        bar.yPositionOnScreen + 12 + (int)bar.bobberBarPos - 16,
+                        52, bar.bobberBarHeight - 28
                         ),
-                    state.bobberInBar ? Color.Green : Color.Red, 1, true
+                    bar.bobberInBar ? Color.Green : Color.Red, 1, true
                     );
-                DrawRectLocal(spriteBatch,
+                DrawRectLocal(index, spriteBatch,
                     new Rectangle(
                         bar.xPositionOnScreen + 56,
-                        bar.yPositionOnScreen + 12 + (int)state.bobberPosition,
+                        bar.yPositionOnScreen + 12 + (int)bar.bobberPosition,
                         52, 1
                         ),
                     new Color(0, 0, 196, 128), 1
                     );
-                DrawRectLocal(spriteBatch,
+                DrawRectLocal(index, spriteBatch,
                     new Rectangle(
                         bar.xPositionOnScreen + 56,
-                        bar.yPositionOnScreen + 12 + (int)state.bobberTargetPosition,
+                        bar.yPositionOnScreen + 12 + (int)bar.bobberTargetPosition,
                         52, 1
                         ),
                     new Color(196, 0, 0, 128), 1
                     );
-                if (state.treasure)
+                if (bar.treasure)
                 {
-                    DrawRectLocal(spriteBatch,
+                    DrawRectLocal(index, spriteBatch,
                     new Rectangle(
                         bar.xPositionOnScreen + 56,
-                        bar.yPositionOnScreen + 12 + (int)state.treasurePosition,
+                        bar.yPositionOnScreen + 12 + (int)bar.treasurePosition,
                         52, 1
                         ),
                     new Color(196, 196, 0, 128), 1

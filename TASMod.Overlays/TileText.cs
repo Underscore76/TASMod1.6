@@ -42,10 +42,11 @@ namespace TASMod.Overlays
         {
             for (int i = 0; i < States.Count; ++i)
             {
-                DrawFilledTile(spriteBatch, States[i].Tile, States[i].BgColor);
-                float scale = FitTextInTile(States[i].Text);
+                DrawFilledTile(ActiveInstance.InstanceIndex, spriteBatch, States[i].Tile, States[i].BgColor);
+                float scale = FitTextInTile(ActiveInstance.InstanceIndex, States[i].Text);
 
                 DrawCenteredTextInTile(
+                    ActiveInstance.InstanceIndex,
                     spriteBatch,
                     States[i].Tile,
                     States[i].Text,

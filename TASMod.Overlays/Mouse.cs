@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using StardewValley;
 using StardewValley.GameData.HomeRenovations;
+using TASMod.Inputs;
 using XMouse = Microsoft.Xna.Framework.Input.Mouse;
 
 namespace TASMod.Overlays
@@ -13,9 +14,14 @@ namespace TASMod.Overlays
         public override string Description => "display the real mouse over the screen";
 
         public Texture2D Cursor;
-        public Color MouseColor = Color.Black;
-        public Mouse() : base()
+        public Color MouseColor;
+        public Mouse() : this(Color.Black)
         {
+            Priority = 1000;
+        }
+        public Mouse(Color color) : base()
+        {
+            MouseColor = color;
             Priority = 1000;
         }
 
@@ -50,7 +56,7 @@ namespace TASMod.Overlays
         {
             BuildCursor();
 
-            MouseState mouseState = XMouse.GetState();
+            MouseState mouseState = RealInputState.mouseState;//XMouse.GetState();
             Vector2 coords = new Vector2(mouseState.X, mouseState.Y);
             //(int)((float)mouseState.X / (1f / Game1.options.zoomLevel)),
             //(int)((float)mouseState.Y / (1f / Game1.options.zoomLevel))

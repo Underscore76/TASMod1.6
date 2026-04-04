@@ -1,3 +1,4 @@
+// TODO: work by instance so multiple floors can be traced
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,12 +30,13 @@ namespace TASMod.Overlays
             Reset();
         }
 
-        public bool ShouldUpdate()
+        public bool ShouldUpdate(int index)
         {
-            return CurrentLocation.IsMines
+            var location = InstanceCurrentLocation.Get(index);
+            return location.IsMines
                 && (
-                    Game1.currentLocation.Name != currentLocationName
-                    || Game1.currentLocation.Objects.Count() != currentLocationNumObjects
+                    location.Name != currentLocationName
+                    || location.Location.Objects.Count() != currentLocationNumObjects
                 );
         }
 
@@ -47,16 +49,17 @@ namespace TASMod.Overlays
 
         public override void ActiveUpdate()
         {
-            if (!ShouldUpdate())
+            if (!ShouldUpdate(ActiveInstance.InstanceIndex))
             {
                 return;
             }
-            currentLocationName = Game1.currentLocation.Name;
-            currentLocationNumObjects = Game1.currentLocation.Objects.Count();
+            var location = InstanceCurrentLocation.Get(ActiveInstance.InstanceIndex);
+            var player = InstanceCurrentPlayer.Get(ActiveInstance.InstanceIndex).Player;
+            currentLocationName = location.Name;
+            currentLocationNumObjects = location.Location.Objects.Count();
             objectsThatHaveDrops.Clear();
             foreach (
-                KeyValuePair<Vector2, StardewValley.Object> current in Game1
-                    .currentLocation
+                KeyValuePair<Vector2, StardewValley.Object> current in location.Location
                     .Objects
                     .Pairs
             )
@@ -64,7 +67,8 @@ namespace TASMod.Overlays
                 if (current.Value.Name == "Stone")
                 {
                     List<string> results = EvalTile(
-                        Game1.currentLocation as MineShaft,
+                        player,
+                        location.Location as MineShaft,
                         current.Key
                     );
                     results = results.Where(o => !o.Contains("Stone")).ToList();
@@ -78,22 +82,37 @@ namespace TASMod.Overlays
 
         public override void ActiveDraw(SpriteBatch b)
         {
-            if (!CurrentLocation.IsMines)
+            for (int i = 0; i < GameRunner.instance.gameInstances.Count; i++)
+            {
+                try
+                {
+                    DrawForInstance(i, b);
+                }
+                catch (Exception e)
+                {
+                    ModEntry.Console.Log($"MinesRocks ActiveDraw Exception: {e}", StardewModdingAPI.LogLevel.Error);
+                }
+            }
+        }
+        public void DrawForInstance(int index, SpriteBatch spriteBatch)
+        {
+            var location = InstanceCurrentLocation.Get(index);
+            if (!location.IsMines)
                 return;
 
             foreach (KeyValuePair<Vector2, List<string>> current in objectsThatHaveDrops)
             {
-                DrawTextAtTile(b, current.Value, current.Key, TextColor, RectColor);
+                DrawTextAtTile(index, spriteBatch, current.Value, current.Key, TextColor, RectColor);
             }
         }
 
-        public List<string> EvalTile(MineShaft mine, Vector2 tile)
+        public List<string> EvalTile(Farmer player, MineShaft mine, Vector2 tile)
         {
             string stoneId = mine.getObjectAtTile((int)tile.X, (int)tile.Y).ItemId;
             int x = (int)tile.X;
             int y = (int)tile.Y;
             int mineLevel = mine.mineLevel;
-            Farmer who = Game1.player;
+            Farmer who = player;
 
             // MineShaft::checkStoneForItems
             long farmerId = who?.UniqueMultiplayerID ?? 0;
@@ -112,7 +131,7 @@ namespace TASMod.Overlays
                 0.02
                 + 1.0 / (double)Math.Max(1, stonesLeftOnThisLevel)
                 + (double)farmerLuckLevel / 100.0
-                + Game1.player.DailyLuck / 5.0;
+                + player.DailyLuck / 5.0;
 
             if (mine.EnemyCount == 0)
             {
@@ -131,7 +150,7 @@ namespace TASMod.Overlays
             {
                 // createLadderDown(x, y);
             }
-            List<string> breakStone = new List<string>(BreakStone(stoneId, x, y, who, r));
+            List<string> breakStone = new List<string>(BreakStone(stoneId, x, y, who, mine, r));
             if (breakStone.Count != 0)
             {
                 return breakStone;
@@ -217,7 +236,7 @@ namespace TASMod.Overlays
                 {
                     breakStone.Add(Game1.objectData["382"].Name);
                 }
-                string id = getOreIdForLevel(mine, r);
+                string id = getOreIdForLevel(player, mine, r);
                 if (id == "CalicoEgg")
                 {
                     breakStone.Add("CalicoEgg");
@@ -235,7 +254,7 @@ namespace TASMod.Overlays
         }
 
         // GameLocation::BreakStone
-        public List<string> BreakStone(string stoneId, int x, int y, Farmer who, Random r)
+        public List<string> BreakStone(string stoneId, int x, int y, Farmer who, GameLocation loc, Random r)
         {
             List<string> items = new List<string>();
             int experience = 0;
@@ -275,7 +294,7 @@ namespace TASMod.Overlays
                 case "25":
                     amount = r.Next(2, 5);
                     items.Add(Game1.objectData["719"].Name + (amount > 1 ? $"x{amount}" : ""));
-                    if (Game1.currentLocation is IslandLocation && r.NextDouble() < 0.1)
+                    if (loc is IslandLocation && r.NextDouble() < 0.1)
                     {
                         items.Add("Nut");
                     }
@@ -481,7 +500,7 @@ namespace TASMod.Overlays
                 }
             }
             if (
-                (Game1.currentLocation.IsOutdoors || Game1.currentLocation.treatAsOutdoors.Value)
+                (loc.IsOutdoors || loc.treatAsOutdoors.Value)
                 && experience == 0
             )
             {
@@ -515,7 +534,7 @@ namespace TASMod.Overlays
             }
             if (
                 who != null
-                && Game1.currentLocation.HasUnlockedAreaSecretNotes(who)
+                && loc.HasUnlockedAreaSecretNotes(who)
                 && r.NextDouble() < 0.0075
             )
             {
@@ -525,7 +544,7 @@ namespace TASMod.Overlays
         }
 
         // Mines::getOreIdForLevel
-        public string getOreIdForLevel(MineShaft mines, Random r)
+        public string getOreIdForLevel(Farmer player, MineShaft mines, Random r)
         {
             if (mines.getMineArea() == 77377)
             {
@@ -568,7 +587,7 @@ namespace TASMod.Overlays
                 && r.NextDouble()
                     < 0.13
                         + (double)(
-                            (float)((int)Game1.player.team.calicoEggSkullCavernRating.Value * 5)
+                            (float)((int)player.team.calicoEggSkullCavernRating.Value * 5)
                             / 1000f
                         )
             )

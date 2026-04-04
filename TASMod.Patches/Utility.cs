@@ -28,7 +28,7 @@ namespace TASMod.Patches
     public class Utility_trySpawnRareObject : IPatch
     {
         public override string Name => "Utility.trySpawnRareObject";
-        public static bool IsEnabled = true;
+        public static bool IsEnabled = false;
 
         public static Dictionary<string, double> ChanceModifier = new Dictionary<string, double>
         {

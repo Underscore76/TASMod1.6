@@ -2,6 +2,7 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <ServerGarbageCollection>true</ServerGarbageCollection>
   </PropertyGroup>
   <PropertyGroup>
     <EnableHarmony>true</EnableHarmony>
@@ -15,6 +16,9 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="Pathoschild.Stardew.ModBuildConfig" Version="4.1.1" />
     <PackageReference Include="DynamicExpresso.Core" Version="2.16.1" />
+  </ItemGroup>
+  <ItemGroup>
+     <Reference Include="Lidgren.Network" HintPath="$(GamePath)\Lidgren.Network.dll" Private="$(_BundleExtraAssembliesForGame)" />
   </ItemGroup>
   <ItemGroup>
     <Content Remove="Decompile\**" />
@@ -55,4 +59,7 @@
       <TargetPath>libcimgui.so</TargetPath>
     </ContentWithTargetPath>
   </ItemGroup>
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+  	<Exec Command="xattr -dr com.apple.quarantine $(OutDir)" />
+  </Target>
 </Project>

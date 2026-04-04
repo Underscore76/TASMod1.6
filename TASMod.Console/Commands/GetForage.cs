@@ -34,7 +34,7 @@ namespace TASMod.Console.Commands
             {
                 if (tokens[0].ToLower() == "all")
                 {
-                    foreach (var val in CurrentLocation.AllForage)
+                    foreach (var val in LocationHelpers.AllForage)
                     {
                         if (
                             !val.Key.Contains("Island")
@@ -54,12 +54,13 @@ namespace TASMod.Console.Commands
                     }
                     else
                     {
-                        WriteForLocation(location.Name, CurrentLocation.LocationForage(location));
+                        WriteForLocation(location.Name, LocationHelpers.LocationForage(location));
                     }
                 }
             }
             else
             {
+                var CurrentLocation = InstanceCurrentLocation.Get(ActiveInstance.InstanceIndex);
                 if (CurrentLocation.Active)
                 {
                     WriteForLocation(CurrentLocation.Name, CurrentLocation.Forage);

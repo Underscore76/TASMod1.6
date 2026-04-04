@@ -1,9 +1,13 @@
 using System;
 using System.Reflection;
+using System.Threading;
+using HarmonyLib;
 using Microsoft.Xna.Framework;
 using StardewModdingAPI;
 using StardewValley;
 using TASMod.Monogame.Framework;
+using TASMod.Networking;
+using TASMod.Simulators.Fishing;
 using TASMod.System;
 using TASMod.Views;
 
@@ -14,10 +18,6 @@ namespace TASMod.Extensions
         public static void Reset(this GameRunner runner)
         {
             Controller.ViewController.Reset();
-            var input = Game1.input;
-            var multiplayer = ModEntry
-                .Reflection.GetField<Multiplayer>(typeof(Game1), "multiplayer")
-                .GetValue();
 
             ModEntry.Console.Log("Reseting the GameRunner", LogLevel.Trace);
             if (Game1.content != null)
@@ -28,10 +28,15 @@ namespace TASMod.Extensions
             for (int i = numInstances - 1; i >= 0; i--)
             {
                 GameRunner.LoadInstance(runner.gameInstances[i]);
+                Game1.Multiplayer.latestID = 0;
+                if (Game1.server != null) { Game1.server = null; }
+                if (Game1.client != null) { Game1.client = null; }
                 runner.gameInstances[i].exitEvent(null, null);
                 runner.gameInstances.RemoveAt(i);
                 Game1.game1 = null;
             }
+            runner.nextInstanceId = 0;
+            NetworkState.Shutdown();
             // Force random to be in a vanilla state
             Controller.OverrideStaticDefaults();
 
@@ -59,10 +64,10 @@ namespace TASMod.Extensions
 
             ModEntry.Console.Log($"Set Game1.game1 to {runner.gameInstances[0]}", LogLevel.Trace);
             Game1.game1 = runner.gameInstances[0];
+            Game1.game1.instancePlayerOneIndex = PlayerIndex.One;
+            Game1.game1.instanceIndex = 0;
 
-            // TODO: force an initialization of the rng. Our Frame 0 RNG isn't the same for some reason
-            // I assume it's cause we are getting a garbo'd random that is unassigned
-            // it's getting the actual game seed time
+            // force a stale random start state for day 1 seeding
             Game1.random = new Random(Controller.State == null ? 0 : Controller.State.Frame0RandomSeed);
             for (int i = 0; i < Controller.State?.Frame0RandomIndex; i++)
                 Game1.random.Next();
@@ -70,10 +75,15 @@ namespace TASMod.Extensions
             runner.gameInstances[0].Instance_Initialize();
 
             // enforcing input/multiplayer get carried over
-            Game1.input = input;
+            // Game1.input = input;
+            Game1.input = (InputState)Activator.CreateInstance(Reflector.GetTypeInAnyAssembly("StardewModdingAPI.Framework.Input.SInputState"));
             ModEntry
                 .Reflection.GetField<Multiplayer>(typeof(Game1), "multiplayer")
-                .SetValue(multiplayer);
+                .SetValue(new Multiplayer());
+            Game1.Multiplayer.defaultInterpolationTicks = NetworkState.InterpolationTicks;
+
+            // clear any changes on splitscreen options
+            Game1.splitscreenOptions.Clear();
 
             ModEntry.Console.Log("Instance_LoadContent", LogLevel.Trace);
             runner.gameInstances[0].Instance_LoadContent();
@@ -147,17 +157,26 @@ namespace TASMod.Extensions
             {
                 try
                 {
+                    if ((int)TASDateTime.CurrentFrame + 2 > Controller.PauseFrame && Controller.GameMode == TASMode.Replay)
+                    {
+                        counter = 0;
+                        break;
+                    }
                     //ModEntry.Console.Log($"Reset {TASDateTime.CurrentFrame}", LogLevel.Error);
                     //runner.Step();
                     GameTime gameTime = TASDateTime.CurrentGameTime;
                     runner.InvokeUpdate(gameTime);
                     runner.InvokeDraw(gameTime);
                     runner.EventLoop();
-                    if (counter++ >= Controller.FramesBetweenRender)
+                    if (counter++ >= Controller.FramesBetweenRender && (Controller.GameMode == TASMode.Edit || !Controller.IsPaused))
                         break;
                 }
-                catch
+                catch (Exception e)
                 {
+                    ModEntry.Console.Log($"Exception during Fast Run: {e}", LogLevel.Error);
+                    ModEntry.Console.Log($"Exiting the game due to exception.", LogLevel.Error);
+                    ModEntry.Console.Log($"At Frame: {TASDateTime.CurrentFrame}", LogLevel.Error);
+                    ModEntry.Console.Log(e.StackTrace, LogLevel.Error);
                     Game1.game1.Exit();
                     Environment.Exit(1);
                 }

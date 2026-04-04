@@ -1,4 +1,3 @@
-using System;
 using StardewValley;
 
 namespace TASMod.Views

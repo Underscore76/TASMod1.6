@@ -31,31 +31,33 @@ namespace TASMod.Console.Commands
             string filePath = Path.Combine(Constants.BasePath, name);
             using (StreamWriter file = File.CreateText(filePath))
             {
-                foreach (var traces in RandomExtensions.StackTraces)
+                foreach (var frameTraces in RandomExtensions.StackTraces)
                 {
-                    if (traces.Key < startFrame)
+                    if (frameTraces.Key < startFrame)
                         continue;
-
-                    file.WriteLine($"Frame\t{traces.Key}\t{traces.Value.Count}");
-                    foreach (var trace in traces.Value)
+                    file.WriteLine($"Frame\t{frameTraces.Key}");
+                    foreach (var playerTraces in frameTraces.Value)
                     {
-                        var lines = trace.Split('\n');
-                        // file.WriteLine(trace);
-                        foreach (var line in lines)
+                        file.WriteLine($"\tPlayer\t{playerTraces.Key}\tTraces\t{playerTraces.Value.Count}");
+                        foreach (var trace in playerTraces.Value)
                         {
-                            if (
-                                line.Contains(
-                                    "at StardewModdingAPI.Framework.SCore.OnGameUpdating(GameTime gameTime, Action runGameUpdate)"
-                                )
-                            )
+                            var lines = trace.Split('\n');
+                            foreach (var line in lines)
                             {
-                                break;
+                                if (
+                                    line.Contains(
+                                        "at StardewModdingAPI.Framework.SCore.OnGameUpdating(GameTime gameTime, Action runGameUpdate)"
+                                    )
+                                )
+                                {
+                                    break;
+                                }
+                                var cleanLine = CleanLine(line);
+                                if (cleanLine != "")
+                                    file.WriteLine(cleanLine);
                             }
-                            var cleanLine = CleanLine(line);
-                            if (cleanLine != "")
-                                file.WriteLine(cleanLine);
+                            file.WriteLine();
                         }
-                        file.WriteLine();
                     }
                 }
             }
@@ -63,7 +65,7 @@ namespace TASMod.Console.Commands
 
         private string CleanLine(string line)
         {
-            if (line.ToLower().Contains("tasmod") || line.Contains("at Microsoft.Xna.Framework"))
+            if (line.Contains("at TASMod") || line.Contains("at Microsoft.Xna.Framework"))
                 return "";
 
             return line.Replace(

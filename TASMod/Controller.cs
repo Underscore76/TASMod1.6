@@ -23,9 +23,17 @@ using TASMod.Recording;
 using TASMod.Scripting;
 using TASMod.System;
 using TASMod.Views;
+using TASMod.Networking;
+using TASMod.Monogame.Framework.Audio;
 
 namespace TASMod
 {
+    public enum TASMode
+    {
+        Edit,
+        Replay,
+    }
+
     public class Controller
     {
         public static TASConsole Console = null;
@@ -35,6 +43,7 @@ namespace TASMod
         public static RecordingManager Recording = null;
         public static PathFinder PathFinder = null;
         public static ViewController ViewController = null;
+        public static PerformanceTiming Timing = new PerformanceTiming();
 
         public static TASMouseState LastFrameMouse() => Recording.LastFrameMouse();
 
@@ -55,6 +64,12 @@ namespace TASMod
         public static bool SkipSave = true;
         public static bool ResetGame;
         public static bool BlockOverlays = true;
+        public static bool DebugMode = false;
+        public static bool PushStackTrace = false;
+
+        public static bool IsPaused = false;
+        public static int PauseFrame = -1;
+        public static TASMode GameMode = TASMode.Edit;
 
         public static TASMouseState RealMouse { get; private set; } = new TASMouseState();
         public static TASKeyboardState RealKeyboard { get; private set; } = new TASKeyboardState();
@@ -83,6 +98,91 @@ namespace TASMod
             return Recording.HasUpdate() || Automation.HasUpdate();
         }
 
+        public static bool ReplayUpdate()
+        {
+            UpdateRealInput();
+            if (ViewController.CurrentView != TASView.Base)
+            {
+                return false;
+            }
+            if (!Console.IsOpen)
+            {
+                if (ScriptInterface._instance != null)
+                {
+                    if (ScriptInterface._instance.ReceiveKeys(RealInputState.GetTriggeredKeys()))
+                    {
+                        return false;
+                    }
+                }
+            }
+            if (ResetGame)
+            {
+                IsPaused = false;
+                return false;
+            }
+            if (!IsPaused)
+            {
+                if (PauseFrame == (int)TASDateTime.CurrentFrame)
+                {
+                    IsPaused = true;
+                    return false;
+                }
+                return Recording.Update();
+            }
+
+            return false;
+        }
+
+        public static bool EditUpdate()
+        {
+            // check if there is frame data to process
+            if (Recording.Update())
+            {
+                return true;
+            }
+
+            // if sp then just update if the automation has something to do
+            if (NetworkState.NumConnections == 0)
+            {
+                if (Automation.Update())
+                {
+                    Recording.PushMultiplayerFrame();
+                    return true;
+                }
+                if (HandleRealInput())
+                {
+                    TASInputState.SetKeyboard(RealKeyboard);
+                    TASInputState.SetMouse(RealMouse);
+                    Recording.PushMultiplayerFrame();
+                    return true;
+                }
+                return false;
+            }
+
+            // multiplayer - check if gamepad input AND automation have something to do
+            if (Automation.HasUpdate())
+            {
+                Automation.Update();
+                Recording.PushMultiplayerFrame();
+                return true;
+            }
+
+            // forced update by player, run the automation if it exists
+            // (in case we're just not worrying about gamepad)
+            if (HandleRealInput())
+            {
+                Automation.Update();
+                if (AutomationManager.AppliedLogic == null)
+                {
+                    TASInputState.SetKeyboard(RealKeyboard);
+                    TASInputState.SetMouse(RealMouse);
+                }
+                Recording.PushMultiplayerFrame();
+                return true;
+            }
+            return false;
+        }
+
         public static bool Update()
         {
             // handle initial game launch
@@ -98,33 +198,20 @@ namespace TASMod
                 Overlays.Update();
             }
             TASInputState.Active = false;
-
-            // check if there is frame data to process
-            if (Recording.Update())
+            switch (GameMode)
             {
-                return true;
+                case TASMode.Edit:
+                    return EditUpdate();
+                case TASMode.Replay:
+                    return ReplayUpdate();
             }
-
-            // check if there is automation data to process
-            if (Automation.Update())
-            {
-                Recording.PushFrame();
-                return true;
-            }
-
-            if (HandleRealInput())
-            {
-                TASInputState.SetKeyboard(RealKeyboard);
-                TASInputState.SetMouse(RealMouse);
-                Recording.PushFrame();
-                return true;
-            }
-
             return false;
         }
 
         public static bool Draw()
         {
+            // ActiveInstance.TryLoad(); // attempts to load the correct instance for probing state
+            ActiveInstance.LoadZero();
             bool tmp = TASSpriteBatch.Active;
             TASSpriteBatch.Active = true;
             if (Game1.spriteBatch.inBeginEndPair())
@@ -161,16 +248,33 @@ namespace TASMod
             TASSpriteBatch.Active = tmp;
         }
 
-        private static bool HandleRealInput()
+        private static void UpdateRealInput()
         {
             RealMouse = new TASMouseState(RealInputState.mouseState);
             RealKeyboard = new TASKeyboardState(RealInputState.keyboardState);
+
+            if (ViewController.CurrentView == TASView.Base && RealInputState.LeftMouseReleased())
+            {
+                for (int i = 0; i < GameRunner.instance.gameInstances.Count; i++)
+                {
+                    var viewport = InstanceViewport.Get(i);
+                    if (viewport.Window.Contains(RealMouse.MouseX, RealMouse.MouseY))
+                    {
+                        ActiveInstance.InstanceIndex = i;
+                        break;
+                    }
+                }
+            }
+        }
+
+        private static bool HandleRealInput()
+        {
+            UpdateRealInput();
 
             if (Console.IsOpen)
                 return false;
             if (ViewController.CurrentView != TASView.Base)
                 return false;
-
             bool capture = Overlays.HandleInput(RealMouse, RealKeyboard);
             if (capture)
                 return false;
@@ -227,9 +331,9 @@ namespace TASMod
             ModEntry.Console.Log("Calling reset", LogLevel.Error);
             FastAdvance = fastAdvance;
             ResetGame = true;
-            if (Game1.audioEngine.Engine != null)
+            if (Game1.audioEngine is TASAudioEngine tasAudioEngine)
             {
-                Game1.audioEngine.Engine.Reset();
+                tasAudioEngine.Reset();
             }
             GameRunner_Update.Reset();
             GameRunner_Draw.Reset();
@@ -237,6 +341,7 @@ namespace TASMod
             TASDateTime.Reset();
             RandomExtensions.Reset();
             TextBoxInput.Reset();
+            NetworkState.Shutdown();
             State.ReRecords++;
             // IsPaused = false;
         }
@@ -338,7 +443,6 @@ namespace TASMod
             using (StreamReader file = File.OpenText(filePath))
             {
                 JsonSerializer serializer = new JsonSerializer();
-                // TODO: any safety rails for overwriting current State?
                 state = (EngineState)serializer.Deserialize(file, typeof(EngineState));
             }
             state.UpdateGame();

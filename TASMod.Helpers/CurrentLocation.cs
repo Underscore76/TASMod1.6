@@ -17,31 +17,8 @@ using xTile.ObjectModel;
 
 namespace TASMod.Helpers
 {
-    public class CurrentLocation
+    public class LocationHelpers
     {
-        public static bool Active
-        {
-            get { return Game1.currentLocation != null; }
-        }
-        public static string Name
-        {
-            get { return Game1.currentLocation?.Name; }
-        }
-        public static IEnumerable<NPC> Characters
-        {
-            get { return Game1.currentLocation?.characters.Where((n) => (!(n is Monster))); }
-        }
-
-        public static IEnumerable<NPC> Monsters
-        {
-            get { return (Game1.currentLocation?.characters.Where((n) => (n is Monster))); }
-        }
-
-        public static IEnumerable<KeyValuePair<Vector2, StardewValley.Object>> Forage
-        {
-            get { return LocationForage(Game1.currentLocation); }
-        }
-
         public static Dictionary<
             string,
             IEnumerable<KeyValuePair<Vector2, StardewValley.Object>>
@@ -95,113 +72,78 @@ namespace TASMod.Helpers
             }
             return true;
         }
+    }
 
-        public static bool IsMines
-        {
-            get { return Game1.currentLocation is MineShaft; }
-        }
-        public static int MineLevel
-        {
-            get { return (Game1.currentLocation as MineShaft).mineLevel; }
-        }
 
-        public static int StonesLeftOnThisLevel()
+    public class LocationInfo
+    {
+        public int index;
+        public GameLocation Location;
+        public bool Active => Location != null;
+        public string Name => Location?.Name;
+        public IEnumerable<NPC> Characters => Location?.characters.Where((n) => (!(n is Monster)));
+        public IEnumerable<NPC> Monsters => Location?.characters.Where((n) => (n is Monster));
+        public IEnumerable<KeyValuePair<Vector2, StardewValley.Object>> Forage => LocationHelpers.LocationForage(Location);
+        public bool IsMines => Location is MineShaft;
+        public int MineLevel => (Location as MineShaft).mineLevel;
+        public int StonesLeftOnThisLevel()
         {
-            if (Game1.currentLocation is MineShaft mine)
+            if (Location is MineShaft mine)
             {
-                return Reflector.GetValue<MineShaft, int>(mine, "stonesLeftOnThisLevel");
+                return mine.stonesLeftOnThisLevel;
             }
             return 0;
         }
-
-        public static bool LadderHasSpawned()
+        public bool LadderHasSpawned()
         {
-            if (Game1.currentLocation is MineShaft mine)
+            if (Location is MineShaft mine)
             {
-                //if (mine.getMineArea() != 121 && (mine.mineLevel % 10 == 0 || mine.mineLevel % 40 == 12))
-                //    return true;
                 return mine.ladderHasSpawned;
             }
             return false;
         }
-
-        public static int EnemyCount
+        public int EnemyCount
         {
             get
             {
-                if (Game1.currentLocation is MineShaft mine)
+                if (Location is MineShaft mine)
                     return mine.EnemyCount;
                 return 0;
             }
         }
-
-        public static bool FogActive
+        public bool FogActive
         {
             get
             {
-                if (Game1.currentLocation is MineShaft mine)
-                    return ((NetBool)Reflector.GetValue(mine, "isFogUp")).Value;
+                if (Location is MineShaft mine)
+                    return mine.isFogUp.Value;
                 return false;
             }
         }
-
-        public static Random mineRandom
+        public Random mineRandom
         {
             get
             {
-                if (Game1.currentLocation is MineShaft mine)
+                if (Location is MineShaft mine)
                 {
-                    return (Random)Reflector.GetValue(mine, "mineRandom");
+                    return mine.mineRandom;
                 }
                 return null;
             }
         }
-
-        public static bool MustKillAllMonstersToAdvance()
+        public bool MustKillAllMonstersToAdvance()
         {
-            if (Game1.currentLocation is MineShaft mine)
+            if (Location is MineShaft mine)
             {
                 return mine.mustKillAllMonstersToAdvance();
             }
             return false;
         }
 
-        public static int StonesRemaining(MineShaft mine, Vector2 loc)
-        {
-            int stonesLeftOnThisLevel = CurrentLocation.StonesLeftOnThisLevel();
-            if (CurrentLocation.LadderHasSpawned() || (stonesLeftOnThisLevel == 0))
-            {
-                return -1;
-            }
-
-            double rockChance =
-                (mine.EnemyCount == 0 ? 0.06 : 0.02)
-                + (double)Game1.player.LuckLevel / 100.0
-                + Game1.player.DailyLuck / 5.0;
-            for (int i = 0; i < stonesLeftOnThisLevel; i++)
-            {
-                Random random = new Random(
-                    (int)loc.X * 1000
-                        + (int)loc.Y
-                        + mine.mineLevel
-                        + (int)Game1.uniqueIDForThisGame / 2
-                );
-                random.NextDouble();
-                if (
-                    random.NextDouble()
-                    < rockChance + 1.0 / (double)Math.Max(1, stonesLeftOnThisLevel - i)
-                )
-                {
-                    return i;
-                }
-            }
-            return -1;
-        }
-
-        public static bool HasLadder(out Vector2 location)
+        public bool HasLadder(out Vector2 location)
         {
             location = Vector2.Zero;
-            if (Game1.currentLocation is MineShaft mine && mine.ladderHasSpawned)
+            if (Location is MineShaft mine && mine.ladderHasSpawned)
             {
                 // have to find it...
                 xTile.Dimensions.Size mapDims = mine.map.Layers[0].LayerSize;
@@ -220,25 +162,20 @@ namespace TASMod.Helpers
             }
             return false;
         }
+    }
 
-        public static Vector2 NearestGrass()
+    public class InstanceCurrentLocation
+    {
+        public static LocationInfo Get(int index)
         {
-            float minDist = float.MaxValue;
-            Vector2 nearest = Vector2.Zero;
-            Vector2 player = Game1.player.Tile;
-            foreach (var tf in Game1.currentLocation.terrainFeatures.Pairs)
+            if (GameRunner.instance.gameInstances.Count == 1)
             {
-                if (tf.Value is Grass grass)
-                {
-                    float diff = Vector2.DistanceSquared(tf.Key, player);
-                    if (diff < minDist)
-                    {
-                        minDist = diff;
-                        nearest = tf.Key;
-                    }
-                }
+                return new LocationInfo { index = index, Location = Game1.currentLocation };
             }
-            return nearest;
+            if (index < 0 || index >= GameRunner.instance.gameInstances.Count)
+                return new LocationInfo { index = index, Location = null };
+            var location = GameRunner.instance.gameInstances[index]?.instanceGameLocation;
+            return new LocationInfo { index = index, Location = location };
         }
     }
 }

@@ -1,3 +1,4 @@
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using StardewValley;
 using StardewValley.Menus;
@@ -13,6 +14,7 @@ namespace TASMod
     {
         public bool Active { get; set; } = true;
         public SaveState State { get; set; } = new SaveState();
+        public bool TrackRandom = false;
 
         public bool HasUpdate()
         {
@@ -30,10 +32,10 @@ namespace TASMod
             if (HandleStoredInput())
             {
                 FrameState state = PullFrame();
-                if (
+                if (TrackRandom && (
                     Game1.random.get_Index() != state.randomState.index
                     || Game1.random.get_Seed() != state.randomState.seed
-                )
+                ))
                 {
                     ModEntry.Console.Log(
                         string.Format(
@@ -58,7 +60,7 @@ namespace TASMod
             }
             State
                 .FrameStates[(int)TASDateTime.CurrentFrame - 1]
-                .toStates(out _, out TASMouseState mouse);
+                .toStates(out _, out TASMouseState mouse, out _);
             return mouse;
         }
 
@@ -102,7 +104,7 @@ namespace TASMod
         {
             State
                 .FrameStates[(int)TASDateTime.CurrentFrame]
-                .toStates(out TASInputState.kState, out TASInputState.mState);
+                .toStates(out TASInputState.kState, out TASInputState.mState, out TASInputState.gState);
             TASInputState.Active = true;
             return State.FrameStates[(int)TASDateTime.CurrentFrame];
         }
@@ -110,8 +112,25 @@ namespace TASMod
         public void PushFrame()
         {
             State.FrameStates.Add(
-                new FrameState(TASInputState.GetKeyboard(), TASInputState.GetMouse())
+                new FrameState(TASInputState.kState, TASInputState.mState, TASInputState.gState)
             );
+            TASInputState.Active = true;
+        }
+
+        public void PushMultiplayerFrame()
+        {
+            for (int i = 0; i < 4; i++)
+            {
+                TASInputState.SetTASGamePadState(i, GamePadInputQueue.GetNextInput(i));
+            }
+            var window = GameRunner.instance.gameInstances[0].localMultiplayerWindow;
+            if (!window.Contains(new Vector2(TASInputState.mState.MouseX, TASInputState.mState.MouseY)))
+            {
+                TASInputState.MoveMouse(LastFrameMouse().MouseX, LastFrameMouse().MouseY);
+            }
+            State.FrameStates.Add(
+                    new FrameState(TASInputState.kState, TASInputState.mState, TASInputState.gState)
+                );
             TASInputState.Active = true;
         }
     }

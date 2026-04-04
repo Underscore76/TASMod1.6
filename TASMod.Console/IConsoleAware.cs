@@ -56,7 +56,11 @@ namespace TASMod.Console
         {
             if (line == "")
             {
-                Console.PushEntry(line);
+                if (Console.followLogUpdate)
+                {
+                    Console.PushEntry(line);
+                }
+                Console.followLogUpdate = true;
                 return;
             }
             foreach (

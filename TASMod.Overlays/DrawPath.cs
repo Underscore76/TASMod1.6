@@ -22,6 +22,7 @@ namespace TASMod.Overlays
                 for (int i = 0; i < Controller.PathFinder.path.Count - 1; i++)
                 {
                     DrawLineBetweenTiles(
+                        ActiveInstance.InstanceIndex,
                         spriteBatch,
                         Controller.PathFinder.path[i].toVector2(),
                         Controller.PathFinder.path[i + 1].toVector2(),

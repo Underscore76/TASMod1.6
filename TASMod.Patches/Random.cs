@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using HarmonyLib;
 using StardewValley;
 using TASMod.Extensions;
@@ -26,15 +27,24 @@ namespace TASMod.Patches
 
         public static void Postfix(ref Random __instance)
         {
-            __instance.InitData();
             if (__instance.IsNet6())
             {
                 __instance.LoadFromShared();
             }
+
+            if (!RandomExtensions.IsTrackingEnabledForCurrentThread)
+            {
+                return;
+            }
+            __instance.InitData();
         }
 
         public static void Postfix_Seeded(Random __instance, int Seed)
         {
+            if (!RandomExtensions.IsTrackingEnabledForCurrentThread)
+            {
+                return;
+            }
             __instance.InitData(Seed);
         }
     }
@@ -98,24 +108,25 @@ namespace TASMod.Patches
 
         public static void Postfix(Random __instance)
         {
+            if (!RandomExtensions.IsTrackingEnabledForCurrentThread)
+            {
+                return;
+            }
+
             __instance.IncrementCounter();
         }
 
         public static bool Prefix(Random __instance)
         {
-            if (__instance == Game1.random)
+            if (!RandomExtensions.IsTrackingEnabledForCurrentThread)
             {
-                if (!RandomExtensions.StackTraces.ContainsKey((int)TASDateTime.CurrentFrame))
-                {
-                    RandomExtensions.StackTraces.Add(
-                        (int)TASDateTime.CurrentFrame,
-                        new List<string>()
-                    );
-                }
-                RandomExtensions
-                    .StackTraces[(int)TASDateTime.CurrentFrame]
-                    .Add(Environment.StackTrace);
+                return true;
             }
+            if (Game1.game1 is null || Thread.CurrentThread.IsThreadPoolThread)
+            {
+                return true;
+            }
+            RandomExtensions.PushTrace(__instance, (int)TASDateTime.CurrentFrame, Game1.game1.instanceIndex);
             return true;
         }
     }
@@ -135,24 +146,26 @@ namespace TASMod.Patches
 
         public static bool Prefix(Random __instance)
         {
-            if (__instance == Game1.random)
+            if (!RandomExtensions.IsTrackingEnabledForCurrentThread)
             {
-                if (!RandomExtensions.StackTraces.ContainsKey((int)TASDateTime.CurrentFrame))
-                {
-                    RandomExtensions.StackTraces.Add(
-                        (int)TASDateTime.CurrentFrame,
-                        new List<string>()
-                    );
-                }
-                RandomExtensions
-                    .StackTraces[(int)TASDateTime.CurrentFrame]
-                    .Add(Environment.StackTrace);
+                return true;
             }
+            if (Game1.game1 is null || Thread.CurrentThread.IsThreadPoolThread)
+            {
+                return true;
+            }
+
+            RandomExtensions.PushTrace(__instance, (int)TASDateTime.CurrentFrame, Game1.game1.instanceIndex);
             return true;
         }
 
         public static void Postfix(Random __instance)
         {
+            if (!RandomExtensions.IsTrackingEnabledForCurrentThread)
+            {
+                return;
+            }
+
             __instance.IncrementCounter();
         }
     }
@@ -169,12 +182,18 @@ namespace TASMod.Patches
                     "NextBytes",
                     new Type[] { typeof(byte[]) }
                 ),
-                postfix: new HarmonyMethod(this.GetType(), nameof(this.Postfix))
+                postfix: new HarmonyMethod(this.GetType(), nameof(this.Postfix)),
+                prefix: new HarmonyMethod(this.GetType(), nameof(this.Prefix))
             );
         }
 
         public static void Postfix(Random __instance, byte[] buffer)
         {
+            if (!RandomExtensions.IsTrackingEnabledForCurrentThread)
+            {
+                return;
+            }
+
             if (__instance.IsNet6())
             {
                 __instance.IncrementCounter((buffer.Length + 7) / 8);
@@ -183,6 +202,20 @@ namespace TASMod.Patches
             {
                 __instance.IncrementCounter(buffer.Length);
             }
+        }
+        public static bool Prefix(Random __instance)
+        {
+            if (!RandomExtensions.IsTrackingEnabledForCurrentThread)
+            {
+                return true;
+            }
+            if (Game1.game1 is null || Thread.CurrentThread.IsThreadPoolThread)
+            {
+                return true;
+            }
+
+            RandomExtensions.PushTrace(__instance, (int)TASDateTime.CurrentFrame, Game1.game1.instanceIndex);
+            return true;
         }
     }
 }

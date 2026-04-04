@@ -95,11 +95,43 @@ namespace TASMod.Recording
         {
             ModEntry.Console.Log($"Called Save {FilePath}", StardewModdingAPI.LogLevel.Alert);
             StoreGameDetails();
-            using (StreamWriter file = File.CreateText(FilePath))
+
+            string finalPath = FilePath;
+            string directory = Path.GetDirectoryName(finalPath);
+            Directory.CreateDirectory(directory);
+
+            string tempPath = Path.Combine(directory, $"{Path.GetFileName(finalPath)}.tmp.{Environment.ProcessId}");
+
+            try
             {
-                JsonSerializer serializer = new JsonSerializer();
-                serializer.Formatting = Formatting.Indented;
-                serializer.Serialize(file, this);
+                var serializer = new JsonSerializer { Formatting = Formatting.Indented };
+
+                using (var stream = new FileStream(tempPath, FileMode.CreateNew, FileAccess.Write, FileShare.None))
+                {
+                    using (var writer = new StreamWriter(stream))
+                    {
+                        serializer.Serialize(writer, this);
+                        writer.Flush();
+                        stream.Flush(true);
+                    }
+                }
+
+                File.Move(tempPath, finalPath, true);
+            }
+            catch
+            {
+                try
+                {
+                    if (File.Exists(tempPath))
+                    {
+                        File.Delete(tempPath);
+                    }
+                }
+                catch
+                {
+                }
+
+                throw;
             }
         }
 
@@ -147,7 +179,6 @@ namespace TASMod.Recording
                 using (StreamReader file = File.OpenText(filePath))
                 {
                     JsonSerializer serializer = new JsonSerializer();
-                    // TODO: any safety rails for overwriting current State?
                     state = (SaveState)serializer.Deserialize(file, typeof(SaveState));
                 }
                 state.Prefix = newPrefix;
@@ -157,6 +188,7 @@ namespace TASMod.Recording
 
         public void Reset(int resetTo)
         {
+            if (Controller.GameMode != TASMode.Edit) return; // only modify the stack in edit mode
             if (resetTo < 0)
                 resetTo = FrameStates.Count + 1 + resetTo;
             resetTo = Math.Min(resetTo, FrameStates.Count);

@@ -11,11 +11,16 @@ namespace TASMod.Console.Commands
 
         public override void Run(string[] tokens)
         {
-            Game1.graphics.GraphicsDevice.SetRenderTarget(Game1.game1.screen);
-            Game1.graphics.GraphicsDevice.Clear(Color.Black);
-            Game1.graphics.GraphicsDevice.SetRenderTarget(Game1.game1.uiScreen);
-            Game1.graphics.GraphicsDevice.Clear(Color.Black);
-            Game1.graphics.GraphicsDevice.SetRenderTarget(null);
+            for (int index = 0; index < GameRunner.instance.gameInstances.Count; index++)
+            {
+                var screen = GameRunner.instance.gameInstances[index].screen;
+                var uiScreen = GameRunner.instance.gameInstances[index].uiScreen;
+                Game1.graphics.GraphicsDevice.SetRenderTarget(screen);
+                Game1.graphics.GraphicsDevice.Clear(Color.Black);
+                Game1.graphics.GraphicsDevice.SetRenderTarget(uiScreen);
+                Game1.graphics.GraphicsDevice.Clear(Color.Black);
+                Game1.graphics.GraphicsDevice.SetRenderTarget(null);
+            }
         }
     }
 }

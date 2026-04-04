@@ -69,6 +69,12 @@ namespace TASMod.Overlays
                 );
             }
 
+            public int GetWidth()
+            {
+                var span = Span.ToString(Format(Span));
+                return SpriteText.getWidthOfString(span) + 32;
+            }
+
             public static void StaticDraw(SpriteBatch spriteBatch, TimeSpan span, int left, int top)
             {
                 SpriteText.drawString(
@@ -147,6 +153,7 @@ namespace TASMod.Overlays
         {
             Microsoft.Xna.Framework.Rectangle tsarea =
                 Game1.game1.GraphicsDevice.Viewport.GetTitleSafeArea();
+            var top = tsarea.Top;
             tsarea.X += SpriteText.getWidthOfString("     ") + 16;
             int fontHeight = (int)(SpriteText.getHeightOfString(" ") * 1.5);
             foreach (var tup in Timers)
@@ -166,12 +173,26 @@ namespace TASMod.Overlays
                     tsarea.Y += fontHeight;
                 }
             }
-            TimerElement.StaticDraw(
-                spriteBatch,
-                CurrentFrame.ToString("D7"),
-                tsarea.Left,
-                tsarea.Top
-            );
+            if (Timers.Count > 0)
+            {
+                var span = Timers[0].Item2.Span;
+                var x = tsarea.Left + SpriteText.getWidthOfString(span.ToString(TimerElement.Format(span))) + 32;
+                TimerElement.StaticDraw(
+                    spriteBatch,
+                    CurrentFrame.ToString("D7"),
+                    x,
+                    top
+                );
+            }
+            else
+            {
+                TimerElement.StaticDraw(
+                    spriteBatch,
+                    CurrentFrame.ToString("D7"),
+                    tsarea.Left,
+                    tsarea.Top
+                );
+            }
         }
 
         public void RegisterTimer(

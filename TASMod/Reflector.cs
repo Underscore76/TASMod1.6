@@ -4,16 +4,27 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using StardewValley;
 
 namespace TASMod
 {
     public class Reflector
     {
-        public static Dictionary<string, FieldInfo> FieldInfos = new Dictionary<string, FieldInfo>();
-        public static Dictionary<string, PropertyInfo> PropertyInfos = new Dictionary<string, PropertyInfo>();
-        public static Dictionary<string, MethodInfo> MethodInfos = new Dictionary<string, MethodInfo>();
-        public static Dictionary<string, List<string>> FieldsInTypeInfos = new Dictionary<string, List<string>>();
-
+        [ThreadStatic]
+        private static Dictionary<string, FieldInfo> _fieldInfos;
+        private static Dictionary<string, FieldInfo> FieldInfos => _fieldInfos ??= new Dictionary<string, FieldInfo>();
+        [ThreadStatic]
+        private static Dictionary<string, PropertyInfo> _propertyInfos;
+        private static Dictionary<string, PropertyInfo> PropertyInfos => _propertyInfos ??= new Dictionary<string, PropertyInfo>();
+        [ThreadStatic]
+        private static Dictionary<string, MethodInfo> _methodInfos;
+        private static Dictionary<string, MethodInfo> MethodInfos => _methodInfos ??= new Dictionary<string, MethodInfo>();
+        [ThreadStatic]
+        private static Dictionary<string, List<string>> _fieldsInTypeInfos;
+        private static Dictionary<string, List<string>> FieldsInTypeInfos => _fieldsInTypeInfos ??= new Dictionary<string, List<string>>();
+        [ThreadStatic]
+        private static Dictionary<string, Type> _remoteAssemblyTypes;
+        private static Dictionary<string, Type> RemoteAssemblyTypes => _remoteAssemblyTypes ??= new Dictionary<string, Type>();
         public const BindingFlags AllFlags = (BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static);
         public const BindingFlags HiddenFlags = (BindingFlags.NonPublic | BindingFlags.Instance);
 
@@ -50,6 +61,26 @@ namespace TASMod
             MethodInfo info = type.GetType().GetMethod(field, flags);
             MethodInfos.Add(key, info);
             return info;
+        }
+
+        public static V GetStaticValue<T, V>(string field, BindingFlags flags = AllFlags)
+        {
+            FieldInfo info = typeof(T).GetField(field, flags);
+            if (info != null)
+            {
+                V value = (V)info.GetValue(null);
+                return value;
+            }
+            else
+            {
+                PropertyInfo pinfo = typeof(T).GetProperty(field, flags);
+                if (pinfo != null)
+                {
+                    V value = (V)pinfo.GetValue(null, null);
+                    return value;
+                }
+            }
+            return default(V);
         }
 
 
@@ -158,14 +189,27 @@ namespace TASMod
         {
             return assembly.GetTypes().ToArray();
         }
-
+        public static Type GetTypeInAnyAssembly(string fullname)
+        {
+            if (RemoteAssemblyTypes.ContainsKey(fullname))
+            {
+                return RemoteAssemblyTypes[fullname];
+            }
+            Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
+            foreach (var assembly in assemblies)
+            {
+                var t = GetTypeInAssembly(assembly, fullname);
+                if (t != null)
+                {
+                    RemoteAssemblyTypes.Add(fullname, t);
+                    return t;
+                }
+            }
+            return null;
+        }
         public static Type GetTypeInAssembly(Assembly assembly, string fullname)
         {
             var matches = assembly.GetTypes().Where(t => t.FullName == fullname);
-            foreach (var v in AllTypesInAssembly(assembly))
-            {
-                ModEntry.Console.Log($"{v.FullName}");
-            }
             foreach (var t in matches)
             {
                 return t;
@@ -223,12 +267,29 @@ namespace TASMod
             {
                 Type type = obj.GetType();
                 dynamic castObj = Convert.ChangeType(obj, type);
-                return Reflector.GetValue(castObj, field);
+                return Reflector.GetValue(castObj, field, AllFlags);
             }
-            catch
+            catch (Exception e)
             {
+                Controller.Console.Alert("Failed to get dynamic cast field " + field + ": " + e.ToString());
                 return null;
             }
+        }
+
+        public static object GetStaticVar(int index, string key)
+        {
+            var obj = GameRunner.instance.gameInstances[index]?.staticVarHolder;
+            if (obj == null)
+                return null;
+            return GetValue(obj, key);
+        }
+
+        public static void SetStaticVar(int index, string key, object value)
+        {
+            var obj = GameRunner.instance.gameInstances[index]?.staticVarHolder;
+            if (obj == null)
+                return;
+            SetValue(obj, key, value);
         }
     }
 }

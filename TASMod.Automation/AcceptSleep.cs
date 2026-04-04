@@ -18,22 +18,23 @@ namespace TASMod.Automation
         }
 
         public override bool ActiveUpdate(
+        int index,
             out TASKeyboardState kstate,
             out TASMouseState mstate,
             out TASGamePadState gstate
         )
         {
+            var menuInfo = InstanceCurrentMenu.Get(index);
             if (
-                !CurrentMenu.Active
-                || !CurrentMenu.IsDialogue
-                || !CurrentMenu.IsQuestion
-                || CurrentMenu.Transitioning
-                || !CurrentMenu.CurrentString.Equals("Go to sleep for the night?")
+                !menuInfo.Active
+                || !menuInfo.IsDialogue
+                || !menuInfo.IsQuestion
+                || menuInfo.Transitioning
+                || !menuInfo.CurrentString.Equals("Go to sleep for the night?")
             )
             {
-                return base.ActiveUpdate(out kstate, out mstate, out gstate);
+                return base.ActiveUpdate(index, out kstate, out mstate, out gstate);
             }
-            Log($"{CurrentMenu.CurrentString}", StardewModdingAPI.LogLevel.Alert);
             kstate = new TASKeyboardState("Y");
             mstate = null;
             gstate = null;

@@ -11,6 +11,7 @@ namespace TASMod.Automation
         public override string Description => "auto advance frames during screen transitions";
 
         public override bool ActiveUpdate(
+            int index,
             out TASKeyboardState kstate,
             out TASMouseState mstate,
             out TASGamePadState gstate
@@ -19,15 +20,19 @@ namespace TASMod.Automation
             kstate = null;
             mstate = new TASMouseState(Controller.LastFrameMouse(), false, false);
             gstate = null;
+            var locationInfo = InstanceCurrentLocation.Get(index);
+            var menuInfo = InstanceCurrentMenu.Get(index);
+            var playerInfo = InstanceCurrentPlayer.Get(index);
+            var fadeInfo = InstanceScreenFade.Get(index);
 
-            if (!CurrentLocation.Active || CurrentMenu.Active)
+            if (!locationInfo.Active || menuInfo.Active)
                 return false;
 
-            if (Globals.GlobalFade)
+            if (fadeInfo.GlobalFade)
                 return true;
-            if (Globals.FadeIn && Globals.FadeToBlackAlpha < 1f && Globals.FadeToBlackAlpha != 0)
+            if (fadeInfo.FadeIn && fadeInfo.FadeToBlackAlpha < 1f && fadeInfo.FadeToBlackAlpha != 0)
                 return true;
-            if (Globals.FadeToBlack && Globals.FadeToBlackAlpha > 0f && !PlayerInfo.CanMove)
+            if (fadeInfo.FadeToBlack && fadeInfo.FadeToBlackAlpha > 0f && !playerInfo.CanMove)
                 return true;
 
             return false;

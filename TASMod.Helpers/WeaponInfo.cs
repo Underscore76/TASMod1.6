@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
 using StardewValley;
+using StardewValley.Extensions;
 using StardewValley.Tools;
 using TASMod.Extensions;
 
@@ -22,107 +23,55 @@ namespace TASMod.Helpers
         {
             if (random == null)
                 random = Game1.random.Copy();
-            int type = tool.type.Value;
-            int addedAreaOfEffect = tool.addedAreaOfEffect.Value;
-            // default code below with random swapped in
             Rectangle areaOfEffect = Rectangle.Empty;
-            int horizontalYOffset2 = 0;
-            int upHeightOffset2 = 0;
-            int num = type;
             int width;
             int height;
-            if (num == 1)
+            int upHeightOffset;
+            int horizontalYOffset;
+            if (tool.type.Value == 1)
             {
                 width = 74;
                 height = 48;
-                upHeightOffset2 = 42;
-                horizontalYOffset2 = -32;
+                upHeightOffset = 42;
+                horizontalYOffset = -32;
             }
             else
             {
                 width = 64;
                 height = 64;
-                horizontalYOffset2 = -32;
-                upHeightOffset2 = 0;
+                horizontalYOffset = -32;
+                upHeightOffset = 0;
             }
-            if ((int)type == 1)
+            if (tool.type.Value == 1)
             {
                 switch (facingDirection)
                 {
                     case 0:
-                        areaOfEffect = new Rectangle(
-                            x - width / 2,
-                            wielderBoundingBox.Y - height - upHeightOffset2,
-                            width / 2,
-                            height + upHeightOffset2
-                        );
-                        tileLocation1 = new Vector2(
-                            ((random.NextDouble() < 0.5) ? areaOfEffect.Left : areaOfEffect.Right)
-                                / 64,
-                            areaOfEffect.Top / 64
-                        );
-                        tileLocation2 = new Vector2(
-                            areaOfEffect.Center.X / 64,
-                            areaOfEffect.Top / 64
-                        );
+                        areaOfEffect = new Rectangle(x - width / 2, wielderBoundingBox.Y - height - upHeightOffset, width / 2, height + upHeightOffset);
+                        tileLocation1 = new Vector2(random.Choose(areaOfEffect.Left, areaOfEffect.Right) / 64, areaOfEffect.Top / 64);
+                        tileLocation2 = new Vector2(areaOfEffect.Center.X / 64, areaOfEffect.Top / 64);
                         areaOfEffect.Offset(20, -16);
                         areaOfEffect.Height += 16;
                         areaOfEffect.Width += 20;
                         break;
                     case 1:
-                        areaOfEffect = new Rectangle(
-                            wielderBoundingBox.Right,
-                            y - height / 2 + horizontalYOffset2,
-                            height,
-                            width
-                        );
-                        tileLocation1 = new Vector2(
-                            areaOfEffect.Center.X / 64,
-                            ((random.NextDouble() < 0.5) ? areaOfEffect.Top : areaOfEffect.Bottom)
-                                / 64
-                        );
-                        tileLocation2 = new Vector2(
-                            areaOfEffect.Center.X / 64,
-                            areaOfEffect.Center.Y / 64
-                        );
+                        areaOfEffect = new Rectangle(wielderBoundingBox.Right, y - height / 2 + horizontalYOffset, (int)((float)height * 1.15f), width);
+                        tileLocation1 = new Vector2(areaOfEffect.Center.X / 64, random.Choose(areaOfEffect.Top, areaOfEffect.Bottom) / 64);
+                        tileLocation2 = new Vector2(areaOfEffect.Center.X / 64, areaOfEffect.Center.Y / 64);
                         areaOfEffect.Offset(-4, 0);
                         areaOfEffect.Width += 16;
                         break;
                     case 2:
-                        areaOfEffect = new Rectangle(
-                            x - width / 2,
-                            wielderBoundingBox.Bottom,
-                            width,
-                            height
-                        );
-                        tileLocation1 = new Vector2(
-                            ((random.NextDouble() < 0.5) ? areaOfEffect.Left : areaOfEffect.Right)
-                                / 64,
-                            areaOfEffect.Center.Y / 64
-                        );
-                        tileLocation2 = new Vector2(
-                            areaOfEffect.Center.X / 64,
-                            areaOfEffect.Center.Y / 64
-                        );
+                        areaOfEffect = new Rectangle(x - width / 2, wielderBoundingBox.Bottom, width, (int)((float)height * 1.75f));
+                        tileLocation1 = new Vector2(random.Choose(areaOfEffect.Left, areaOfEffect.Right) / 64, areaOfEffect.Center.Y / 64);
+                        tileLocation2 = new Vector2(areaOfEffect.Center.X / 64, areaOfEffect.Center.Y / 64);
                         areaOfEffect.Offset(12, -8);
                         areaOfEffect.Width -= 21;
                         break;
                     case 3:
-                        areaOfEffect = new Rectangle(
-                            wielderBoundingBox.Left - height,
-                            y - height / 2 + horizontalYOffset2,
-                            height,
-                            width
-                        );
-                        tileLocation1 = new Vector2(
-                            areaOfEffect.Left / 64,
-                            ((random.NextDouble() < 0.5) ? areaOfEffect.Top : areaOfEffect.Bottom)
-                                / 64
-                        );
-                        tileLocation2 = new Vector2(
-                            areaOfEffect.Left / 64,
-                            areaOfEffect.Center.Y / 64
-                        );
+                        areaOfEffect = new Rectangle(wielderBoundingBox.Left - (int)((float)height * 1.15f), y - height / 2 + horizontalYOffset, (int)((float)height * 1.15f), width);
+                        tileLocation1 = new Vector2(areaOfEffect.Left / 64, random.Choose(areaOfEffect.Top, areaOfEffect.Bottom) / 64);
+                        tileLocation2 = new Vector2(areaOfEffect.Left / 64, areaOfEffect.Center.Y / 64);
                         areaOfEffect.Offset(-12, 0);
                         areaOfEffect.Width += 16;
                         break;
@@ -133,21 +82,9 @@ namespace TASMod.Helpers
                 switch (facingDirection)
                 {
                     case 0:
-                        areaOfEffect = new Rectangle(
-                            x - width / 2,
-                            wielderBoundingBox.Y - height - upHeightOffset2,
-                            width,
-                            height + upHeightOffset2
-                        );
-                        tileLocation1 = new Vector2(
-                            ((random.NextDouble() < 0.5) ? areaOfEffect.Left : areaOfEffect.Right)
-                                / 64,
-                            areaOfEffect.Top / 64
-                        );
-                        tileLocation2 = new Vector2(
-                            areaOfEffect.Center.X / 64,
-                            areaOfEffect.Top / 64
-                        );
+                        areaOfEffect = new Rectangle(x - width / 2, wielderBoundingBox.Y - height - upHeightOffset, width, height + upHeightOffset);
+                        tileLocation1 = new Vector2(random.Choose(areaOfEffect.Left, areaOfEffect.Right) / 64, areaOfEffect.Top / 64);
+                        tileLocation2 = new Vector2(areaOfEffect.Center.X / 64, areaOfEffect.Top / 64);
                         switch (indexInCurrentAnimation)
                         {
                             case 5:
@@ -175,21 +112,9 @@ namespace TASMod.Helpers
                         }
                         break;
                     case 2:
-                        areaOfEffect = new Rectangle(
-                            x - width / 2,
-                            wielderBoundingBox.Bottom,
-                            width,
-                            height
-                        );
-                        tileLocation1 = new Vector2(
-                            ((random.NextDouble() < 0.5) ? areaOfEffect.Left : areaOfEffect.Right)
-                                / 64,
-                            areaOfEffect.Center.Y / 64
-                        );
-                        tileLocation2 = new Vector2(
-                            areaOfEffect.Center.X / 64,
-                            areaOfEffect.Center.Y / 64
-                        );
+                        areaOfEffect = new Rectangle(x - width / 2, wielderBoundingBox.Bottom, width, (int)((float)height * 1.5f));
+                        tileLocation1 = new Vector2(random.Choose(areaOfEffect.Left, areaOfEffect.Right) / 64, areaOfEffect.Center.Y / 64);
+                        tileLocation2 = new Vector2(areaOfEffect.Center.X / 64, areaOfEffect.Center.Y / 64);
                         switch (indexInCurrentAnimation)
                         {
                             case 0:
@@ -214,21 +139,9 @@ namespace TASMod.Helpers
                         }
                         break;
                     case 1:
-                        areaOfEffect = new Rectangle(
-                            wielderBoundingBox.Right,
-                            y - height / 2 + horizontalYOffset2,
-                            height,
-                            width
-                        );
-                        tileLocation1 = new Vector2(
-                            areaOfEffect.Center.X / 64,
-                            ((random.NextDouble() < 0.5) ? areaOfEffect.Top : areaOfEffect.Bottom)
-                                / 64
-                        );
-                        tileLocation2 = new Vector2(
-                            areaOfEffect.Center.X / 64,
-                            areaOfEffect.Center.Y / 64
-                        );
+                        areaOfEffect = new Rectangle(wielderBoundingBox.Right, y - height / 2 + horizontalYOffset, height, width);
+                        tileLocation1 = new Vector2(areaOfEffect.Center.X / 64, random.Choose(areaOfEffect.Top, areaOfEffect.Bottom) / 64);
+                        tileLocation2 = new Vector2(areaOfEffect.Center.X / 64, areaOfEffect.Center.Y / 64);
                         switch (indexInCurrentAnimation)
                         {
                             case 0:
@@ -252,21 +165,9 @@ namespace TASMod.Helpers
                         }
                         break;
                     case 3:
-                        areaOfEffect = new Rectangle(
-                            wielderBoundingBox.Left - height,
-                            y - height / 2 + horizontalYOffset2,
-                            height,
-                            width
-                        );
-                        tileLocation1 = new Vector2(
-                            areaOfEffect.Left / 64,
-                            ((random.NextDouble() < 0.5) ? areaOfEffect.Top : areaOfEffect.Bottom)
-                                / 64
-                        );
-                        tileLocation2 = new Vector2(
-                            areaOfEffect.Left / 64,
-                            areaOfEffect.Center.Y / 64
-                        );
+                        areaOfEffect = new Rectangle(wielderBoundingBox.Left - height, y - height / 2 + horizontalYOffset, height, width);
+                        tileLocation1 = new Vector2(areaOfEffect.Left / 64, random.Choose(areaOfEffect.Top, areaOfEffect.Bottom) / 64);
+                        tileLocation2 = new Vector2(areaOfEffect.Left / 64, areaOfEffect.Center.Y / 64);
                         switch (indexInCurrentAnimation)
                         {
                             case 0:
@@ -291,23 +192,23 @@ namespace TASMod.Helpers
                         break;
                 }
             }
-            areaOfEffect.Inflate(addedAreaOfEffect, addedAreaOfEffect);
+            areaOfEffect.Inflate(tool.addedAreaOfEffect.Value, tool.addedAreaOfEffect.Value);
             return areaOfEffect;
         }
 
-        public static int GetNumberOfSwingFrames(MeleeWeapon tool, int index)
+        public static int GetNumberOfSwingFrames(PlayerInfo player, MeleeWeapon tool, int index)
         {
-            float swipeSpeed = 400 - tool.speed.Value * 40 - Game1.player.addedSpeed * 40; // setFarmerAnimating
-            swipeSpeed *= 1f - Game1.player.buffs.WeaponSpeedMultiplier; // setFarmerAnimating
+            float swipeSpeed = 400 - tool.speed.Value * 40 - player.Player.addedSpeed * 40; // setFarmerAnimating
+            swipeSpeed *= 1f - player.Player.buffs.WeaponSpeedMultiplier; // setFarmerAnimating
             swipeSpeed /= ((tool.type.Value == 2) ? 5 : 8); // setFarmerAnimating
             float animationInterval = swipeSpeed * 1.3f; // doSwipe
             float milliseconds = GetBaseSwingMilliseconds(index, (int)animationInterval);
             if (
-                PlayerInfo.IsSwingingSword
-                && Game1.player.FarmerSprite.currentAnimationIndex == index
+                player.IsSwingingSword
+                && player.FarmerSprite.currentAnimationIndex == index
             )
             {
-                milliseconds -= Game1.player.FarmerSprite.timer;
+                milliseconds -= player.FarmerSprite.timer;
             }
             return ((int)milliseconds + 15) / 16;
         }

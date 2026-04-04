@@ -35,7 +35,7 @@ namespace TASMod.Overlays
                 }
                 ImGui.SeparatorText("Lua Watchlist");
                 ImGui.BeginTable("LuaScripts", 3, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg);
-                ImGui.TableSetupColumn("", ImGuiTableColumnFlags.WidthFixed, ImGui.CalcTextSize("X").X+10);
+                ImGui.TableSetupColumn("", ImGuiTableColumnFlags.WidthFixed, ImGui.CalcTextSize("X").X + 10);
                 ImGui.TableSetupColumn("Name", ImGuiTableColumnFlags.WidthStretch);
                 ImGui.TableSetupColumn("Value", ImGuiTableColumnFlags.WidthStretch);
                 ImGui.TableHeadersRow();
@@ -45,7 +45,7 @@ namespace TASMod.Overlays
                 {
                     ImGui.TableNextRow();
                     ImGui.TableSetColumnIndex(0);
-                    ImGui.PushID("LuaScripts##"+script.Key);
+                    ImGui.PushID("LuaScripts##" + script.Key);
                     if (ImGui.Button("X"))
                     {
                         toRemove.Add(script.Key);

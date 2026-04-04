@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
@@ -22,23 +23,39 @@ namespace TASMod.Overlays
 
         public override void ActiveDraw(SpriteBatch spriteBatch)
         {
-            if (CurrentLocation.Active)
+            for (int i = 0; i < GameRunner.instance.gameInstances.Count; i++)
             {
-                foreach (NPC current in CurrentLocation.Characters)
+                try
                 {
-                    DrawRectGlobal(spriteBatch, current.GetBoundingBox(), NPCColor, LineColor);
+                    DrawHitboxesForInstance(i, spriteBatch);
                 }
-                foreach (NPC current in CurrentLocation.Monsters)
+                catch (Exception e)
+                {
+                    ModEntry.Console.Log($"Hitbox2 ActiveDraw Exception: {e}", StardewModdingAPI.LogLevel.Error);
+                }
+            }
+        }
+        public void DrawHitboxesForInstance(int i, SpriteBatch spriteBatch)
+        {
+            var currentLocation = InstanceCurrentLocation.Get(i);
+            var playerInfo = InstanceCurrentPlayer.Get(i);
+            if (currentLocation.Active)
+            {
+                foreach (NPC current in currentLocation.Characters)
+                {
+                    DrawRectGlobal(i, spriteBatch, current.GetBoundingBox(), NPCColor, LineColor);
+                }
+                foreach (NPC current in currentLocation.Monsters)
                 {
                     if ((current as Monster).isInvincible())
-                        DrawRectGlobal(spriteBatch, current.GetBoundingBox(), MonsterInvincibleColor, LineColor);
+                        DrawRectGlobal(i, spriteBatch, current.GetBoundingBox(), MonsterInvincibleColor, LineColor);
                     else
-                        DrawRectGlobal(spriteBatch, current.GetBoundingBox(), MonsterColor, LineColor);
+                        DrawRectGlobal(i, spriteBatch, current.GetBoundingBox(), MonsterColor, LineColor);
                 }
-                if (!Game1.player.temporarilyInvincible && Game1.player.CanMove)
-                    DrawRectGlobal(spriteBatch, PlayerInfo.BoundingBox, PlayerColor, LineColor);
+                if (!playerInfo.Player.temporarilyInvincible && playerInfo.CanMove)
+                    DrawRectGlobal(i, spriteBatch, playerInfo.BoundingBox, PlayerColor, LineColor);
                 else
-                    DrawRectGlobal(spriteBatch, PlayerInfo.BoundingBox, PlayerInvincibleColor, LineColor);
+                    DrawRectGlobal(i, spriteBatch, playerInfo.BoundingBox, PlayerInvincibleColor, LineColor);
             }
         }
     }
@@ -53,59 +70,74 @@ namespace TASMod.Overlays
         {
             return new string[] { string.Format("{0}: display the weapon swing position", Name) };
         }
-
         public override void ActiveDraw(SpriteBatch spriteBatch)
         {
-            if (PlayerInfo.CurrentTool is MeleeWeapon weapon && weapon.type.Value != MeleeWeapon.dagger)
+            for (int i = 0; i < GameRunner.instance.gameInstances.Count; i++)
+            {
+                try
+                {
+                    DrawForInstance(i, spriteBatch);
+                }
+                catch (Exception e)
+                {
+                    ModEntry.Console.Log($"Hitbox2 ActiveDraw Exception: {e}", StardewModdingAPI.LogLevel.Error);
+                }
+            }
+        }
+
+        public void DrawForInstance(int index, SpriteBatch spriteBatch)
+        {
+            var playerInfo = InstanceCurrentPlayer.Get(index);
+            if (playerInfo.CurrentTool is MeleeWeapon weapon && weapon.type.Value != MeleeWeapon.dagger)
             {
                 // draw the current arc
-                if (PlayerInfo.IsSwingingSword)
+                if (playerInfo.IsSwingingSword)
                 {
                     Color col = Color.Gray;
-                    for (int index = Game1.player.FarmerSprite.currentAnimationIndex;
-                        index < Game1.player.FarmerSprite.CurrentAnimation.Count; index++)
+                    for (int animIndex = playerInfo.FarmerSprite.currentAnimationIndex;
+                        animIndex < playerInfo.FarmerSprite.CurrentAnimation.Count; animIndex++)
                     {
 
-                        if (Game1.player.FarmerSprite.CurrentAnimation[index].frameStartBehavior != null &&
-                            Game1.player.FarmerSprite.CurrentAnimation[index].frameStartBehavior.Method.Name == "showSwordSwipe")
+                        if (playerInfo.FarmerSprite.CurrentAnimation[animIndex].frameStartBehavior != null &&
+                            playerInfo.FarmerSprite.CurrentAnimation[animIndex].frameStartBehavior.Method.Name == "showSwordSwipe")
                         {
-                            DrawAnimation(spriteBatch, weapon, PlayerInfo.FacingDirection, index, col, Color.Black);
+                            DrawAnimation(playerInfo, spriteBatch, weapon, playerInfo.FacingDirection, animIndex, col, Color.Black);
                             col.A = (byte)(col.A * 0.8);
                         }
                     }
                 }
                 else
                 {
-                    int currDir = PlayerInfo.GetLastMouseFacingDirection();
+                    int currDir = playerInfo.GetLastMouseFacingDirection();
                     Color currCol = new Color(64, 220, 64, 128);
-                    DrawAnimation(spriteBatch, weapon, currDir, 0, currCol);
+                    DrawAnimation(playerInfo, spriteBatch, weapon, currDir, 0, currCol);
 
-                    int newDir = PlayerInfo.GetMouseFacingDirection();
+                    int newDir = playerInfo.GetMouseFacingDirection();
                     Color newCol = new Color(220, 64, 64, 128);
-                    DrawAnimation(spriteBatch, weapon, newDir, 0, newCol);
+                    DrawAnimation(playerInfo, spriteBatch, weapon, newDir, 0, newCol);
 
                 }
             }
         }
-        public void DrawAnimation(SpriteBatch spriteBatch, MeleeWeapon weapon, int facingDirection, int index, Color rectColor)
+        public void DrawAnimation(PlayerInfo info, SpriteBatch spriteBatch, MeleeWeapon weapon, int facingDirection, int index, Color rectColor)
         {
-            Vector2 toolLoc = PlayerInfo.GetToolLocation(facingDirection);
+            Vector2 toolLoc = info.GetToolLocation(facingDirection);
             Vector2 tileLoc = Vector2.Zero;
             Vector2 tileLoc2 = Vector2.Zero;
-            Rectangle areaOfEffect = WeaponInfo.GetAreaOfEffect(weapon, (int)toolLoc.X, (int)toolLoc.Y, facingDirection, ref tileLoc, ref tileLoc2, PlayerInfo.BoundingBox, index);
+            Rectangle areaOfEffect = WeaponInfo.GetAreaOfEffect(weapon, (int)toolLoc.X, (int)toolLoc.Y, facingDirection, ref tileLoc, ref tileLoc2, info.BoundingBox, index);
 
-            DrawRectGlobal(spriteBatch, areaOfEffect, rectColor);
+            DrawRectGlobal(info.index, spriteBatch, areaOfEffect, rectColor);
         }
-        public void DrawAnimation(SpriteBatch spriteBatch, MeleeWeapon weapon, int facingDirection, int index, Color rectColor, Color textColor)
+        public void DrawAnimation(PlayerInfo info, SpriteBatch spriteBatch, MeleeWeapon weapon, int facingDirection, int index, Color rectColor, Color textColor)
         {
-            Vector2 toolLoc = PlayerInfo.GetToolLocation();
+            Vector2 toolLoc = info.GetToolLocation();
             Vector2 tileLoc = Vector2.Zero;
             Vector2 tileLoc2 = Vector2.Zero;
-            Rectangle areaOfEffect = WeaponInfo.GetAreaOfEffect(weapon, (int)toolLoc.X, (int)toolLoc.Y, facingDirection, ref tileLoc, ref tileLoc2, PlayerInfo.BoundingBox, index);
+            Rectangle areaOfEffect = WeaponInfo.GetAreaOfEffect(weapon, (int)toolLoc.X, (int)toolLoc.Y, facingDirection, ref tileLoc, ref tileLoc2, info.BoundingBox, index);
 
-            int numFrames = WeaponInfo.GetNumberOfSwingFrames(weapon, index);
-            DrawRectGlobal(spriteBatch, areaOfEffect, rectColor);
-            DrawCenteredTextInRectGlobal(spriteBatch, areaOfEffect, numFrames.ToString(), textColor, 1.5f, 1);
+            int numFrames = WeaponInfo.GetNumberOfSwingFrames(info, weapon, index);
+            DrawRectGlobal(info.index, spriteBatch, areaOfEffect, rectColor);
+            DrawCenteredTextInRectGlobal(info.index, spriteBatch, areaOfEffect, numFrames.ToString(), textColor, 1.5f, 1);
         }
     }
 }

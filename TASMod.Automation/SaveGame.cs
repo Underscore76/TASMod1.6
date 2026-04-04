@@ -14,17 +14,19 @@ namespace TASMod.Automation
         public override string Description => "advance frame through night save";
 
         public override bool ActiveUpdate(
+            int index,
             out TASKeyboardState kstate,
             out TASMouseState mstate,
             out TASGamePadState gstate
         )
         {
+            var menuInfo = InstanceCurrentMenu.Get(index);
             kstate = null;
             mstate = new TASMouseState(Controller.LastFrameMouse(), false, false);
             gstate = null;
-            if (CurrentMenu.IsSaveGame)
+            if (menuInfo.IsSaveGame)
             {
-                return !CurrentMenu.CanQuit;
+                return !menuInfo.CanQuit;
             }
             return false;
         }

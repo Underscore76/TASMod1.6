@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using ImGuiNET;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using StardewValley;
 
 namespace TASMod.Overlays
 {
@@ -38,12 +39,28 @@ namespace TASMod.Overlays
 
         public override void ActiveDraw(SpriteBatch spriteBatch)
         {
+            for (int i = 0; i < GameRunner.instance.gameInstances.Count; i++)
+            {
+                try
+                {
+                    DrawForInstance(i, spriteBatch);
+                }
+                catch (Exception e)
+                {
+                    ModEntry.Console.Log($"TileOutlines ActiveDraw Exception: {e}", StardewModdingAPI.LogLevel.Error);
+                }
+            }
+        }
+
+        public void DrawForInstance(int index, SpriteBatch spriteBatch)
+        {
             for (int i = 0; i < States.Count; ++i)
             {
-                DrawFilledTile(spriteBatch, States[i].Tile, States[i].BgColor);
+                DrawFilledTile(index, spriteBatch, States[i].Tile, States[i].BgColor);
                 if (DrawOrder)
                 {
                     DrawCenteredTextInTile(
+                        index,
                         spriteBatch,
                         States[i].Tile,
                         (i + 1).ToString(),

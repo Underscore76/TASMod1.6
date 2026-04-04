@@ -70,6 +70,21 @@ namespace TASMod.System
             }
         }
 
+        public static long NextFrameTicks
+        {
+            get
+            {
+                DateTime ret = EpochNow;
+                ret = ret.AddMilliseconds(FrameTimeSpan.TotalMilliseconds * (CurrentFrame + 1));
+                return ret.Ticks;
+            }
+        }
+
+        public static DateTime NextFrameUtcNow
+        {
+            get { return new DateTime(NextFrameTicks); }
+        }
+
         public static int Ticks32
         {
             get

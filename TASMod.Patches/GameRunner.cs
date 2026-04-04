@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewValley;
 using TASMod.Extensions;
+using TASMod.Networking;
 using TASMod.System;
 using TASMod.Views;
 
@@ -43,6 +44,10 @@ namespace TASMod.Patches
         {
             CanDraw = (Counter + 1) == GameRunner_Update.Counter;
             gameTime = TASDateTime.CurrentGameTime;
+            if (CanDraw)
+            {
+                Controller.Timing.DrawPrefix();
+            }
             return CanDraw;
         }
 
@@ -50,6 +55,8 @@ namespace TASMod.Patches
         {
             if (CanDraw)
             {
+                Controller.Timing.DrawPostfix();
+                Controller.Timing.EndFrame();
                 Counter++;
                 TASDateTime.Update();
                 // NOTE: Allows for each frame to get new rng values to match Interop.GetRandomBytes
@@ -79,13 +86,14 @@ namespace TASMod.Patches
             {
                 GameRunner.LoadInstance(instance2);
                 Viewport old_viewport = GameRunner.instance.GraphicsDevice.Viewport;
+                Game1.graphics.GraphicsDevice.Viewport = new Viewport(0, 0, Math.Min(instance2.localMultiplayerWindow.Width, Game1.graphics.GraphicsDevice.PresentationParameters.BackBufferWidth), Math.Min(instance2.localMultiplayerWindow.Height, Game1.graphics.GraphicsDevice.PresentationParameters.BackBufferHeight));
                 Game1_renderScreenBuffer.Base(instance2.screen, instance2.uiScreen);
                 GameRunner.instance.GraphicsDevice.Viewport = old_viewport;
             }
 
             if (LocalMultiplayer.IsLocalMultiplayer())
             {
-                GameRunner.instance.GraphicsDevice.Clear(Color.White);
+                GameRunner.instance.GraphicsDevice.Clear(Game1.bgColor);
                 foreach (Game1 gameInstance in GameRunner.instance.gameInstances)
                 {
                     Game1.isRenderingScreenBuffer = true;
@@ -165,6 +173,7 @@ namespace TASMod.Patches
             }
             if (Controller.FastAdvance)
             {
+                ActiveInstance.LoadZero(); // forces the load state to neutral so an update can fire safely
                 if (Controller.PlaybackFrame == -1 || (int)TASDateTime.CurrentFrame < Controller.PlaybackFrame)
                 {
                     __instance.RunFast();
@@ -184,6 +193,12 @@ namespace TASMod.Patches
                 CanUpdate = Controller.Update();
                 gameTime = TASDateTime.CurrentGameTime;
             }
+            if (CanUpdate)
+            {
+                Controller.Timing.StartFrame();
+                Controller.Timing.UpdatePrefix();
+                ActiveInstance.LoadZero(); // forces the load state to neutral so an update can fire safely
+            }
             return CanUpdate;
         }
 
@@ -191,6 +206,7 @@ namespace TASMod.Patches
         {
             if (CanUpdate)
             {
+                Controller.Timing.UpdatePostfix();
                 Counter++;
             }
             else

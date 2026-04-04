@@ -52,11 +52,19 @@ namespace TASMod.Scripting
             LuaState.DoString("import ('TASMod.Patches')");
             LuaState.DoString("import ('TASMod.System')");
             LuaState.DoString("import ('TASMod.Minigames')");
+            LuaState.DoString("import ('TASMod.Networking')");
+            LuaState.DoString("import ('TASMod.Recording')");
             LuaState.DoString("import ('TASMod.Simulators')");
             LuaState.DoString("import ('TASMod.Views')");
             LuaState.DoString("import ('TASMod.Scripting')");
             LuaState.DoString("import ('TASMod.Simulators.SkullCaverns')");
             LuaState.DoString("import ('TASMod.Simulators.Fishing')");
+            LuaState.DoString("import ('TASMod.Simulators.CutWeed')");
+            LuaState.DoString("import ('TASMod.Simulators.GemNode')");
+            LuaState.DoString("import ('TASMod.Simulators.TreeHit')");
+            LuaState.DoString("import ('TASMod.Simulators.EnemyKill')");
+            LuaState.DoString("import ('TASMod.Simulators.FishingMinigame')");
+            LuaState.DoString("import ('TASMod.Overlays.Widgets')");
         }
 
         public static void LoadAllFiles()
@@ -171,6 +179,11 @@ namespace TASMod.Scripting
             HasBooted = true;
         }
 
+        public static void GarbageCollect()
+        {
+            LuaState.State.GarbageCollector(KeraLua.LuaGC.Collect, 0);
+        }
+
         public static string FormatError(string message, Exception innerException)
         {
             string err = message;
@@ -188,6 +201,13 @@ namespace TASMod.Scripting
                 curr += item + " ";
             }
             err += "\n\t" + curr;
+            foreach (var line in innerException.StackTrace.Split("\n"))
+            {
+                // Remove home directory from stack trace lines
+                string homePath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+                string sanitizedLine = line.Replace(homePath, "~");
+                err += "\n\t" + sanitizedLine.Trim();
+            }
             return err;
         }
     }

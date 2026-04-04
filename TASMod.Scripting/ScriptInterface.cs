@@ -17,6 +17,7 @@ using TASMod.Extensions;
 using TASMod.Helpers;
 using TASMod.Inputs;
 using TASMod.Minigames;
+using TASMod.Networking;
 using TASMod.Recording;
 using TASMod.Simulators;
 using TASMod.Simulators.SkullCaverns;
@@ -120,7 +121,7 @@ namespace TASMod.Scripting
         public bool HasStep
 #pragma warning restore CA1822 // Mark members as static
         {
-            get { return TASInputState.Active; }
+            get { return Controller.HasUpdate(); }
         }
 
         public void WaitPrefix()
@@ -155,12 +156,14 @@ namespace TASMod.Scripting
                 input,
                 out TASKeyboardState kstate,
                 out TASMouseState mstate,
+                out TASGamePadState[] gstate,
                 out string injectText
             );
             Controller.State.FrameStates.Add(
                 new FrameState(
-                    kstate.GetKeyboardState(),
-                    mstate.GetMouseState(),
+                    kstate,
+                    mstate,
+                    gstate,
                     inject: injectText
                 )
             );
@@ -180,10 +183,43 @@ namespace TASMod.Scripting
             Controller.AcceptRealInput = true;
         }
 
+        public void ClearGamePadInputQueues()
+        {
+            GamePadInputQueue.Clear();
+        }
+
+        public void AddGamePadInput(int index, LuaTable tbl)
+        {
+            if (tbl != null)
+            {
+                var gState = new TASGamePadState
+                {
+                    DPadUp = Convert.ToBoolean(tbl["up"]),
+                    DPadDown = Convert.ToBoolean(tbl["down"]),
+                    DPadLeft = Convert.ToBoolean(tbl["left"]),
+                    DPadRight = Convert.ToBoolean(tbl["right"]),
+                    ButtonStart = Convert.ToBoolean(tbl["start"]),
+                    ButtonSelect = Convert.ToBoolean(tbl["select"]),
+                    ButtonZL = Convert.ToBoolean(tbl["zl"]),
+                    ButtonZR = Convert.ToBoolean(tbl["zr"]),
+                    ButtonA = Convert.ToBoolean(tbl["a"]),
+                    ButtonB = Convert.ToBoolean(tbl["b"]),
+                    ButtonX = Convert.ToBoolean(tbl["x"]),
+                    ButtonY = Convert.ToBoolean(tbl["y"]),
+                    ButtonL = Convert.ToBoolean(tbl["lt"]),
+                    ButtonR = Convert.ToBoolean(tbl["rt"]),
+                    AnalogX = Convert.ToSingle(tbl["rx"]),
+                    AnalogY = Convert.ToSingle(tbl["ry"])
+                };
+                GamePadInputQueue.PushGamePadInput(index, gState);
+            }
+        }
+
         public static void ReadInputStates(
             LuaTable input,
             out TASKeyboardState kstate,
             out TASMouseState mstate,
+            out TASGamePadState[] gstate,
             out string injectText
         )
         {
@@ -221,6 +257,8 @@ namespace TASMod.Scripting
             {
                 mstate = new TASMouseState(Controller.LastFrameMouse(), false, false);
             }
+
+            gstate = GamePadInputQueue.GetNextInputs();
         }
 
         public void ResetGame(int frame)
@@ -347,6 +385,8 @@ namespace TASMod.Scripting
         public Item TrySpawnChestFloorItem(int menuFrames, int unpausedRandomOffset, bool tryCursor)
         {
             // stash state
+            ActiveInstance.LoadZero();
+            var location = InstanceCurrentLocation.Get(0);
             ICue old_cue = Game1.currentSong;
             Random old_random = Game1.random.Copy();
             Random sharedRandom = RandomExtensions.SharedRandom.Copy();
@@ -394,7 +434,7 @@ namespace TASMod.Scripting
             RandomExtensions.Update();
 
             // build the mineshaft
-            MineShaft mineShaft = new MineShaft(CurrentLocation.MineLevel + 1);
+            MineShaft mineShaft = new MineShaft(location.MineLevel + 1);
             Controller.Console.Warn(
                 $"\test: b:generateContents: {Game1.random.get_Index():D4} {mineShaft.mineRandom.get_Index():D4}"
             );
@@ -446,6 +486,7 @@ namespace TASMod.Scripting
         public MineShaft SpawnNextMineShaftWithOffset(int offset)
         {
             // stash state
+            ActiveInstance.LoadZero();
             ICue old_cue = Game1.currentSong;
             Random old_random = Game1.random.Copy();
             Random sharedRandom = RandomExtensions.SharedRandom.Copy();
@@ -472,7 +513,7 @@ namespace TASMod.Scripting
             }
 
             // build the mineshaft
-            MineShaft mineShaft = new MineShaft(CurrentLocation.MineLevel + 1);
+            MineShaft mineShaft = new MineShaft(((Game1.currentLocation as MineShaft)?.mineLevel ?? 0) + 1);
             Reflector.InvokeMethod(mineShaft, "generateContents");
 
             // advance up to the add chest call
@@ -501,9 +542,10 @@ namespace TASMod.Scripting
 
         public MineShaft SpawnMineShaft(int level)
         {
+            ActiveInstance.LoadZero();
             // stash state
-            ICue old_cue = Game1.currentSong;
             Random old_random = Game1.random.Copy();
+            ICue old_cue = Game1.game1.instanceCurrentSong;
             Random sharedRandom = RandomExtensions.SharedRandom.Copy();
 
             int LowestMineLevel = MineShaft.lowestLevelReached;
@@ -529,10 +571,10 @@ namespace TASMod.Scripting
                 }
             }
             Reflector.InvokeMethod(mineShaft, "addLevelChests");
-
             // reset the state
-            Game1.currentSong = old_cue;
+            Game1.game1.instanceCurrentSong = old_cue;
             Game1.random = old_random;
+            Reflector.SetStaticVar(0, "Game1_random", old_random);
             RandomExtensions.SharedRandom = sharedRandom;
             MineShaft.lowestLevelReached = LowestMineLevel;
             MineShaft.mushroomLevelsGeneratedToday = mushroomLevelsGeneratedToday;
@@ -568,6 +610,40 @@ namespace TASMod.Scripting
         public void Kill()
         {
             Process.GetCurrentProcess().Kill();
+        }
+
+        public object InspectStaticVars(int index, string key)
+        {
+            try
+            {
+                var obj = GameRunner.instance.gameInstances[index].staticVarHolder;
+                return Reflector.GetValue(obj, key);
+            }
+            catch (Exception)
+            {
+                Console.PushResult($"failed to get static var {index}:{key}");
+                return null;
+            }
+        }
+
+        public bool SetStaticVars(int index, string key, object value)
+        {
+            try
+            {
+                var obj = GameRunner.instance.gameInstances[index].staticVarHolder;
+                Reflector.SetValue(obj, key, value);
+                return true;
+            }
+            catch (Exception)
+            {
+                Console.PushResult($"failed to set static var {index}:{key}");
+                return false;
+            }
+        }
+
+        public void LoadGameByIndex(int index)
+        {
+            GameRunner.LoadInstance(GameRunner.instance.gameInstances[index], true);
         }
     }
 }

@@ -38,10 +38,10 @@ namespace TASMod
         {
             // need to trigger before GameRunner gets fully launched
             (GameRunner.instance as Game).Window.AllowUserResizing = false;
-            foreach (var mode in Game1.graphics.GraphicsDevice.Adapter.SupportedDisplayModes)
-            {
-                ModEntry.Console.Log($"{mode.Width}x{mode.Height} ({mode.AspectRatio}) {mode.TitleSafeArea}");
-            }
+            // foreach (var mode in Game1.graphics.GraphicsDevice.Adapter.SupportedDisplayModes)
+            // {
+            //     ModEntry.Console.Log($"{mode.Width}x{mode.Height} ({mode.AspectRatio}) {mode.TitleSafeArea}");
+            // }
 
             try
             {

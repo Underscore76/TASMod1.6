@@ -1,3 +1,4 @@
+// TODO: this only works for single player for now
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -74,7 +75,7 @@ namespace TASMod.Overlays
             }
         }
 
-        public void DrawState(SpriteBatch spriteBatch, JunimoKartState state, Color color)
+        public void DrawState(int index, SpriteBatch spriteBatch, JunimoKartState state, Color color)
         {
             if (!DoDraw)
             {
@@ -83,6 +84,7 @@ namespace TASMod.Overlays
             foreach (KartPath path in state.Paths)
             {
                 DrawLineLocal(
+                    index,
                     spriteBatch,
                     state.TransformDraw(path.Start),
                     state.TransformDraw(path.End),
@@ -94,11 +96,11 @@ namespace TASMod.Overlays
             if (state.Game.player is PlayerMineCartCharacter player)
             {
                 Rectangle rect = player.GetBounds();
-                DrawRectLocal(spriteBatch, state.TransformDraw(rect), color, 4);
+                DrawRectLocal(index, spriteBatch, state.TransformDraw(rect), color, 4);
             }
         }
 
-        public void DrawState(SpriteBatch spriteBatch, JunimoKartState state)
+        public void DrawState(int index, SpriteBatch spriteBatch, JunimoKartState state)
         {
             if (!DoDraw)
             {
@@ -129,6 +131,7 @@ namespace TASMod.Overlays
                         break;
                 }
                 DrawLineLocal(
+                    index,
                     spriteBatch,
                     state.TransformDraw(path.Start),
                     state.TransformDraw(path.End),
@@ -141,7 +144,7 @@ namespace TASMod.Overlays
             if (state.Game.player is PlayerMineCartCharacter player)
             {
                 Rectangle rect = player.GetBounds();
-                DrawRectLocal(spriteBatch, state.TransformDraw(rect), Color.Blue, 4);
+                DrawRectLocal(index, spriteBatch, state.TransformDraw(rect), Color.Blue, 4);
             }
         }
     }

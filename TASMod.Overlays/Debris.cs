@@ -14,11 +14,27 @@ namespace TASMod.Overlays
 
         public override void ActiveDraw(SpriteBatch spriteBatch)
         {
-            if (Game1.currentLocation == null)
+            for (int i = 0; i < GameRunner.instance.gameInstances.Count; i++)
+            {
+                try
+                {
+                    DrawForInstance(i, spriteBatch);
+                }
+                catch (Exception e)
+                {
+                    Error($"Debris ActiveDraw Exception: {e}");
+                }
+            }
+        }
+        public void DrawForInstance(int index, SpriteBatch spriteBatch)
+        {
+            var currentLocation = InstanceCurrentLocation.Get(index).Location;
+            var player = InstanceCurrentPlayer.Get(index).Player;
+            if (currentLocation == null)
                 return;
-            if (Game1.currentLocation.debris.Count == 0)
+            if (currentLocation.debris.Count == 0)
                 return;
-            foreach (var debris in Game1.currentLocation.debris)
+            foreach (var debris in currentLocation.debris)
             {
                 Vector2 vec = approximatePosition(debris);
                 /*
@@ -28,7 +44,7 @@ namespace TASMod.Overlays
                     else
                         radius + X + 32 >= pX >= -radius + X + 32
                 */
-                int appliedMagneticRadius = Game1.player.GetAppliedMagneticRadius();
+                int appliedMagneticRadius = player.GetAppliedMagneticRadius();
                 Rectangle rect = new Rectangle(
                     (int)(-appliedMagneticRadius + vec.X + 32),
                     (int)(-appliedMagneticRadius + vec.Y + 32),
@@ -37,18 +53,21 @@ namespace TASMod.Overlays
                 );
                 if (debris.itemId.Value == null)
                     continue;
+                if (debris.itemId.Value.Length < 3 || debris.itemId.Value.Substring(0, 3) != "(O)")
+                    continue;
                 string name = DropInfo.ObjectName(debris.itemId.Value.Substring(3));
                 if (name == "unknown")
                     continue;
-                if (playerInRange(vec, Game1.player))
+                if (playerInRange(vec, player))
                 {
-                    DrawRectOutline(spriteBatch, rect, Color.Green, 2);
+                    DrawRectOutline(index, spriteBatch, rect, Color.Green, 2);
                 }
                 else
                 {
-                    DrawRectOutline(spriteBatch, rect, Color.Purple, 2);
+                    DrawRectOutline(index, spriteBatch, rect, Color.Purple, 2);
                 }
                 DrawTextGlobal(
+                        index,
                         spriteBatch,
                         name,
                         vec,

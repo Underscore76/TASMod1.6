@@ -10,6 +10,7 @@ namespace TASMod.Console.Commands
 
         public override void Run(string[] tokens)
         {
+            Controller.Console.SaveConsoleState();
             Program.gamePtr.Exit();
         }
     }

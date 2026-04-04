@@ -53,8 +53,13 @@ namespace TASMod.Inputs
 
         public static void Write(TextBox textBox, string text)
         {
-            if (textBox != null)
+            if (textBox != null && textBox.Text != text)
             {
+                if (text.Contains('\n'))
+                {
+                    Reflector.SetValue(textBox, "_text", text);
+                    return;
+                }
                 textBox.Text = "";
                 foreach (char c in text)
                 {

@@ -7,18 +7,22 @@ using StardewValley;
 using TASMod.System;
 using TASMod.Extensions;
 using TASMod.Inputs;
+using StardewValley.Objects;
+using TASMod.Overlays.Widgets;
+using TASMod.Patches;
+using TASMod.Recording;
+using TASMod.Networking;
+using System.Linq;
 using TASMod.Console;
 using System;
-using System.Diagnostics;
-using System.Runtime.CompilerServices;
-using StardewValley.Minigames;
-using StardewValley.Objects;
 
 namespace TASMod.Overlays
 {
 
     public class ImGuiOverlay : IOverlay
     {
+        public static bool ShowControllers = true;
+        public static bool ShowObjectViewer = false;
         public static ImGuiRenderer GuiRenderer;
         public static RenderTarget2D imguiTarget;
         public Num.Vector4 MouseColor = Color.Black.ToVector4().ToNumerics();
@@ -41,16 +45,33 @@ namespace TASMod.Overlays
         {
         }
 
-        public void BuildLayout()
+        public void EngineLayout()
         {
-            ImGui.Begin("Engine");
+            if (!ImGui.Begin("Engine"))
+            {
+                ImGui.End();
+                return;
+            }
             if (ImGui.CollapsingHeader("Config"))
             {
                 if (ImGui.DragFloat("Window Scale", ref FontScale, 0.005f, 1, 2, "%.2f", ImGuiSliderFlags.AlwaysClamp))
                 {
                     ImGui.SetWindowFontScale(FontScale);
                 }
+                ImGui.Checkbox("Log External Messages", ref ExternalLogger.LogExternalMessages);
+                if (ImGui.IsItemHovered())
+                {
+                    string exportPath = Constants.StripUsername(ExternalLogger.ExportPath());
+                    ImGui.SetTooltip($"Writes to '{exportPath}' when enabled.");
+                }
+                ImGui.Checkbox("Show Object Viewer", ref ShowObjectViewer);
+                ImGui.Checkbox("Show Controllers", ref ShowControllers);
+                ImGui.SliderInt("Total Players", ref TASInputState.NumControllers, 2, 4);
+                ImGui.SliderInt("Active Instance", ref ActiveInstance.InstanceIndex, 0, GameRunner.instance.gameInstances.Count - 1);
             }
+
+            FileSelection.Draw();
+
             if (ImGui.CollapsingHeader("Overlays"))
             {
                 foreach (var overlay in OverlayManager.Overlays.Values)
@@ -59,6 +80,7 @@ namespace TASMod.Overlays
                     ImGui.Checkbox(overlay.Name, ref overlay.Active);
                 }
             }
+
             if (ImGui.CollapsingHeader("Logic"))
             {
                 foreach (var logic in AutomationManager.Automation.Values)
@@ -66,31 +88,11 @@ namespace TASMod.Overlays
                     ImGui.Checkbox(logic.Name, ref logic.Active);
                 }
             }
+
             if (ImGui.CollapsingHeader("State Info"))
             {
-                if (TextBoxInput.GetSelected() != null)
-                {
-                    // var helper = OverlayManager.Get<TextBoxHelper>();
-                    string text = TextBoxInput.Text;
-                    ImGui.InputTextMultiline("Multiline", ref text, 100000, new Num.Vector2(200, 100));
-                    TextBoxInput.Text = text;
-                }
-                else
-                {
-                    TextBoxInput.Text = "";
-                }
                 ImGui.Text($"State Name: {Controller.State.Prefix}");
                 ImGui.Text($"Frame: {TASDateTime.CurrentFrame}");
-                ImGui.Text($"Player Tile: {Game1.player.Tile.X},{Game1.player.Tile.Y}");
-                ImGui.SeparatorText("Last Frame Input");
-                if (Controller.State.FrameStates.Count > 0)
-                {
-                    ImGui.Text("Left Click: " + Controller.LastFrameMouse().LeftMouseClicked);
-                    ImGui.Text("Right Click: " + Controller.LastFrameMouse().RightMouseClicked);
-                    ImGui.Text($"Mouse Position: {Controller.LastFrameMouse().MouseX},{Controller.LastFrameMouse().MouseY}");
-                    string keys = string.Join(",", Controller.State.FrameStates.Last().keyboardState);
-                    ImGui.Text("Keyboard: " + keys);
-                }
             }
 
             foreach (var overlay in OverlayManager.Items)
@@ -102,34 +104,29 @@ namespace TASMod.Overlays
                     ImGui.PopID();
                 }
             }
-            if(Game1.player != null && ImGui.CollapsingHeader("Inventory"))
-            {
-                for(int i = 0; i < Game1.player.Items.Count; i++)
-                {
-                    var item = Game1.player.Items[i];
-                    if (item == null) continue;
-                    if (item is Furniture furniture)
-                    {
-                        ImGui.Text($"{i}: {furniture.Name} (dir: {furniture.GetSittingDirection()})");
-                    }
-                    else if(item is Tool tool)
-                    {
-                        ImGui.Text($"{i}: {tool.Name}");
-                    }
-                    else
-                    {
-                        ImGui.Text($"{i}: {item.Name} x{item.Stack}");
-                    }
-                }
-            }
+
             ImGui.End();
         }
 
         public override void ActiveDraw(SpriteBatch spriteBatch)
         {
             GuiRenderer.BeforeLayout(TASDateTime.CurrentGameTime);
-            BuildLayout();
-            // ImGui.ShowDemoWindow();
+            EngineLayout();
+
+            KeyboardMouseWindow.Draw(0);
+            if (ShowControllers)
+            {
+                for (int i = 1; i < TASInputState.NumControllers; i++)
+                {
+                    ControllerWindow.Draw(i);
+                }
+                DrawPlayerStatusWindow();
+            }
+            if (ShowObjectViewer)
+            {
+                ObjectViewerWindow.Draw();
+            }
+
             if (imguiTarget == null || imguiTarget.Width != Game1.graphics.PreferredBackBufferWidth || imguiTarget.Height != Game1.graphics.PreferredBackBufferHeight)
             {
                 imguiTarget?.Dispose();
@@ -141,6 +138,120 @@ namespace TASMod.Overlays
             GuiRenderer.AfterLayout();
             Game1.graphics.GraphicsDevice.SetRenderTargets(oldTargets);
             spriteBatch.Draw(imguiTarget, Vector2.Zero, Color.White);
+        }
+
+        private static void DrawPlayerStatusWindow()
+        {
+            ImGui.SetNextWindowPos(new Num.Vector2(10, 10), ImGuiCond.FirstUseEver);
+            ImGui.SetNextWindowSize(new Num.Vector2(200, 60), ImGuiCond.FirstUseEver);
+            ImGui.PushStyleVar(ImGuiStyleVar.WindowRounding, 5.0f);
+
+            if (ImGui.Begin("Player Status", ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.AlwaysAutoResize))
+            {
+                var drawList = ImGui.GetWindowDrawList();
+                var pos = ImGui.GetCursorScreenPos();
+                float squareSize = 20.0f;
+                float spacing = 5.0f;
+
+                int serverMessages = 0;
+                if (NetworkState.IncomingMessages.ContainsKey("SERVER"))
+                {
+                    serverMessages = NetworkState.IncomingMessages["SERVER"].Count;
+                }
+
+                float serverWidth = 40.0f;
+                Num.Vector4 serverBgColor = serverMessages > 0
+                    ? new Num.Vector4(1, 0, 0, 1)
+                    : new Num.Vector4(0.3f, 0.3f, 0.3f, 1);
+
+                drawList.AddRectFilled(
+                    new Num.Vector2(pos.X, pos.Y),
+                    new Num.Vector2(pos.X + serverWidth, pos.Y + squareSize),
+                    ImGui.ColorConvertFloat4ToU32(serverBgColor)
+                );
+
+                drawList.AddRect(
+                    new Num.Vector2(pos.X, pos.Y),
+                    new Num.Vector2(pos.X + serverWidth, pos.Y + squareSize),
+                    ImGui.ColorConvertFloat4ToU32(new Num.Vector4(0, 0, 0, 1))
+                );
+
+                string serverText = serverMessages.ToString();
+                var textSize = ImGui.CalcTextSize(serverText);
+                float textX = pos.X + (serverWidth - textSize.X) / 2;
+                float textY = pos.Y + (squareSize - textSize.Y) / 2;
+                drawList.AddText(
+                    new Num.Vector2(textX, textY),
+                    ImGui.ColorConvertFloat4ToU32(new Num.Vector4(1, 1, 1, 1)),
+                    serverText
+                );
+
+                float playerStartX = pos.X + serverWidth + spacing;
+
+                for (int i = 0; i < 4; i++)
+                {
+                    bool hasActivity = false;
+
+                    if (i == 0)
+                    {
+                        hasActivity = AutomationManager.AppliedLogic != null;
+                    }
+                    else if (i < TASInputState.NumControllers)
+                    {
+                        hasActivity = GamePadInputQueue.HasInput(i) || GamePadInputQueue.HasPlayerCoroutine(i);
+                    }
+
+                    float x = playerStartX + i * (squareSize + spacing);
+                    float y = pos.Y;
+
+                    Num.Vector4 color = hasActivity
+                        ? new Num.Vector4(0, 1, 0, 1)
+                        : new Num.Vector4(0.5f, 0.5f, 0.5f, 1);
+
+                    drawList.AddRectFilled(
+                        new Num.Vector2(x, y),
+                        new Num.Vector2(x + squareSize, y + squareSize),
+                        ImGui.ColorConvertFloat4ToU32(color)
+                    );
+
+                    drawList.AddRect(
+                        new Num.Vector2(x, y),
+                        new Num.Vector2(x + squareSize, y + squareSize),
+                        ImGui.ColorConvertFloat4ToU32(new Num.Vector4(0, 0, 0, 1))
+                    );
+                }
+
+                float totalWidth = serverWidth + spacing + 4 * (squareSize + spacing) - spacing;
+                float totalHeight = squareSize + 5 + ImGui.GetTextLineHeight();
+
+                ImGui.Dummy(new Num.Vector2(totalWidth, totalHeight));
+
+                float labelY = pos.Y + squareSize + 5;
+
+                string srvLabel = "SRV";
+                var srvTextSize = ImGui.CalcTextSize(srvLabel);
+                float srvLabelX = pos.X + (serverWidth - srvTextSize.X) / 2;
+                drawList.AddText(
+                    new Num.Vector2(srvLabelX, labelY),
+                    ImGui.ColorConvertFloat4ToU32(new Num.Vector4(1, 1, 1, 1)),
+                    srvLabel
+                );
+
+                for (int i = 0; i < 4; i++)
+                {
+                    string playerLabel = $"P{i}";
+                    var playerTextSize = ImGui.CalcTextSize(playerLabel);
+                    float playerLabelX = playerStartX + i * (squareSize + spacing) + (squareSize - playerTextSize.X) / 2;
+
+                    drawList.AddText(
+                        new Num.Vector2(playerLabelX, labelY),
+                        ImGui.ColorConvertFloat4ToU32(new Num.Vector4(1, 1, 1, 1)),
+                        playerLabel
+                    );
+                }
+            }
+            ImGui.End();
+            ImGui.PopStyleVar();
         }
 
         public static bool ColorEdit4(string label, ref Color color)
