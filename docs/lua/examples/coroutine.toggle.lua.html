@@ -37,14 +37,14 @@
 <ul class="nowrap">
   <li><a href="../examples/coroutine.basic.lua.html">coroutine.basic.lua</a></li>
   <li><a href="../examples/coroutine.infiniteloop.lua.html">coroutine.infiniteloop.lua</a></li>
-  <li><a href="../examples/coroutine.toggle.lua.html">coroutine.toggle.lua</a></li>
+  <li><strong>coroutine.toggle.lua</strong></li>
   <li><a href="../examples/coroutine.watch.lua.html">coroutine.watch.lua</a></li>
   <li><a href="../examples/create_char.lua.html">create_char.lua</a></li>
   <li><a href="../examples/file_handling.lua.html">file_handling.lua</a></li>
   <li><a href="../examples/init.lua.html">init.lua</a></li>
   <li><a href="../examples/lua_overlay.lua.html">lua_overlay.lua</a></li>
   <li><a href="../examples/newgame.lua.html">newgame.lua</a></li>
-  <li><strong>use_keybinds.lua</strong></li>
+  <li><a href="../examples/use_keybinds.lua.html">use_keybinds.lua</a></li>
 </ul>
 <h2>Modules</h2>
 <ul class="nowrap">
@@ -78,27 +78,42 @@
 
 <div id="content">
 
-    <h2>use_keybinds.lua</h2>
+    <h2>coroutine.toggle.lua</h2>
 <pre>
-<span class="keyword">local</span> keybinds = <span class="global">require</span>(<span class="string">"core.keybinds"</span>)
+<span class="comment">---flip back and forth of a tile boundary by staging coroutines
+</span><span class="keyword">local</span> KeyboardAndMouse = <span class="global">require</span>(<span class="string">"core.input.kbm"</span>)
 
-<span class="comment">-- example for adding a custom keybind,
-</span><span class="comment">-- here we bind the key 'j' to an inlined function definition that animation cancels 10 times
-</span>keybinds.<span class="function-name">add</span>(Keys.J,
-    <span class="keyword">function</span>()
-        <span class="keyword">for</span> i = <span class="number">1</span>, <span class="number">10</span> <span class="keyword">do</span>
-            <span class="function-name">advance</span>({ keyboard = { Keys.C, Keys.RightShift, Keys.R, Keys.Delete } })
-        <span class="keyword">end</span>
-    <span class="keyword">end</span>
-)
+<span class="comment">-- lua requires forward declaring if we want to reference a variable before defining it
+</span><span class="keyword">local</span> walk_up, walk_down
 
-<span class="comment">-- we can also take an existing function and bind it to a key, and we can also add a description for the keybind
-</span><span class="keyword">local</span> <span class="keyword">function</span> <span class="function-name">z</span>()
-    <span class="keyword">for</span> i = <span class="number">1</span>, <span class="number">10</span> <span class="keyword">do</span>
-        <span class="function-name">advance</span>({ keyboard = { Keys.C, Keys.RightShift, Keys.R, Keys.Delete } })
+walk_down = <span class="keyword">function</span>()
+    <span class="comment">-- register another function to run after this one, could also be a named function
+</span>    KeyboardMouseInputQueue.<span class="function-name">PushFunction</span>(walk_up, <span class="string">"walk_up"</span>)
+
+    <span class="comment">-- walk until we cross the tile boundary
+</span>    <span class="keyword">local</span> kbm = KeyboardAndMouse.<span class="function-name">new</span>()
+    <span class="keyword">local</span> tile = Game1.player.Tile
+    <span class="keyword">while</span> Game1.player.Tile.Y == tile.Y <span class="keyword">do</span>
+        kbm:<span class="function-name">press_key</span>(Keys.S)
+        kbm:<span class="function-name">push</span>()
+        <span class="global">coroutine</span>.<span class="function-name">yield</span>()
     <span class="keyword">end</span>
 <span class="keyword">end</span>
-keybinds.<span class="function-name">add</span>(Keys.Z, z, <span class="string">"press z"</span>)</pre>
+walk_up = <span class="keyword">function</span>()
+    <span class="comment">-- walk until we cross the tile boundary
+</span>    <span class="keyword">local</span> kbm = KeyboardAndMouse.<span class="function-name">new</span>()
+    <span class="keyword">local</span> tile = Game1.player.Tile
+    <span class="keyword">while</span> Game1.player.Tile.Y == tile.Y <span class="keyword">do</span>
+        kbm:<span class="function-name">press_key</span>(Keys.W)
+        kbm:<span class="function-name">push</span>()
+        <span class="global">coroutine</span>.<span class="function-name">yield</span>()
+    <span class="keyword">end</span>
+    <span class="comment">-- as long as this happens before we exit out of this function, it'll register and apply
+</span>    KeyboardMouseInputQueue.<span class="function-name">PushFunction</span>(walk_down, <span class="string">"walk_down"</span>)
+<span class="keyword">end</span>
+
+<span class="comment">-- kicking off the process by assigning a coroutine
+</span>KeyboardMouseInputQueue.<span class="function-name">PushFunction</span>(walk_down, <span class="string">"walk_down"</span>)</pre>
 
 
 </div> <!-- id="content" -->

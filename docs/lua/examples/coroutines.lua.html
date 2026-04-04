@@ -1,0 +1,210 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>TAS Mod Lua Docs</title>
+    <link rel="stylesheet" href="../ldoc_new.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>TASMod 1.6</h1>
+
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+
+
+<h2>Examples</h2>
+<ul class="nowrap">
+  <li><strong>coroutines.lua</strong></li>
+  <li><a href="../examples/create_char.lua.html">create_char.lua</a></li>
+  <li><a href="../examples/file_handling.lua.html">file_handling.lua</a></li>
+  <li><a href="../examples/init.lua.html">init.lua</a></li>
+  <li><a href="../examples/lua_overlay.lua.html">lua_overlay.lua</a></li>
+  <li><a href="../examples/newgame.lua.html">newgame.lua</a></li>
+  <li><a href="../examples/use_keybinds.lua.html">use_keybinds.lua</a></li>
+</ul>
+<h2>Modules</h2>
+<ul class="nowrap">
+  <li><a href="../modules/aliases.html">aliases</a></li>
+  <li><a href="../modules/core.clickables.html">core.clickables</a></li>
+  <li><a href="../modules/core.collections.deque.html">core.collections.deque</a></li>
+  <li><a href="../modules/core.collections.stack.html">core.collections.stack</a></li>
+  <li><a href="../modules/core.common.html">core.common</a></li>
+  <li><a href="../modules/core.console.html">core.console</a></li>
+  <li><a href="../modules/core.engine.html">core.engine</a></li>
+  <li><a href="../modules/core.fileio.html">core.fileio</a></li>
+  <li><a href="../modules/core.input.html">core.input</a></li>
+  <li><a href="../modules/core.input.gamepad.html">core.input.gamepad</a></li>
+  <li><a href="../modules/core.input.kbm.html">core.input.kbm</a></li>
+  <li><a href="../modules/core.inventory.html">core.inventory</a></li>
+  <li><a href="../modules/core.keybinds.html">core.keybinds</a></li>
+  <li><a href="../modules/core.lua_utils.html">core.lua_utils</a></li>
+  <li><a href="../modules/core.replay.html">core.replay</a></li>
+  <li><a href="../modules/core.scripts.newgame.html">core.scripts.newgame</a></li>
+  <li><a href="../modules/core.scripts.startup.html">core.scripts.startup</a></li>
+  <li><a href="../modules/core.utilities.frame_stack.html">core.utilities.frame_stack</a></li>
+  <li><a href="../modules/core.view.html">core.view</a></li>
+  <li><a href="../modules/prelaunch.html">prelaunch</a></li>
+</ul>
+<h2>Readme</h2>
+<ul class="nowrap">
+  <li><a href="../readme/README.md.html">README</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+    <h2>coroutines.lua</h2>
+<pre>
+<span class="comment">--- this is an example of how to use coroutines to create more complex input behaviors
+</span><span class="comment">--- we can define code that will run across multiple frames/interplaying with the existing automation logic
+</span><span class="comment">--- * these coroutines can be registered by name and assigned as the active coroutine
+</span><span class="comment">--- * custom functions can be assigned manually to support things like closures or to allow a function to assign another function
+</span>
+<span class="keyword">local</span> KeyboardAndMouse = <span class="global">require</span>(<span class="string">"core.input.kbm"</span>)
+
+<span class="comment">---@section Example of registering a function and button in the imgui overlay
+</span><span class="comment">-- register a named function that we can set by name later
+</span>LuaFunctionRegistry.<span class="function-name">RegisterFunction</span>(
+    <span class="string">"walk_right"</span>, <span class="comment">-- name of the function we want to register
+</span>    <span class="comment">-- this is an inline function that defines our behavior
+</span>    <span class="keyword">function</span>()
+        <span class="keyword">local</span> tile = Game1.player.Tile
+        <span class="keyword">local</span> kbm = KeyboardAndMouse.<span class="function-name">new</span>()
+        <span class="keyword">while</span> Game1.player.Tile == tile <span class="keyword">do</span>
+            kbm:<span class="function-name">press_key</span>(Keys.D) <span class="comment">-- register the D key as being pressed
+</span>            kbm:<span class="function-name">push</span>()            <span class="comment">-- sends the game input
+</span>            <span class="global">coroutine</span>.<span class="function-name">yield</span>()     <span class="comment">-- yield control back to the game
+</span>        <span class="keyword">end</span>
+    <span class="keyword">end</span>,
+    <span class="string">"walk right until we reach the next tile"</span> <span class="comment">-- this is the description for this function
+</span>)
+
+LuaOverlay.<span class="function-name">AddButton</span>(
+    <span class="string">"Walk Right 1 Tile"</span>, <span class="comment">-- name of the button
+</span>    <span class="comment">-- inline function to run when we click the button in the imgui overlay
+</span>    <span class="keyword">function</span>()
+        <span class="comment">-- setting our current coroutine based on the registered function name
+</span>        KeyboardMouseInputQueue.<span class="function-name">PushNamedFunction</span>(<span class="string">"walk_right"</span>)
+    <span class="keyword">end</span>
+)
+
+<span class="comment">---@section Breaking out of a Bad Idea
+</span><span class="comment">-- its possible to generate a coroutine function that loops indefinitely if not careful
+</span><span class="comment">-- in order to break out, press both the '-' and '+' keys at the same time while the console is closed
+</span><span class="keyword">local</span> <span class="keyword">function</span> <span class="function-name">BAD_IDEA</span>()
+    <span class="keyword">local</span> kbm = KeyboardAndMouse.<span class="function-name">new</span>()
+    <span class="keyword">while</span> <span class="keyword">true</span> <span class="keyword">do</span>
+        kbm:<span class="function-name">push</span>()
+        <span class="global">coroutine</span>.<span class="function-name">yield</span>()
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+LuaOverlay.<span class="function-name">AddButton</span>(
+    <span class="string">"Freeze The Game"</span>, <span class="comment">-- name of the button
+</span>    <span class="comment">-- inline function to run when we click the button in the imgui overlay
+</span>    <span class="keyword">function</span>()
+        <span class="comment">-- registering a function that will start executing
+</span>        KeyboardMouseInputQueue.<span class="function-name">PushFunction</span>(
+            BAD_IDEA,                         <span class="comment">-- function to run
+</span>            <span class="string">"freeze_game"</span>,                    <span class="comment">-- name of the function for debugging purposes
+</span>            <span class="string">"will absolutely freeze the game"</span> <span class="comment">-- description of the function for debugging purposes
+</span>        )
+    <span class="keyword">end</span>
+)
+
+<span class="comment">---@section Register a coroutine that watches for behavior and reacts to it
+</span><span class="comment">-- example of a coroutine that watches for when the player is not holding a pickaxe and then swaps back to it
+</span><span class="keyword">local</span> inventory = <span class="global">require</span>(<span class="string">'core.inventory'</span>)
+<span class="keyword">local</span> <span class="keyword">function</span> <span class="function-name">swap_back</span>()
+    <span class="keyword">local</span> kbm = KeyboardAndMouse.<span class="function-name">new</span>()
+    <span class="keyword">while</span> <span class="keyword">true</span> <span class="keyword">do</span>
+        <span class="comment">-- if the player is holding a pickaxe, just yield and check again next frame
+</span>        <span class="keyword">local</span> current = Game1.player.CurrentTool
+        <span class="keyword">if</span> current ~= <span class="keyword">nil</span> <span class="keyword">and</span> current.Name ~= <span class="string">"Pickaxe"</span> <span class="keyword">then</span>
+            <span class="keyword">local</span> keys = inventory.<span class="function-name">GetInventoryKey</span>(<span class="string">"Pickaxe"</span>)
+            kbm:<span class="function-name">press_keys</span>(keys)
+            kbm:<span class="function-name">push</span>()
+        <span class="keyword">end</span>
+        <span class="global">coroutine</span>.<span class="function-name">yield</span>()
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+LuaOverlay.<span class="function-name">AddButton</span>(
+    <span class="string">"Swap to Pickaxe When Equipped"</span>,
+    <span class="keyword">function</span>()
+        KeyboardMouseInputQueue.<span class="function-name">PushFunction</span>(
+            swap_back,
+            <span class="string">"swap_back"</span>,
+            <span class="string">"will swap back to the previous tool"</span>
+        )
+    <span class="keyword">end</span>
+)
+
+<span class="comment">---@section flip back and forth of a tile boundary by staging coroutines
+</span><span class="keyword">local</span> walk_up, walk_down <span class="comment">-- lua requires forward declaring
+</span>
+walk_down = <span class="keyword">function</span>()
+    <span class="comment">-- register another function to run after this one
+</span>    KeyboardMouseInputQueue.<span class="function-name">PushFunction</span>(walk_up, <span class="string">"walk_up"</span>)
+
+    <span class="keyword">local</span> kbm = KeyboardAndMouse.<span class="function-name">new</span>()
+    <span class="keyword">local</span> tile = Game1.player.Tile
+    <span class="keyword">while</span> Game1.player.Tile.Y == tile.Y <span class="keyword">do</span>
+        kbm:<span class="function-name">press_key</span>(Keys.S)
+        kbm:<span class="function-name">push</span>()
+        <span class="global">coroutine</span>.<span class="function-name">yield</span>()
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+walk_up = <span class="keyword">function</span>()
+    <span class="keyword">local</span> kbm = KeyboardAndMouse.<span class="function-name">new</span>()
+    <span class="keyword">local</span> tile = Game1.player.Tile
+    <span class="keyword">while</span> Game1.player.Tile.Y == tile.Y <span class="keyword">do</span>
+        kbm:<span class="function-name">press_key</span>(Keys.W)
+        kbm:<span class="function-name">push</span>()
+        <span class="global">coroutine</span>.<span class="function-name">yield</span>()
+    <span class="keyword">end</span>
+    <span class="comment">-- as long as this happens before we exit out of this function, it'll register and apply
+</span>    KeyboardMouseInputQueue.<span class="function-name">PushFunction</span>(walk_down, <span class="string">"walk_down"</span>)
+<span class="keyword">end</span>
+LuaOverlay.<span class="function-name">AddButton</span>(
+    <span class="string">"Up and Down"</span>,
+    <span class="keyword">function</span>()
+        KeyboardMouseInputQueue.<span class="function-name">PushFunction</span>(
+            walk_down,
+            <span class="string">"walk_down"</span>
+        )
+    <span class="keyword">end</span>
+)</pre>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/lunarmodules/LDoc">LDoc 1.5.0</a></i>
+<i style="float:right;">Last updated 2026-04-04 17:53:18 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>

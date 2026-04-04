@@ -24,11 +24,14 @@ end
 function fs.push(f)
     if f == nil then
         f = interface:GetCurrentFrame()
+        if f == nil then
+            error("Could not get current frame")
+        end
     end
     if fs.last() ~= f then
         fs.stack:push(f)
     end
-    return f ---type:ignore
+    return f
 end
 
 ---pop a frame from the stack

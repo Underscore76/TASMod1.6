@@ -36,7 +36,7 @@
 <h2>Examples</h2>
 <ul class="nowrap">
   <li><a href="../examples/coroutine.basic.lua.html">coroutine.basic.lua</a></li>
-  <li><a href="../examples/coroutine.infiniteloop.lua.html">coroutine.infiniteloop.lua</a></li>
+  <li><strong>coroutine.infiniteloop.lua</strong></li>
   <li><a href="../examples/coroutine.toggle.lua.html">coroutine.toggle.lua</a></li>
   <li><a href="../examples/coroutine.watch.lua.html">coroutine.watch.lua</a></li>
   <li><a href="../examples/create_char.lua.html">create_char.lua</a></li>
@@ -44,7 +44,7 @@
   <li><a href="../examples/init.lua.html">init.lua</a></li>
   <li><a href="../examples/lua_overlay.lua.html">lua_overlay.lua</a></li>
   <li><a href="../examples/newgame.lua.html">newgame.lua</a></li>
-  <li><strong>use_keybinds.lua</strong></li>
+  <li><a href="../examples/use_keybinds.lua.html">use_keybinds.lua</a></li>
 </ul>
 <h2>Modules</h2>
 <ul class="nowrap">
@@ -78,27 +78,40 @@
 
 <div id="content">
 
-    <h2>use_keybinds.lua</h2>
+    <h2>coroutine.infiniteloop.lua</h2>
 <pre>
-<span class="keyword">local</span> keybinds = <span class="global">require</span>(<span class="string">"core.keybinds"</span>)
+<span class="comment">--- Breaking out of an Infinite Frame Advance Loop
+</span><span class="comment">-- its possible to generate a coroutine function that loops indefinitely if not careful
+</span><span class="comment">-- in order to break out, press both the '-' and '+' keys at the same time while the console is closed
+</span>
+<span class="keyword">local</span> KeyboardAndMouse = <span class="global">require</span>(<span class="string">"core.input.kbm"</span>)
 
-<span class="comment">-- example for adding a custom keybind,
-</span><span class="comment">-- here we bind the key 'j' to an inlined function definition that animation cancels 10 times
-</span>keybinds.<span class="function-name">add</span>(Keys.J,
-    <span class="keyword">function</span>()
-        <span class="keyword">for</span> i = <span class="number">1</span>, <span class="number">10</span> <span class="keyword">do</span>
-            <span class="function-name">advance</span>({ keyboard = { Keys.C, Keys.RightShift, Keys.R, Keys.Delete } })
-        <span class="keyword">end</span>
-    <span class="keyword">end</span>
-)
-
-<span class="comment">-- we can also take an existing function and bind it to a key, and we can also add a description for the keybind
-</span><span class="keyword">local</span> <span class="keyword">function</span> <span class="function-name">z</span>()
-    <span class="keyword">for</span> i = <span class="number">1</span>, <span class="number">10</span> <span class="keyword">do</span>
-        <span class="function-name">advance</span>({ keyboard = { Keys.C, Keys.RightShift, Keys.R, Keys.Delete } })
+<span class="comment">-- this function will run forever because we never escape the loop
+</span><span class="keyword">local</span> <span class="keyword">function</span> <span class="function-name">BAD_IDEA</span>()
+    <span class="keyword">local</span> kbm = KeyboardAndMouse.<span class="function-name">new</span>()
+    <span class="keyword">while</span> <span class="keyword">true</span> <span class="keyword">do</span>
+        kbm:<span class="function-name">push</span>() <span class="comment">-- send 1 frame of input to the game
+</span>        <span class="comment">--[[
+            WARNING WARNING WARNING
+            if you don't include a coroutine.yield in your loop, you WILL freeze the game
+            as the game will never get control back to process the frame
+        --]]</span>
+        <span class="global">coroutine</span>.<span class="function-name">yield</span>()
     <span class="keyword">end</span>
 <span class="keyword">end</span>
-keybinds.<span class="function-name">add</span>(Keys.Z, z, <span class="string">"press z"</span>)</pre>
+
+LuaOverlay.<span class="function-name">AddButton</span>(
+    <span class="string">"Freeze The Game"</span>, <span class="comment">-- name of the button
+</span>    <span class="comment">-- inline function to run when we click the button in the imgui overlay
+</span>    <span class="keyword">function</span>()
+        <span class="comment">-- registering a function that will start executing
+</span>        KeyboardMouseInputQueue.<span class="function-name">PushFunction</span>(
+            BAD_IDEA,                         <span class="comment">-- function to run
+</span>            <span class="string">"freeze_game"</span>,                    <span class="comment">-- name of the function for debugging purposes
+</span>            <span class="string">"will absolutely freeze the game"</span> <span class="comment">-- description of the function for debugging purposes
+</span>        )
+    <span class="keyword">end</span>
+)</pre>
 
 
 </div> <!-- id="content" -->

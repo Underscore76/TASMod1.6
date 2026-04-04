@@ -39,7 +39,7 @@
 
 <h2>Modules</h2>
 <ul class="nowrap">
-  <li><strong>aliases</strong></li>
+  <li><a href="../modules/aliases.html">aliases</a></li>
   <li><a href="../modules/core.clickables.html">core.clickables</a></li>
   <li><a href="../modules/core.collections.deque.html">core.collections.deque</a></li>
   <li><a href="../modules/core.collections.stack.html">core.collections.stack</a></li>
@@ -49,7 +49,7 @@
   <li><a href="../modules/core.fileio.html">core.fileio</a></li>
   <li><a href="../modules/core.input.html">core.input</a></li>
   <li><a href="../modules/core.input.gamepad.html">core.input.gamepad</a></li>
-  <li><a href="../modules/core.input.kbm.html">core.input.kbm</a></li>
+  <li><strong>core.input.kbm</strong></li>
   <li><a href="../modules/core.inventory.html">core.inventory</a></li>
   <li><a href="../modules/core.keybinds.html">core.keybinds</a></li>
   <li><a href="../modules/core.lua_utils.html">core.lua_utils</a></li>
@@ -82,8 +82,8 @@
 
 <div id="content">
 
-<h1>Module <code>aliases</code></h1>
-<p>NOTE: this file pollutes the global namespace with common named elements</p>
+<h1>Module <code>core.input.kbm</code></h1>
+<p>Wraps writing to the GamePadInputQueue</p>
 <p>
 
 </p>
@@ -92,40 +92,48 @@
 <h2><a href="#Functions">Functions</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" nowrap><a href="#view">view ()</a></td>
-	<td class="summary">swaps between different view states (base, map)</td>
+	<td class="name" nowrap><a href="#KeyboardAndMouse.new">KeyboardAndMouse.new ()</a></td>
+	<td class="summary">creates a new keyboard and mouse input object</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#save">save (name)</a></td>
-	<td class="summary">save the current TAS inputs to the current file</td>
+	<td class="name" nowrap><a href="#KeyboardAndMouse:clear">KeyboardAndMouse:clear ()</a></td>
+	<td class="summary">clears current keys and mouse buttons</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#saveas">saveas (name)</a></td>
-	<td class="summary">save the current TAS inputs to the specified file</td>
+	<td class="name" nowrap><a href="#KeyboardAndMouse:press_key">KeyboardAndMouse:press_key (key)</a></td>
+	<td class="summary">press a key</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#load">load (name)</a></td>
-	<td class="summary">load a TAS input file</td>
+	<td class="name" nowrap><a href="#KeyboardAndMouse:release_key">KeyboardAndMouse:release_key (key)</a></td>
+	<td class="summary">release a key</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#fload">fload (name)</a></td>
-	<td class="summary">fast load a TAS input file</td>
+	<td class="name" nowrap><a href="#KeyboardAndMouse:press_keys">KeyboardAndMouse:press_keys (keys)</a></td>
+	<td class="summary">press multiple keys</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#iload">iload (name)</a></td>
-	<td class="summary">incremental load a TAS input file, attempts to add new frames to end or resets</td>
+	<td class="name" nowrap><a href="#KeyboardAndMouse:mouse_left_down">KeyboardAndMouse:mouse_left_down ()</a></td>
+	<td class="summary">press the left mouse button</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#exec">exec (command)</a></td>
-	<td class="summary">run the specified command on the top level console</td>
+	<td class="name" nowrap><a href="#KeyboardAndMouse:mouse_left_up">KeyboardAndMouse:mouse_left_up ()</a></td>
+	<td class="summary">release the left mouse button</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#save_state_exists">save_state_exists (name)</a></td>
-	<td class="summary">check if a save state exists</td>
+	<td class="name" nowrap><a href="#KeyboardAndMouse:mouse_right_down">KeyboardAndMouse:mouse_right_down ()</a></td>
+	<td class="summary">press the right mouse button</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#dumpconsole">dumpconsole ()</a></td>
-	<td class="summary">dump console output to random file</td>
+	<td class="name" nowrap><a href="#KeyboardAndMouse:mouse_right_up">KeyboardAndMouse:mouse_right_up ()</a></td>
+	<td class="summary">release the right mouse button</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#KeyboardAndMouse:mouse_position">KeyboardAndMouse:mouse_position (x, y)</a></td>
+	<td class="summary">set the mouse position</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#KeyboardAndMouse:push">KeyboardAndMouse:push ()</a></td>
+	<td class="summary">pushes current keys and mouse buttons to the input queue and clears them</td>
 	</tr>
 </table>
 
@@ -137,158 +145,18 @@
 
     <dl class="function">
     <dt>
-    <a name = "view"></a>
-    <strong>view ()</strong>
+    <a name = "KeyboardAndMouse.new"></a>
+    <strong>KeyboardAndMouse.new ()</strong>
     </dt>
     <dd>
-    swaps between different view states (base, map)
+    creates a new keyboard and mouse input object
 
 
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "save"></a>
-    <strong>save (name)</strong>
-    </dt>
-    <dd>
-    save the current TAS inputs to the current file
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">name</span>
-         string|nil @name of file to save to (default: nil)
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "saveas"></a>
-    <strong>saveas (name)</strong>
-    </dt>
-    <dd>
-    save the current TAS inputs to the specified file
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">name</span>
-         string @name of file to save to
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "load"></a>
-    <strong>load (name)</strong>
-    </dt>
-    <dd>
-    load a TAS input file
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">name</span>
-         string @name of file to load
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "fload"></a>
-    <strong>fload (name)</strong>
-    </dt>
-    <dd>
-    fast load a TAS input file
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">name</span>
-         string @name of file to load
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "iload"></a>
-    <strong>iload (name)</strong>
-    </dt>
-    <dd>
-    incremental load a TAS input file, attempts to add new frames to end or resets
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">name</span>
-         string @name of file to load
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "exec"></a>
-    <strong>exec (command)</strong>
-    </dt>
-    <dd>
-    run the specified command on the top level console
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">command</span>
-         string command to execute
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "save_state_exists"></a>
-    <strong>save_state_exists (name)</strong>
-    </dt>
-    <dd>
-    check if a save state exists
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">name</span>
-         string @name of the save state
-        </li>
-    </ul>
 
     <h3>Returns:</h3>
     <ol>
 
-        boolean @whether the save state exists
+        KeyboardAndMouse - new keyboard and mouse input object
     </ol>
 
 
@@ -296,11 +164,164 @@
 
 </dd>
     <dt>
-    <a name = "dumpconsole"></a>
-    <strong>dumpconsole ()</strong>
+    <a name = "KeyboardAndMouse:clear"></a>
+    <strong>KeyboardAndMouse:clear ()</strong>
     </dt>
     <dd>
-    dump console output to random file
+    clears current keys and mouse buttons
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "KeyboardAndMouse:press_key"></a>
+    <strong>KeyboardAndMouse:press_key (key)</strong>
+    </dt>
+    <dd>
+    press a key
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">key</span>
+         Microsoft.Xna.Framework.Input.Keys the key to press
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "KeyboardAndMouse:release_key"></a>
+    <strong>KeyboardAndMouse:release_key (key)</strong>
+    </dt>
+    <dd>
+    release a key
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">key</span>
+         Microsoft.Xna.Framework.Input.Keys the key to release
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "KeyboardAndMouse:press_keys"></a>
+    <strong>KeyboardAndMouse:press_keys (keys)</strong>
+    </dt>
+    <dd>
+    press multiple keys
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">keys</span>
+         table the keys to press
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "KeyboardAndMouse:mouse_left_down"></a>
+    <strong>KeyboardAndMouse:mouse_left_down ()</strong>
+    </dt>
+    <dd>
+    press the left mouse button
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "KeyboardAndMouse:mouse_left_up"></a>
+    <strong>KeyboardAndMouse:mouse_left_up ()</strong>
+    </dt>
+    <dd>
+    release the left mouse button
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "KeyboardAndMouse:mouse_right_down"></a>
+    <strong>KeyboardAndMouse:mouse_right_down ()</strong>
+    </dt>
+    <dd>
+    press the right mouse button
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "KeyboardAndMouse:mouse_right_up"></a>
+    <strong>KeyboardAndMouse:mouse_right_up ()</strong>
+    </dt>
+    <dd>
+    release the right mouse button
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "KeyboardAndMouse:mouse_position"></a>
+    <strong>KeyboardAndMouse:mouse_position (x, y)</strong>
+    </dt>
+    <dd>
+    set the mouse position
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">x</span>
+         number the x position of the mouse
+        </li>
+        <li><span class="parameter">y</span>
+         number the y position of the mouse
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "KeyboardAndMouse:push"></a>
+    <strong>KeyboardAndMouse:push ()</strong>
+    </dt>
+    <dd>
+    pushes current keys and mouse buttons to the input queue and clears them
 
 
 

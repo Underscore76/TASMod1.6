@@ -49,7 +49,7 @@ namespace TASMod.Overlays.Widgets
             if (!hasInput) ImGui.EndDisabled();
 
             // Frame function status display with inline clear button
-            bool hasCoroutine = GamePadInputQueue.HasPlayerCoroutine(index);
+            bool hasCoroutine = GamePadInputQueue.HasCoroutine(index);
 
             if (hasCoroutine)
             {
@@ -63,13 +63,13 @@ namespace TASMod.Overlays.Widgets
             if (!hasCoroutine) ImGui.BeginDisabled();
             if (ImGui.Button("Clear##function"))
             {
-                GamePadInputQueue.ClearPlayerCoroutine(index);
+                GamePadInputQueue.ClearCoroutine(index);
             }
             if (!hasCoroutine) ImGui.EndDisabled();
 
             if (hasCoroutine)
             {
-                LuaCoroutine coroutine = GamePadInputQueue.GetPlayerCoroutine(index);
+                LuaCoroutine coroutine = GamePadInputQueue.GetCoroutine(index);
                 ImGui.Text($"Name: {coroutine?.Name}");
                 if (ImGui.IsItemHovered())
                 {
@@ -88,17 +88,17 @@ namespace TASMod.Overlays.Widgets
             // Function assignment section
             if (ImGui.CollapsingHeader("Assign Function"))
             {
-                var namedFunctions = GamePadInputQueue.FrameFunctionNames;
+                var namedFunctions = LuaFunctionRegistry.FrameFunctionNames;
                 if (namedFunctions.Count > 0)
                 {
                     ImGui.Text("Available Functions:");
                     foreach (var functionName in namedFunctions)
                     {
-                        var frameFunction = GamePadInputQueue.GetFunctionByName(functionName);
+                        var frameFunction = LuaFunctionRegistry.GetFunctionByName(functionName);
 
                         if (ImGui.Button($"Assign '{functionName}'"))
                         {
-                            GamePadInputQueue.SetPlayerCoroutine(index, functionName);
+                            GamePadInputQueue.SetCoroutine(index, functionName);
                         }
 
                         // Show description as tooltip

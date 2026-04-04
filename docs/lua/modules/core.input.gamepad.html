@@ -1,0 +1,481 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>TAS Mod Lua Docs</title>
+    <link rel="stylesheet" href="../ldoc_new.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>TASMod 1.6</h1>
+
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Functions">Functions</a></li>
+</ul>
+
+
+<h2>Modules</h2>
+<ul class="nowrap">
+  <li><a href="../modules/aliases.html">aliases</a></li>
+  <li><a href="../modules/core.clickables.html">core.clickables</a></li>
+  <li><a href="../modules/core.collections.deque.html">core.collections.deque</a></li>
+  <li><a href="../modules/core.collections.stack.html">core.collections.stack</a></li>
+  <li><a href="../modules/core.common.html">core.common</a></li>
+  <li><a href="../modules/core.console.html">core.console</a></li>
+  <li><a href="../modules/core.engine.html">core.engine</a></li>
+  <li><a href="../modules/core.fileio.html">core.fileio</a></li>
+  <li><a href="../modules/core.input.html">core.input</a></li>
+  <li><strong>core.input.gamepad</strong></li>
+  <li><a href="../modules/core.input.kbm.html">core.input.kbm</a></li>
+  <li><a href="../modules/core.inventory.html">core.inventory</a></li>
+  <li><a href="../modules/core.keybinds.html">core.keybinds</a></li>
+  <li><a href="../modules/core.lua_utils.html">core.lua_utils</a></li>
+  <li><a href="../modules/core.replay.html">core.replay</a></li>
+  <li><a href="../modules/core.scripts.newgame.html">core.scripts.newgame</a></li>
+  <li><a href="../modules/core.scripts.startup.html">core.scripts.startup</a></li>
+  <li><a href="../modules/core.utilities.frame_stack.html">core.utilities.frame_stack</a></li>
+  <li><a href="../modules/core.view.html">core.view</a></li>
+  <li><a href="../modules/prelaunch.html">prelaunch</a></li>
+</ul>
+<h2>Readme</h2>
+<ul class="nowrap">
+  <li><a href="../readme/README.md.html">README</a></li>
+</ul>
+<h2>Examples</h2>
+<ul class="nowrap">
+  <li><a href="../examples/coroutine.basic.lua.html">coroutine.basic.lua</a></li>
+  <li><a href="../examples/coroutine.infiniteloop.lua.html">coroutine.infiniteloop.lua</a></li>
+  <li><a href="../examples/coroutine.toggle.lua.html">coroutine.toggle.lua</a></li>
+  <li><a href="../examples/coroutine.watch.lua.html">coroutine.watch.lua</a></li>
+  <li><a href="../examples/create_char.lua.html">create_char.lua</a></li>
+  <li><a href="../examples/file_handling.lua.html">file_handling.lua</a></li>
+  <li><a href="../examples/init.lua.html">init.lua</a></li>
+  <li><a href="../examples/lua_overlay.lua.html">lua_overlay.lua</a></li>
+  <li><a href="../examples/newgame.lua.html">newgame.lua</a></li>
+  <li><a href="../examples/use_keybinds.lua.html">use_keybinds.lua</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Module <code>core.input.gamepad</code></h1>
+<p>Wraps writing to the GamePadInputQueue</p>
+<p>
+
+</p>
+
+
+<h2><a href="#Functions">Functions</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#Gamepad.new">Gamepad.new (index)</a></td>
+	<td class="summary">creates a new gamepad for player index (0 indexed so p1 = 0, p2 = 1, etc)</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Gamepad:num_staged">Gamepad:num_staged ()</a></td>
+	<td class="summary">gets the number of inputs currently staged in the queue for this gamepad</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Gamepad:clear">Gamepad:clear ()</a></td>
+	<td class="summary">clears current buttons</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Gamepad:up">Gamepad:up ()</a></td>
+	<td class="summary">press up</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Gamepad:down">Gamepad:down ()</a></td>
+	<td class="summary">press down</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Gamepad:left">Gamepad:left ()</a></td>
+	<td class="summary">press left</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Gamepad:right">Gamepad:right ()</a></td>
+	<td class="summary">press right</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Gamepad:a">Gamepad:a ()</a></td>
+	<td class="summary">press 'a' button</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Gamepad:b">Gamepad:b ()</a></td>
+	<td class="summary">press 'b' button</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Gamepad:x">Gamepad:x ()</a></td>
+	<td class="summary">press 'x' button</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Gamepad:y">Gamepad:y ()</a></td>
+	<td class="summary">press 'y' button</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Gamepad:start">Gamepad:start ()</a></td>
+	<td class="summary">press start button</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Gamepad:select">Gamepad:select ()</a></td>
+	<td class="summary">press select button</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Gamepad:lt">Gamepad:lt ()</a></td>
+	<td class="summary">press left trigger</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Gamepad:rt">Gamepad:rt ()</a></td>
+	<td class="summary">press right trigger</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Gamepad:zl">Gamepad:zl ()</a></td>
+	<td class="summary">press left bumper</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Gamepad:zr">Gamepad:zr ()</a></td>
+	<td class="summary">press right bumper</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Gamepad:analog">Gamepad:analog (x, y)</a></td>
+	<td class="summary">set the analog stick values, x and y should be between -1 and 1</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Gamepad:push">Gamepad:push ()</a></td>
+	<td class="summary">push the current buttons to the input queue and clear the staged buttons</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "Gamepad.new"></a>
+    <strong>Gamepad.new (index)</strong>
+    </dt>
+    <dd>
+    creates a new gamepad for player index (0 indexed so p1 = 0, p2 = 1, etc)
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">index</span>
+         number the player index for this gamepad (0 indexed so p1 = 0, p2 = 1, etc)
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        Gamepad - new gamepad object
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Gamepad:num_staged"></a>
+    <strong>Gamepad:num_staged ()</strong>
+    </dt>
+    <dd>
+    gets the number of inputs currently staged in the queue for this gamepad
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+        number the number of inputs currently staged
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Gamepad:clear"></a>
+    <strong>Gamepad:clear ()</strong>
+    </dt>
+    <dd>
+    clears current buttons
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Gamepad:up"></a>
+    <strong>Gamepad:up ()</strong>
+    </dt>
+    <dd>
+    press up
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Gamepad:down"></a>
+    <strong>Gamepad:down ()</strong>
+    </dt>
+    <dd>
+    press down
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Gamepad:left"></a>
+    <strong>Gamepad:left ()</strong>
+    </dt>
+    <dd>
+    press left
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Gamepad:right"></a>
+    <strong>Gamepad:right ()</strong>
+    </dt>
+    <dd>
+    press right
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Gamepad:a"></a>
+    <strong>Gamepad:a ()</strong>
+    </dt>
+    <dd>
+    press 'a' button
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Gamepad:b"></a>
+    <strong>Gamepad:b ()</strong>
+    </dt>
+    <dd>
+    press 'b' button
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Gamepad:x"></a>
+    <strong>Gamepad:x ()</strong>
+    </dt>
+    <dd>
+    press 'x' button
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Gamepad:y"></a>
+    <strong>Gamepad:y ()</strong>
+    </dt>
+    <dd>
+    press 'y' button
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Gamepad:start"></a>
+    <strong>Gamepad:start ()</strong>
+    </dt>
+    <dd>
+    press start button
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Gamepad:select"></a>
+    <strong>Gamepad:select ()</strong>
+    </dt>
+    <dd>
+    press select button
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Gamepad:lt"></a>
+    <strong>Gamepad:lt ()</strong>
+    </dt>
+    <dd>
+    press left trigger
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Gamepad:rt"></a>
+    <strong>Gamepad:rt ()</strong>
+    </dt>
+    <dd>
+    press right trigger
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Gamepad:zl"></a>
+    <strong>Gamepad:zl ()</strong>
+    </dt>
+    <dd>
+    press left bumper
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Gamepad:zr"></a>
+    <strong>Gamepad:zr ()</strong>
+    </dt>
+    <dd>
+    press right bumper
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Gamepad:analog"></a>
+    <strong>Gamepad:analog (x, y)</strong>
+    </dt>
+    <dd>
+    set the analog stick values, x and y should be between -1 and 1
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">x</span>
+         number the x value for the right stick, between -1 and 1
+        </li>
+        <li><span class="parameter">y</span>
+         number the y value for the right stick, between -1 and 1
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Gamepad:push"></a>
+    <strong>Gamepad:push ()</strong>
+    </dt>
+    <dd>
+    push the current buttons to the input queue and clear the staged buttons
+
+
+
+
+
+
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/lunarmodules/LDoc">LDoc 1.5.0</a></i>
+<i style="float:right;">Last updated 2026-04-04 18:09:34 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>

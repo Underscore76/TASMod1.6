@@ -40,11 +40,11 @@
   <li><a href="../examples/coroutine.toggle.lua.html">coroutine.toggle.lua</a></li>
   <li><a href="../examples/coroutine.watch.lua.html">coroutine.watch.lua</a></li>
   <li><a href="../examples/create_char.lua.html">create_char.lua</a></li>
-  <li><a href="../examples/file_handling.lua.html">file_handling.lua</a></li>
+  <li><strong>file_handling.lua</strong></li>
   <li><a href="../examples/init.lua.html">init.lua</a></li>
   <li><a href="../examples/lua_overlay.lua.html">lua_overlay.lua</a></li>
   <li><a href="../examples/newgame.lua.html">newgame.lua</a></li>
-  <li><strong>use_keybinds.lua</strong></li>
+  <li><a href="../examples/use_keybinds.lua.html">use_keybinds.lua</a></li>
 </ul>
 <h2>Modules</h2>
 <ul class="nowrap">
@@ -78,27 +78,27 @@
 
 <div id="content">
 
-    <h2>use_keybinds.lua</h2>
+    <h2>file_handling.lua</h2>
 <pre>
-<span class="keyword">local</span> keybinds = <span class="global">require</span>(<span class="string">"core.keybinds"</span>)
+<span class="keyword">local</span> fileio = <span class="global">require</span>(<span class="string">'core.fileio'</span>)
 
-<span class="comment">-- example for adding a custom keybind,
-</span><span class="comment">-- here we bind the key 'j' to an inlined function definition that animation cancels 10 times
-</span>keybinds.<span class="function-name">add</span>(Keys.J,
-    <span class="keyword">function</span>()
-        <span class="keyword">for</span> i = <span class="number">1</span>, <span class="number">10</span> <span class="keyword">do</span>
-            <span class="function-name">advance</span>({ keyboard = { Keys.C, Keys.RightShift, Keys.R, Keys.Delete } })
-        <span class="keyword">end</span>
-    <span class="keyword">end</span>
-)
+<span class="comment">-- Constants.ScriptsPath is mapped to StardewTAS1.6/Scripts directory
+</span><span class="keyword">local</span> testfile = Constants.ScriptsPath .. <span class="string">'/'</span> .. <span class="string">'test.dat'</span>
 
-<span class="comment">-- we can also take an existing function and bind it to a key, and we can also add a description for the keybind
-</span><span class="keyword">local</span> <span class="keyword">function</span> <span class="function-name">z</span>()
-    <span class="keyword">for</span> i = <span class="number">1</span>, <span class="number">10</span> <span class="keyword">do</span>
-        <span class="function-name">advance</span>({ keyboard = { Keys.C, Keys.RightShift, Keys.R, Keys.Delete } })
-    <span class="keyword">end</span>
-<span class="keyword">end</span>
-keybinds.<span class="function-name">add</span>(Keys.Z, z, <span class="string">"press z"</span>)</pre>
+<span class="comment">-- read some random data from a file, if it doesn't exist it will just return an empty table
+</span><span class="keyword">local</span> setup = fileio.<span class="function-name">ReadFileTable</span>(testfile)
+<span class="global">print</span>(setup)
+
+<span class="comment">-- modify the data
+</span>setup[<span class="string">'test'</span>] = <span class="string">'hello world'</span>
+setup[<span class="string">'number'</span>] = <span class="global">math</span>.<span class="function-name">random</span>()
+
+<span class="comment">-- write the modified data back to the file
+</span>fileio.<span class="function-name">WriteFileTable</span>(testfile, setup)
+
+<span class="comment">-- read the data back from the file to verify it was written correctly
+</span><span class="keyword">local</span> newsetup = fileio.<span class="function-name">ReadFileTable</span>(testfile)
+<span class="global">print</span>(newsetup)</pre>
 
 
 </div> <!-- id="content" -->

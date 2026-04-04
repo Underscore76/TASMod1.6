@@ -126,9 +126,9 @@ namespace TASMod.Scripting
 
         public void WaitPrefix()
         {
-        // uses the same logic as https://github.com/MonoGame/MonoGame/blob/develop/MonoGame.Framework/Game.cs#L58
-        // idea is to force a sleep until the next tick should fire
-        // not super accurate but from testing reaches pretty close to 60fps
+            // uses the same logic as https://github.com/MonoGame/MonoGame/blob/develop/MonoGame.Framework/Game.cs#L58
+            // idea is to force a sleep until the next tick should fire
+            // not super accurate but from testing reaches pretty close to 60fps
         PrefixTicks:
             var currentTicks = _gameTimer.Elapsed.Ticks;
             _accumulatedElapsedTime += TimeSpan.FromTicks(currentTicks - _previousTicks);
@@ -188,6 +188,16 @@ namespace TASMod.Scripting
             GamePadInputQueue.Clear();
         }
 
+        public void ClearKeyboardMouseInputQueue()
+        {
+            KeyboardMouseInputQueue.Clear();
+        }
+
+        public void ClearLuaFunctions()
+        {
+            LuaFunctionRegistry.Clear();
+        }
+
         public void AddGamePadInput(int index, LuaTable tbl)
         {
             if (tbl != null)
@@ -211,10 +221,24 @@ namespace TASMod.Scripting
                     AnalogX = Convert.ToSingle(tbl["rx"]),
                     AnalogY = Convert.ToSingle(tbl["ry"])
                 };
-                GamePadInputQueue.PushGamePadInput(index, gState);
+                GamePadInputQueue.PushInput(index, gState);
             }
         }
 
+        public void AddKeyboardMouseInput(LuaTable tbl)
+        {
+            if (tbl != null)
+            {
+                ReadInputStates(
+                    tbl,
+                    out TASKeyboardState kstate,
+                    out TASMouseState mstate,
+                    out _,
+                    out _
+                );
+                KeyboardMouseInputQueue.PushInput(kstate, mstate);
+            }
+        }
         public static void ReadInputStates(
             LuaTable input,
             out TASKeyboardState kstate,
@@ -243,19 +267,21 @@ namespace TASMod.Scripting
                 }
             }
 
+            var lastMouse = Controller.LastFrameMouse();
             if (mouse != null)
             {
-                mstate = new TASMouseState
+                mstate = new TASMouseState(lastMouse);
+                if (mouse["X"] != null && mouse["Y"] != null)
                 {
-                    MouseX = Convert.ToInt32(mouse["X"]),
-                    MouseY = Convert.ToInt32(mouse["Y"]),
-                    LeftMouseClicked = Convert.ToBoolean(mouse["left"]),
-                    RightMouseClicked = Convert.ToBoolean(mouse["right"])
-                };
+                    mstate.MouseX = Convert.ToInt32(mouse["X"]);
+                    mstate.MouseY = Convert.ToInt32(mouse["Y"]);
+                }
+                mstate.LeftMouseClicked = Convert.ToBoolean(mouse["left"]);
+                mstate.RightMouseClicked = Convert.ToBoolean(mouse["right"]);
             }
             else
             {
-                mstate = new TASMouseState(Controller.LastFrameMouse(), false, false);
+                mstate = new TASMouseState(lastMouse, false, false);
             }
 
             gstate = GamePadInputQueue.GetNextInputs();

@@ -42,9 +42,9 @@
   <li><a href="../examples/create_char.lua.html">create_char.lua</a></li>
   <li><a href="../examples/file_handling.lua.html">file_handling.lua</a></li>
   <li><a href="../examples/init.lua.html">init.lua</a></li>
-  <li><a href="../examples/lua_overlay.lua.html">lua_overlay.lua</a></li>
+  <li><strong>lua_overlay.lua</strong></li>
   <li><a href="../examples/newgame.lua.html">newgame.lua</a></li>
-  <li><strong>use_keybinds.lua</strong></li>
+  <li><a href="../examples/use_keybinds.lua.html">use_keybinds.lua</a></li>
 </ul>
 <h2>Modules</h2>
 <ul class="nowrap">
@@ -78,27 +78,39 @@
 
 <div id="content">
 
-    <h2>use_keybinds.lua</h2>
+    <h2>lua_overlay.lua</h2>
 <pre>
-<span class="keyword">local</span> keybinds = <span class="global">require</span>(<span class="string">"core.keybinds"</span>)
-
-<span class="comment">-- example for adding a custom keybind,
-</span><span class="comment">-- here we bind the key 'j' to an inlined function definition that animation cancels 10 times
-</span>keybinds.<span class="function-name">add</span>(Keys.J,
+<span class="comment">--- This file is for testing the LuaOverlay functionality. It adds some watch variables and a button to the overlay.
+</span>
+<span class="comment">-- Add a watch variable to the LuaOverlay for the player's name
+</span>LuaOverlay.<span class="function-name">AddData</span>(
+    <span class="string">"Player Name"</span>,
     <span class="keyword">function</span>()
-        <span class="keyword">for</span> i = <span class="number">1</span>, <span class="number">10</span> <span class="keyword">do</span>
-            <span class="function-name">advance</span>({ keyboard = { Keys.C, Keys.RightShift, Keys.R, Keys.Delete } })
+        <span class="keyword">if</span> Game1.player == <span class="keyword">nil</span> <span class="keyword">then</span>
+            <span class="keyword">return</span> <span class="string">"nil"</span>
         <span class="keyword">end</span>
+        <span class="keyword">return</span> Game1.player.Name
     <span class="keyword">end</span>
 )
 
-<span class="comment">-- we can also take an existing function and bind it to a key, and we can also add a description for the keybind
-</span><span class="keyword">local</span> <span class="keyword">function</span> <span class="function-name">z</span>()
-    <span class="keyword">for</span> i = <span class="number">1</span>, <span class="number">10</span> <span class="keyword">do</span>
-        <span class="function-name">advance</span>({ keyboard = { Keys.C, Keys.RightShift, Keys.R, Keys.Delete } })
+<span class="comment">-- Add a watch variable to the LuaOverlay for experience points
+</span>LuaOverlay.<span class="function-name">AddData</span>(
+    <span class="string">"Experience"</span>,
+    <span class="keyword">function</span>()
+        <span class="keyword">if</span> Game1.player == <span class="keyword">nil</span> <span class="keyword">then</span>
+            <span class="keyword">return</span> <span class="string">"[]"</span>
+        <span class="keyword">end</span>
+        <span class="keyword">return</span> Game1.player.experiencePoints:<span class="function-name">ToString</span>()
     <span class="keyword">end</span>
-<span class="keyword">end</span>
-keybinds.<span class="function-name">add</span>(Keys.Z, z, <span class="string">"press z"</span>)</pre>
+)
+
+<span class="comment">-- Add a button to the LuaOverlay that you can trigger via the UI
+</span>LuaOverlay.<span class="function-name">AddButton</span>(
+    <span class="string">"Test Button"</span>,
+    <span class="keyword">function</span>()
+        <span class="global">print</span>(<span class="string">"Button Pressed"</span>)
+    <span class="keyword">end</span>
+)</pre>
 
 
 </div> <!-- id="content" -->
