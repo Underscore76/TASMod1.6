@@ -342,6 +342,7 @@ namespace TASMod.Console
                         continue;
                     }
                     string text = new string('.', prefix.Length - 1) + " " + historyLog[index].Text;
+                    text = Constants.StripUsername(text);
                     text = text.Replace("\t", new string(' ', TABSTOP));
                     spriteBatch.DrawSafeString(
                         consoleFont,

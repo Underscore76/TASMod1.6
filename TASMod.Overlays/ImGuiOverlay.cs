@@ -14,6 +14,7 @@ using TASMod.Recording;
 using TASMod.Networking;
 using System.Linq;
 using TASMod.Console;
+using System;
 
 namespace TASMod.Overlays
 {
@@ -58,6 +59,11 @@ namespace TASMod.Overlays
                     ImGui.SetWindowFontScale(FontScale);
                 }
                 ImGui.Checkbox("Log External Messages", ref ExternalLogger.LogExternalMessages);
+                if (ImGui.IsItemHovered())
+                {
+                    string exportPath = Constants.StripUsername(ExternalLogger.ExportPath());
+                    ImGui.SetTooltip($"Writes to '{exportPath}' when enabled.");
+                }
                 ImGui.Checkbox("Show Object Viewer", ref ShowObjectViewer);
                 ImGui.Checkbox("Show Controllers", ref ShowControllers);
                 ImGui.SliderInt("Total Players", ref TASInputState.NumControllers, 2, 4);

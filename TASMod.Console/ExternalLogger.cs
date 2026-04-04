@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Security.Cryptography;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Channels;
@@ -20,6 +21,7 @@ namespace TASMod.Console
 
         public static bool LogExternalMessages = true;
         public static int Pid;
+        public static int RandomFileSeed;
 
         private static Channel<QueueItem> _channel;
         private static CancellationTokenSource _cts;
@@ -38,6 +40,7 @@ namespace TASMod.Console
                 }
 
                 Pid = pid;
+                RandomFileSeed = RandomNumberGenerator.GetInt32(0, int.MaxValue);
                 _channel = Channel.CreateUnbounded<QueueItem>(new UnboundedChannelOptions
                 {
                     SingleReader = true,
@@ -168,11 +171,17 @@ namespace TASMod.Console
                 Debug.WriteLine($"Failed to write message: {ex}");
             }
         }
+        public static string ExportPath(string prefix = null)
+        {
+            if (prefix == null)
+                prefix = GetCurrentPrefix();
+            return Path.Combine(Constants.ExportsPath, $"{prefix}.{Pid}.{RandomFileSeed}.out");
+        }
 
         private static async Task AppendLineAsync(string line)
         {
             string prefix = GetCurrentPrefix();
-            string path = Path.Combine(Constants.ExportsPath, $"{prefix}.{Pid}.out");
+            string path = ExportPath(prefix);
             if (!string.Equals(_writerPath, path, StringComparison.Ordinal))
             {
                 _writer?.Dispose();

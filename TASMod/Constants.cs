@@ -37,6 +37,12 @@ namespace TASMod
             Directory.CreateDirectory(path);
             return path;
         }
+
+        public static string StripUsername(string path)
+        {
+            // try to avoid doxxing a user if it shows up in file paths
+            return path.Replace(Environment.UserName, "<gamer>");
+        }
     }
 }
 
