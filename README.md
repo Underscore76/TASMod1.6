@@ -21,6 +21,8 @@ Console supports scrolling, entry selection, normal copy and paste (or it should
 
 ### Lua Support
 
+Docs Website: [https://underscore76.github.io/TASMod1.6/lua/index.html](https://underscore76.github.io/TASMod1.6/lua/index.html)
+
 Scripting in this TAS is done with Lua! By typing `lua` onto the console you'll enter into a Lua REPL (read-eval-print-loop), which will allow you to run arbitrary lua code. Documentation for the core lua engine functions can be found by navigating locally to docs/ldoc/index.html or you can browse the `TASMod/Assets/lua` folder where the lua files are stored.
 
 There is an example `init.lua` file in the `lua-examples` folder. The TASMod will look for a file called `init.lua` in the `StardewTAS1.6/Scripts/` folder and will run that file when first launching into the lua console. This allows you to define custom functions and aliases that you can use in the console. For example, you can define a function called `myfunc` in `init.lua` and then call it from the lua console with `myfunc()`. You can also do things like auto-load into a specific save state or configure the engine state by toggling overlays/logic etc (or loading a particular engine state).
