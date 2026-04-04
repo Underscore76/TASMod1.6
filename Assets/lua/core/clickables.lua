@@ -4,7 +4,7 @@ local intro_click_map = require('core.data.click_maps')
 local clickables = {}
 
 ---get a clickable object by name
----@param name string @the name of the object to get
+---@param name string|number @the name of the object to get
 function clickables.get_object_by_name(name)
     local items = interface:GetClickableObjects()
     if intro_click_map[name] ~= nil then
