@@ -24,7 +24,7 @@
 
 <div id="navigation">
 <br/>
-<h1>TASMod</h1>
+<h1>TASMod 1.6</h1>
 
 
 <ul>
@@ -42,7 +42,7 @@
   <li><a href="../modules/aliases.html">aliases</a></li>
   <li><a href="../modules/core.clickables.html">core.clickables</a></li>
   <li><a href="../modules/core.collections.deque.html">core.collections.deque</a></li>
-  <li><strong>core.collections.stack</strong></li>
+  <li><a href="../modules/core.collections.stack.html">core.collections.stack</a></li>
   <li><a href="../modules/core.common.html">core.common</a></li>
   <li><a href="../modules/core.console.html">core.console</a></li>
   <li><a href="../modules/core.engine.html">core.engine</a></li>
@@ -52,7 +52,7 @@
   <li><a href="../modules/core.replay.html">core.replay</a></li>
   <li><a href="../modules/core.scripts.newgame.html">core.scripts.newgame</a></li>
   <li><a href="../modules/core.scripts.startup.html">core.scripts.startup</a></li>
-  <li><a href="../modules/core.utilities.frame_stack.html">core.utilities.frame_stack</a></li>
+  <li><strong>core.utilities.frame_stack</strong></li>
   <li><a href="../modules/core.view.html">core.view</a></li>
   <li><a href="../modules/prelaunch.html">prelaunch</a></li>
 </ul>
@@ -61,40 +61,43 @@
 
 <div id="content">
 
-<h1>Module <code>core.collections.stack</code></h1>
-<p>A simple stack implementation in Lua</p>
+<h1>Module <code>core.utilities.frame_stack</code></h1>
+<p>Desc: frame stack utility
+defines a utility stack class for working with frames
+allows pushing and popping frames from the stack
+and fast resetting the game to the frame on top of the stack</p>
 <p></p>
 
 
 <h2><a href="#Functions">Functions</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" nowrap><a href="#Stack.new">Stack.new ()</a></td>
-	<td class="summary">initialize a new stack</td>
+	<td class="name" nowrap><a href="#fs.last">fs.last ()</a></td>
+	<td class="summary">get the last frame on the stack</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#Stack:push">Stack:push (value)</a></td>
-	<td class="summary">push a value onto the stack</td>
+	<td class="name" nowrap><a href="#fs.print">fs.print ()</a></td>
+	<td class="summary">print the frame stack</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#Stack:peek">Stack:peek ()</a></td>
-	<td class="summary">pull the top value from the stack without removing it</td>
+	<td class="name" nowrap><a href="#fs.push">fs.push (f)</a></td>
+	<td class="summary">push a frame to the stack</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#Stack:pop">Stack:pop ()</a></td>
-	<td class="summary">pop the top value off the stack</td>
+	<td class="name" nowrap><a href="#fs.pop">fs.pop ()</a></td>
+	<td class="summary">pop a frame from the stack</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#Stack:empty">Stack:empty ()</a></td>
-	<td class="summary">check if the stack is empty</td>
+	<td class="name" nowrap><a href="#fs.clear">fs.clear ()</a></td>
+	<td class="summary">clear the frame stack</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#Stack:size">Stack:size ()</a></td>
-	<td class="summary">check the size of the stack</td>
+	<td class="name" nowrap><a href="#fs.rw">fs.rw ()</a></td>
+	<td class="summary">fast reset the game to the last frame on the stack (NON-BLOCKING)</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#Stack:print">Stack:print ()</a></td>
-	<td class="summary">prints the stack contents to the console</td>
+	<td class="name" nowrap><a href="#fs.brw">fs.brw ()</a></td>
+	<td class="summary">fast reset the game to the last frame on the stack (BLOCKING)</td>
 	</tr>
 </table>
 
@@ -106,18 +109,18 @@
 
     <dl class="function">
     <dt>
-    <a name = "Stack.new"></a>
-    <strong>Stack.new ()</strong>
+    <a name = "fs.last"></a>
+    <strong>fs.last ()</strong>
     </dt>
     <dd>
-    initialize a new stack
+    get the last frame on the stack
 
 
 
     <h3>Returns:</h3>
     <ol>
 
-        table new stack object
+        number last frame number
     </ol>
 
 
@@ -125,66 +128,38 @@
 
 </dd>
     <dt>
-    <a name = "Stack:push"></a>
-    <strong>Stack:push (value)</strong>
+    <a name = "fs.print"></a>
+    <strong>fs.print ()</strong>
     </dt>
     <dd>
-    push a value onto the stack
+    print the frame stack
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "fs.push"></a>
+    <strong>fs.push (f)</strong>
+    </dt>
+    <dd>
+    push a frame to the stack
 
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">value</span>
-         any
+        <li><span class="parameter">f</span>
+         number|nil frame to push (defaults current frame)
         </li>
     </ul>
 
-
-
-
-
-</dd>
-    <dt>
-    <a name = "Stack:peek"></a>
-    <strong>Stack:peek ()</strong>
-    </dt>
-    <dd>
-    pull the top value from the stack without removing it
-
-
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "Stack:pop"></a>
-    <strong>Stack:pop ()</strong>
-    </dt>
-    <dd>
-    pop the top value off the stack
-
-
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "Stack:empty"></a>
-    <strong>Stack:empty ()</strong>
-    </dt>
-    <dd>
-    check if the stack is empty
-
-
-
     <h3>Returns:</h3>
     <ol>
 
-        boolean true if the stack is empty, false otherwise
+        number pushed frame number added to the stack
     </ol>
 
 
@@ -192,18 +167,18 @@
 
 </dd>
     <dt>
-    <a name = "Stack:size"></a>
-    <strong>Stack:size ()</strong>
+    <a name = "fs.pop"></a>
+    <strong>fs.pop ()</strong>
     </dt>
     <dd>
-    check the size of the stack
+    pop a frame from the stack
 
 
 
     <h3>Returns:</h3>
     <ol>
 
-        number the number of items in the stack
+        number|nil popped frame number removed from the stack
     </ol>
 
 
@@ -211,11 +186,39 @@
 
 </dd>
     <dt>
-    <a name = "Stack:print"></a>
-    <strong>Stack:print ()</strong>
+    <a name = "fs.clear"></a>
+    <strong>fs.clear ()</strong>
     </dt>
     <dd>
-    prints the stack contents to the console
+    clear the frame stack
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "fs.rw"></a>
+    <strong>fs.rw ()</strong>
+    </dt>
+    <dd>
+    fast reset the game to the last frame on the stack (NON-BLOCKING)
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "fs.brw"></a>
+    <strong>fs.brw ()</strong>
+    </dt>
+    <dd>
+    fast reset the game to the last frame on the stack (BLOCKING)
 
 
 
@@ -231,7 +234,7 @@
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/lunarmodules/LDoc">LDoc 1.5.0</a></i>
-<i style="float:right;">Last updated 2026-04-04 10:14:36 </i>
+<i style="float:right;">Last updated 2026-04-04 10:23:25 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

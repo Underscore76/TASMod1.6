@@ -24,7 +24,7 @@
 
 <div id="navigation">
 <br/>
-<h1>TASMod</h1>
+<h1>TASMod 1.6</h1>
 
 
 <ul>
@@ -41,8 +41,8 @@
 <ul class="nowrap">
   <li><a href="../modules/aliases.html">aliases</a></li>
   <li><a href="../modules/core.clickables.html">core.clickables</a></li>
-  <li><strong>core.collections.deque</strong></li>
-  <li><a href="../modules/core.collections.stack.html">core.collections.stack</a></li>
+  <li><a href="../modules/core.collections.deque.html">core.collections.deque</a></li>
+  <li><strong>core.collections.stack</strong></li>
   <li><a href="../modules/core.common.html">core.common</a></li>
   <li><a href="../modules/core.console.html">core.console</a></li>
   <li><a href="../modules/core.engine.html">core.engine</a></li>
@@ -61,40 +61,40 @@
 
 <div id="content">
 
-<h1>Module <code>core.collections.deque</code></h1>
-<p>A simple double-ended queue implementation in Lua</p>
+<h1>Module <code>core.collections.stack</code></h1>
+<p>A simple stack implementation in Lua</p>
 <p></p>
 
 
 <h2><a href="#Functions">Functions</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" nowrap><a href="#Deque.new">Deque.new ()</a></td>
-	<td class="summary">initialize a new queue</td>
+	<td class="name" nowrap><a href="#Stack.new">Stack.new ()</a></td>
+	<td class="summary">initialize a new stack</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#Deque:pushleft">Deque:pushleft (value)</a></td>
-	<td class="summary">push a value to the left end of the queue</td>
+	<td class="name" nowrap><a href="#Stack:push">Stack:push (value)</a></td>
+	<td class="summary">push a value onto the stack</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#Deque:pushright">Deque:pushright (value)</a></td>
-	<td class="summary">push a value to the right end of the queue</td>
+	<td class="name" nowrap><a href="#Stack:peek">Stack:peek ()</a></td>
+	<td class="summary">pull the top value from the stack without removing it</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#Deque:popleft">Deque:popleft ()</a></td>
-	<td class="summary">pop a value from the left end of the queue</td>
+	<td class="name" nowrap><a href="#Stack:pop">Stack:pop ()</a></td>
+	<td class="summary">pop the top value off the stack</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#Deque:popright">Deque:popright ()</a></td>
-	<td class="summary">pop a value from the right end of the queue</td>
+	<td class="name" nowrap><a href="#Stack:empty">Stack:empty ()</a></td>
+	<td class="summary">check if the stack is empty</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#Deque:empty">Deque:empty ()</a></td>
-	<td class="summary">check if the queue is empty</td>
+	<td class="name" nowrap><a href="#Stack:size">Stack:size ()</a></td>
+	<td class="summary">check the size of the stack</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#Deque:size">Deque:size ()</a></td>
-	<td class="summary">check the size of the queue</td>
+	<td class="name" nowrap><a href="#Stack:print">Stack:print ()</a></td>
+	<td class="summary">prints the stack contents to the console</td>
 	</tr>
 </table>
 
@@ -106,18 +106,18 @@
 
     <dl class="function">
     <dt>
-    <a name = "Deque.new"></a>
-    <strong>Deque.new ()</strong>
+    <a name = "Stack.new"></a>
+    <strong>Stack.new ()</strong>
     </dt>
     <dd>
-    initialize a new queue
+    initialize a new stack
 
 
 
     <h3>Returns:</h3>
     <ol>
 
-        table new queue object
+        table new stack object
     </ol>
 
 
@@ -125,11 +125,11 @@
 
 </dd>
     <dt>
-    <a name = "Deque:pushleft"></a>
-    <strong>Deque:pushleft (value)</strong>
+    <a name = "Stack:push"></a>
+    <strong>Stack:push (value)</strong>
     </dt>
     <dd>
-    push a value to the left end of the queue
+    push a value onto the stack
 
 
     <h3>Parameters:</h3>
@@ -145,19 +145,13 @@
 
 </dd>
     <dt>
-    <a name = "Deque:pushright"></a>
-    <strong>Deque:pushright (value)</strong>
+    <a name = "Stack:peek"></a>
+    <strong>Stack:peek ()</strong>
     </dt>
     <dd>
-    push a value to the right end of the queue
+    pull the top value from the stack without removing it
 
 
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">value</span>
-         any
-        </li>
-    </ul>
 
 
 
@@ -165,18 +159,32 @@
 
 </dd>
     <dt>
-    <a name = "Deque:popleft"></a>
-    <strong>Deque:popleft ()</strong>
+    <a name = "Stack:pop"></a>
+    <strong>Stack:pop ()</strong>
     </dt>
     <dd>
-    pop a value from the left end of the queue
+    pop the top value off the stack
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Stack:empty"></a>
+    <strong>Stack:empty ()</strong>
+    </dt>
+    <dd>
+    check if the stack is empty
 
 
 
     <h3>Returns:</h3>
     <ol>
 
-        any value popped from the left end of the queue
+        boolean true if the stack is empty, false otherwise
     </ol>
 
 
@@ -184,18 +192,18 @@
 
 </dd>
     <dt>
-    <a name = "Deque:popright"></a>
-    <strong>Deque:popright ()</strong>
+    <a name = "Stack:size"></a>
+    <strong>Stack:size ()</strong>
     </dt>
     <dd>
-    pop a value from the right end of the queue
+    check the size of the stack
 
 
 
     <h3>Returns:</h3>
     <ol>
 
-        any value popped from the right end of the queue
+        number the number of items in the stack
     </ol>
 
 
@@ -203,38 +211,14 @@
 
 </dd>
     <dt>
-    <a name = "Deque:empty"></a>
-    <strong>Deque:empty ()</strong>
+    <a name = "Stack:print"></a>
+    <strong>Stack:print ()</strong>
     </dt>
     <dd>
-    check if the queue is empty
+    prints the stack contents to the console
 
 
 
-    <h3>Returns:</h3>
-    <ol>
-
-        boolean true if the queue is empty, false otherwise
-    </ol>
-
-
-
-
-</dd>
-    <dt>
-    <a name = "Deque:size"></a>
-    <strong>Deque:size ()</strong>
-    </dt>
-    <dd>
-    check the size of the queue
-
-
-
-    <h3>Returns:</h3>
-    <ol>
-
-        number the number of items in the queue
-    </ol>
 
 
 
@@ -247,7 +231,7 @@
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/lunarmodules/LDoc">LDoc 1.5.0</a></i>
-<i style="float:right;">Last updated 2026-04-04 10:14:36 </i>
+<i style="float:right;">Last updated 2026-04-04 10:23:25 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>
