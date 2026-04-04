@@ -24,6 +24,7 @@ using TASMod.Scripting;
 using TASMod.System;
 using TASMod.Views;
 using TASMod.Networking;
+using TASMod.Monogame.Framework.Audio;
 
 namespace TASMod
 {
@@ -330,9 +331,9 @@ namespace TASMod
             ModEntry.Console.Log("Calling reset", LogLevel.Error);
             FastAdvance = fastAdvance;
             ResetGame = true;
-            if (Game1.audioEngine.Engine != null)
+            if (Game1.audioEngine is TASAudioEngine tasAudioEngine)
             {
-                Game1.audioEngine.Engine.Reset();
+                tasAudioEngine.Reset();
             }
             GameRunner_Update.Reset();
             GameRunner_Draw.Reset();

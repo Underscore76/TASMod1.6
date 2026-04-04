@@ -5,10 +5,10 @@ using System.Reflection.Emit;
 using HarmonyLib;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using StardewValley;
+using StardewValley.BellsAndWhistles;
 using TASMod.Extensions;
-using TASMod.System;
+using TASMod.Monogame.Framework.Audio;
 
 namespace TASMod.Patches
 {
@@ -287,6 +287,46 @@ namespace TASMod.Patches
             {
                 yield return i;
             }
+        }
+    }
+
+    public class Game1_InitializeSound : IPatch
+    {
+        public static bool Override = true;
+        public override string Name => "Game1.InitializeSounds";
+
+        public override void Patch(Harmony harmony)
+        {
+            harmony.Patch(
+                original: AccessTools.Method(typeof(Game1), "InitializeSounds"),
+                prefix: new HarmonyMethod(this.GetType(), nameof(this.Prefix)),
+                postfix: new HarmonyMethod(this.GetType(), nameof(this.Postfix))
+            );
+        }
+
+        public static bool Prefix()
+        {
+            return !Override;
+        }
+        public static void Postfix()
+        {
+            if (!Override) return;
+            Game1.audioEngine = TASAudioEngine.Get();
+            Game1.waveBank = TASWaveBank.Get(Game1.audioEngine.Engine, "Wave Bank.xwb");
+            Game1.waveBank1_4 = TASWaveBank.Get(Game1.audioEngine.Engine, "Wave Bank(1.4).xwb");
+            Game1.soundBank = TASSoundBank.Get(Game1.audioEngine.Engine, "Sound Bank.xsb");
+            if (Game1.audioEngine is TASAudioEngine engine && Game1.soundBank is TASSoundBank soundBank && engine.SoundBank == null)
+            {
+                engine.SoundBank = soundBank;
+            }
+            Game1.audioEngine.Update();
+            Game1.musicCategory = Game1.audioEngine.GetCategory("Music");
+            Game1.soundCategory = Game1.audioEngine.GetCategory("Sound");
+            Game1.ambientCategory = Game1.audioEngine.GetCategory("Ambient");
+            Game1.footstepCategory = Game1.audioEngine.GetCategory("Footsteps");
+            Game1.wind = Game1.soundBank.GetCue("wind");
+            Game1.chargeUpSound = Game1.soundBank.GetCue("toolCharge");
+            AmbientLocationSounds.InitShared();
         }
     }
 }

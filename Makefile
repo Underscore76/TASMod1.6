@@ -15,3 +15,6 @@ run: build
 
 nettrace:
 	dotnet-trace collect --name StardewModdingAPI --format speedscope
+
+gcdump:
+	dotnet-gcdump collect --name StardewModdingAPI
