@@ -13,6 +13,7 @@ using TASMod.Patches;
 using TASMod.Recording;
 using TASMod.Networking;
 using System.Linq;
+using TASMod.Console;
 
 namespace TASMod.Overlays
 {
@@ -20,6 +21,7 @@ namespace TASMod.Overlays
     public class ImGuiOverlay : IOverlay
     {
         public static bool ShowControllers = true;
+        public static bool ShowObjectViewer = false;
         public static ImGuiRenderer GuiRenderer;
         public static RenderTarget2D imguiTarget;
         public Num.Vector4 MouseColor = Color.Black.ToVector4().ToNumerics();
@@ -55,6 +57,11 @@ namespace TASMod.Overlays
                 {
                     ImGui.SetWindowFontScale(FontScale);
                 }
+                ImGui.Checkbox("Log External Messages", ref ExternalLogger.LogExternalMessages);
+                ImGui.Checkbox("Show Object Viewer", ref ShowObjectViewer);
+                ImGui.Checkbox("Show Controllers", ref ShowControllers);
+                ImGui.SliderInt("Total Players", ref TASInputState.NumControllers, 2, 4);
+                ImGui.SliderInt("Active Instance", ref ActiveInstance.InstanceIndex, 0, GameRunner.instance.gameInstances.Count - 1);
             }
 
             FileSelection.Draw();
@@ -74,13 +81,6 @@ namespace TASMod.Overlays
                 {
                     ImGui.Checkbox(logic.Name, ref logic.Active);
                 }
-            }
-
-            if (ImGui.CollapsingHeader("Multiplayer"))
-            {
-                ImGui.Checkbox("Show Controllers", ref ShowControllers);
-                ImGui.SliderInt("Total Players", ref TASInputState.NumControllers, 2, 4);
-                ImGui.SliderInt("Active Instance", ref ActiveInstance.InstanceIndex, 0, GameRunner.instance.gameInstances.Count - 1);
             }
 
             if (ImGui.CollapsingHeader("State Info"))
@@ -116,8 +116,10 @@ namespace TASMod.Overlays
                 }
                 DrawPlayerStatusWindow();
             }
-            ObjectViewerWindow.Draw();
-            FishingSolverWindow.Draw();
+            if (ShowObjectViewer)
+            {
+                ObjectViewerWindow.Draw();
+            }
 
             if (imguiTarget == null || imguiTarget.Width != Game1.graphics.PreferredBackBufferWidth || imguiTarget.Height != Game1.graphics.PreferredBackBufferHeight)
             {
