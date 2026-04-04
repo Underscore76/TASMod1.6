@@ -1,0 +1,123 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>TAS Mod Lua Docs</title>
+    <link rel="stylesheet" href="../ldoc_new.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>TASMod 1.6</h1>
+
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+
+
+<h2>Examples</h2>
+<ul class="nowrap">
+  <li><strong>create_char.lua</strong></li>
+  <li><a href="../examples/init.lua.html">init.lua</a></li>
+  <li><a href="../examples/newgame.lua.html">newgame.lua</a></li>
+  <li><a href="../examples/use_keybinds.lua.html">use_keybinds.lua</a></li>
+</ul>
+<h2>Modules</h2>
+<ul class="nowrap">
+  <li><a href="../modules/aliases.html">aliases</a></li>
+  <li><a href="../modules/core.clickables.html">core.clickables</a></li>
+  <li><a href="../modules/core.collections.deque.html">core.collections.deque</a></li>
+  <li><a href="../modules/core.collections.stack.html">core.collections.stack</a></li>
+  <li><a href="../modules/core.common.html">core.common</a></li>
+  <li><a href="../modules/core.console.html">core.console</a></li>
+  <li><a href="../modules/core.engine.html">core.engine</a></li>
+  <li><a href="../modules/core.input.html">core.input</a></li>
+  <li><a href="../modules/core.keybinds.html">core.keybinds</a></li>
+  <li><a href="../modules/core.lua_utils.html">core.lua_utils</a></li>
+  <li><a href="../modules/core.replay.html">core.replay</a></li>
+  <li><a href="../modules/core.scripts.newgame.html">core.scripts.newgame</a></li>
+  <li><a href="../modules/core.scripts.startup.html">core.scripts.startup</a></li>
+  <li><a href="../modules/core.utilities.frame_stack.html">core.utilities.frame_stack</a></li>
+  <li><a href="../modules/core.view.html">core.view</a></li>
+  <li><a href="../modules/prelaunch.html">prelaunch</a></li>
+</ul>
+<h2>Readme</h2>
+<ul class="nowrap">
+  <li><a href="../readme/README.md.html">README</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+    <h2>create_char.lua</h2>
+<pre>
+<span class="comment">--- basic usage of the startup script for creating a character
+</span><span class="keyword">local</span> startup = <span class="global">require</span>(<span class="string">"core.scripts.startup"</span>)
+
+<span class="keyword">local</span> <span class="keyword">function</span> <span class="function-name">launch</span>()
+    <span class="comment">-- character setup
+</span>    <span class="comment">-- NOTE: change to modify name/farm name/favorite thing for new game creation
+</span>    startup.<span class="function-name">set_name</span>(<span class="string">'Underscore'</span>)
+    startup.<span class="function-name">set_farm_name</span>(<span class="string">'Casual'</span>)
+    startup.<span class="function-name">set_favorite</span>(<span class="string">'Going Fast'</span>)
+
+    <span class="comment">-- farm startup params
+</span>    startup.<span class="function-name">set_skip</span>(<span class="keyword">true</span>)
+    startup.<span class="function-name">set_sex</span>(<span class="string">'female'</span>)
+    startup.<span class="function-name">set_farm</span>(<span class="string">'Forest'</span>)
+    <span class="comment">-- NOTE: these numbers can be wonky due to issues with how SDV actually numbers them
+</span>    <span class="comment">-- there may be gaps in the numbers, some numbers might be negative indexed
+</span>    <span class="comment">-- its confusing... Generally it's the number shown in the menu - 1.
+</span>    <span class="comment">-- if you try and number that doesn't work, it will just attempt to spin for a while before giving up and moving on
+</span>    startup.<span class="function-name">set_hair</span>(<span class="number">8</span>)                   <span class="comment">-- there are missing hair styles
+</span>    startup.<span class="function-name">set_shirt</span>(<span class="string">"1105"</span>)
+    startup.<span class="function-name">set_acc</span>(<span class="number">0</span>)                    <span class="comment">-- 0 is the beard in this case, -1 is no accessory...
+</span>    startup.<span class="function-name">set_skin</span>(<span class="number">2</span>)                   <span class="comment">-- 0 indexed and as expected indexing
+</span>    startup.<span class="function-name">set_pant</span>(<span class="string">"0"</span>)                 <span class="comment">-- 0 indexed and as expected indexing
+</span>
+    startup.<span class="function-name">set_eye_color</span>(<span class="keyword">nil</span>, <span class="keyword">nil</span>, <span class="number">89</span>)   <span class="comment">-- these are the hsv sliders, 0-100% on each
+</span>    startup.<span class="function-name">set_hair_color</span>(<span class="keyword">nil</span>, <span class="keyword">nil</span>, <span class="number">24</span>)  <span class="comment">-- these are the hsv sliders, 0-100% on each
+</span>    startup.<span class="function-name">set_pants_color</span>(<span class="keyword">nil</span>, <span class="keyword">nil</span>, <span class="number">21</span>) <span class="comment">-- these are the hsv sliders, 0-100% on each
+</span>
+    <span class="comment">-- this is an example startup script that will launch you into the start of day 1
+</span>    startup.<span class="function-name">run</span>()
+    startup.<span class="function-name">click_ok</span>()
+
+    <span class="function-name">advance</span>() <span class="comment">-- get past the initial launch
+</span>    <span class="function-name">halt</span>()    <span class="comment">-- waits until past the save (generally shouldn't need to manually halt outside this case of overnight load)
+</span>
+    <span class="function-name">advance</span>() <span class="comment">-- push into the day1 load
+</span>    <span class="comment">-- the game will be paused at this point, so you can do whatever you want
+</span><span class="keyword">end</span>
+
+<span class="function-name">launch</span>()</pre>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/lunarmodules/LDoc">LDoc 1.5.0</a></i>
+<i style="float:right;">Last updated 2026-04-04 11:16:43 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>

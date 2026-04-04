@@ -1,6 +1,8 @@
 # Stardew Valley TAS Mod
 [Build Issues?](#build-issues)
 
+@lookup README.md
+
 NOTE: Use of this mod will create a folder `StardewTAS1.6` in your `Documents` folder. This folder will contain your save states, scripts, screenshots, etc.
 
 ## Basic controls

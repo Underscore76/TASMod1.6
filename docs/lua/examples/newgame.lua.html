@@ -31,16 +31,19 @@
   <li><a href="../index.html">Index</a></li>
 </ul>
 
-<h2>Contents</h2>
-<ul>
-<li><a href="#Functions">Functions</a></li>
+
+
+<h2>Examples</h2>
+<ul class="nowrap">
+  <li><a href="../examples/create_char.lua.html">create_char.lua</a></li>
+  <li><a href="../examples/init.lua.html">init.lua</a></li>
+  <li><strong>newgame.lua</strong></li>
+  <li><a href="../examples/use_keybinds.lua.html">use_keybinds.lua</a></li>
 </ul>
-
-
 <h2>Modules</h2>
 <ul class="nowrap">
   <li><a href="../modules/aliases.html">aliases</a></li>
-  <li><strong>core.clickables</strong></li>
+  <li><a href="../modules/core.clickables.html">core.clickables</a></li>
   <li><a href="../modules/core.collections.deque.html">core.collections.deque</a></li>
   <li><a href="../modules/core.collections.stack.html">core.collections.stack</a></li>
   <li><a href="../modules/core.common.html">core.common</a></li>
@@ -60,103 +63,24 @@
 <ul class="nowrap">
   <li><a href="../readme/README.md.html">README</a></li>
 </ul>
-<h2>Examples</h2>
-<ul class="nowrap">
-  <li><a href="../examples/create_char.lua.html">create_char.lua</a></li>
-  <li><a href="../examples/init.lua.html">init.lua</a></li>
-  <li><a href="../examples/newgame.lua.html">newgame.lua</a></li>
-  <li><a href="../examples/use_keybinds.lua.html">use_keybinds.lua</a></li>
-</ul>
 
 </div>
 
 <div id="content">
 
-<h1>Module <code>core.clickables</code></h1>
-<p>clickables: a module for finding clickable objects in menus</p>
-<p>
+    <h2>newgame.lua</h2>
+<pre>
+<span class="comment">-- shows an example of how to generate a new game file
+</span><span class="keyword">local</span> newgame = <span class="global">require</span>(<span class="string">"core.scripts.newgame"</span>)
 
-</p>
+<span class="keyword">local</span> <span class="keyword">function</span> <span class="function-name">gen_file</span>(seed, language, filePrefix)
+    newgame.<span class="function-name">set_seed</span>(seed)
+    newgame.<span class="function-name">set_language</span>(language)
+    newgame.<span class="function-name">set_file_prefix</span>(filePrefix)
+    newgame.<span class="function-name">run</span>()
+<span class="keyword">end</span>
 
-
-<h2><a href="#Functions">Functions</a></h2>
-<table class="function_list">
-	<tr>
-	<td class="name" nowrap><a href="#get_object_by_name">get_object_by_name (name)</a></td>
-	<td class="summary">get a clickable object by name</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#has_object">has_object (name)</a></td>
-	<td class="summary">check if a clickable object exists by name</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#list">list ()</a></td>
-	<td class="summary">list all clickable objects on screen</td>
-	</tr>
-</table>
-
-<br/>
-<br/>
-
-
-    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
-
-    <dl class="function">
-    <dt>
-    <a name = "get_object_by_name"></a>
-    <strong>get_object_by_name (name)</strong>
-    </dt>
-    <dd>
-    get a clickable object by name
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">name</span>
-         string|number @the name of the object to get
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "has_object"></a>
-    <strong>has_object (name)</strong>
-    </dt>
-    <dd>
-    check if a clickable object exists by name
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">name</span>
-         string @the name of the object to check
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "list"></a>
-    <strong>list ()</strong>
-    </dt>
-    <dd>
-    list all clickable objects on screen
-
-
-
-
-
-
-
-</dd>
-</dl>
+<span class="function-name">gen_file</span>(<span class="number">1234</span>, <span class="string">"en"</span>, <span class="string">"gaming"</span>)</pre>
 
 
 </div> <!-- id="content" -->

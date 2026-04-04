@@ -31,16 +31,19 @@
   <li><a href="../index.html">Index</a></li>
 </ul>
 
-<h2>Contents</h2>
-<ul>
-<li><a href="#Functions">Functions</a></li>
+
+
+<h2>Examples</h2>
+<ul class="nowrap">
+  <li><a href="../examples/create_char.lua.html">create_char.lua</a></li>
+  <li><a href="../examples/init.lua.html">init.lua</a></li>
+  <li><a href="../examples/newgame.lua.html">newgame.lua</a></li>
+  <li><strong>use_keybinds.lua</strong></li>
 </ul>
-
-
 <h2>Modules</h2>
 <ul class="nowrap">
   <li><a href="../modules/aliases.html">aliases</a></li>
-  <li><strong>core.clickables</strong></li>
+  <li><a href="../modules/core.clickables.html">core.clickables</a></li>
   <li><a href="../modules/core.collections.deque.html">core.collections.deque</a></li>
   <li><a href="../modules/core.collections.stack.html">core.collections.stack</a></li>
   <li><a href="../modules/core.common.html">core.common</a></li>
@@ -60,103 +63,32 @@
 <ul class="nowrap">
   <li><a href="../readme/README.md.html">README</a></li>
 </ul>
-<h2>Examples</h2>
-<ul class="nowrap">
-  <li><a href="../examples/create_char.lua.html">create_char.lua</a></li>
-  <li><a href="../examples/init.lua.html">init.lua</a></li>
-  <li><a href="../examples/newgame.lua.html">newgame.lua</a></li>
-  <li><a href="../examples/use_keybinds.lua.html">use_keybinds.lua</a></li>
-</ul>
 
 </div>
 
 <div id="content">
 
-<h1>Module <code>core.clickables</code></h1>
-<p>clickables: a module for finding clickable objects in menus</p>
-<p>
+    <h2>use_keybinds.lua</h2>
+<pre>
+<span class="keyword">local</span> keybinds = <span class="global">require</span>(<span class="string">"core.keybinds"</span>)
 
-</p>
+<span class="comment">-- example for adding a custom keybind,
+</span><span class="comment">-- here we bind the key 'j' to an inlined function definition that animation cancels 10 times
+</span>keybinds.<span class="function-name">add</span>(Keys.J,
+    <span class="keyword">function</span>()
+        <span class="keyword">for</span> i = <span class="number">1</span>, <span class="number">10</span> <span class="keyword">do</span>
+            <span class="function-name">advance</span>({ keyboard = { Keys.C, Keys.RightShift, Keys.R, Keys.Delete } })
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+)
 
-
-<h2><a href="#Functions">Functions</a></h2>
-<table class="function_list">
-	<tr>
-	<td class="name" nowrap><a href="#get_object_by_name">get_object_by_name (name)</a></td>
-	<td class="summary">get a clickable object by name</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#has_object">has_object (name)</a></td>
-	<td class="summary">check if a clickable object exists by name</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#list">list ()</a></td>
-	<td class="summary">list all clickable objects on screen</td>
-	</tr>
-</table>
-
-<br/>
-<br/>
-
-
-    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
-
-    <dl class="function">
-    <dt>
-    <a name = "get_object_by_name"></a>
-    <strong>get_object_by_name (name)</strong>
-    </dt>
-    <dd>
-    get a clickable object by name
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">name</span>
-         string|number @the name of the object to get
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "has_object"></a>
-    <strong>has_object (name)</strong>
-    </dt>
-    <dd>
-    check if a clickable object exists by name
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">name</span>
-         string @the name of the object to check
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "list"></a>
-    <strong>list ()</strong>
-    </dt>
-    <dd>
-    list all clickable objects on screen
-
-
-
-
-
-
-
-</dd>
-</dl>
+<span class="comment">-- we can also take an existing function and bind it to a key, and we can also add a description for the keybind
+</span><span class="keyword">local</span> <span class="keyword">function</span> <span class="function-name">z</span>()
+    <span class="keyword">for</span> i = <span class="number">1</span>, <span class="number">10</span> <span class="keyword">do</span>
+        <span class="function-name">advance</span>({ keyboard = { Keys.C, Keys.RightShift, Keys.R, Keys.Delete } })
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+keybinds.<span class="function-name">add</span>(Keys.Z, z, <span class="string">"press z"</span>)</pre>
 
 
 </div> <!-- id="content" -->
