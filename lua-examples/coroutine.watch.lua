@@ -12,6 +12,9 @@ local function swap_back()
         if current ~= nil and current.Name ~= "Pickaxe" then
             -- figure out the keys to swap to the pickaxe and fire them off
             local keys = inventory.GetInventoryKey("Pickaxe")
+            if keys == nil then
+                return
+            end
             kbm:press_keys(keys)
             kbm:push()
         end

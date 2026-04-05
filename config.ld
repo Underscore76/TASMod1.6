@@ -1,5 +1,11 @@
 -- ldoc configuration file
 file = "Assets/lua"
+file = {
+    "Assets/lua",
+    exclude = {
+        "Assets/lua/types"
+    }
+}
 project = "TASMod 1.6"
 dir = "docs/lua"
 format="markdown"

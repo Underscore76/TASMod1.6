@@ -144,7 +144,7 @@ end
 
 ---concatenates a list of strings together with tabs
 --example: concat("a", "b", "c") -> "a\tb\tc"
----@param ... vararg @list of strings to concatenate
+---@param ... string @list of strings to concatenate
 ---@return string @concatenated string
 ---
 function concat(...)

@@ -14,9 +14,9 @@ end
 
 ---plays back a function with the console closed
 function console.playback(func)
-    Controller.Console.Close()
+    Controller.Console:Close()
     func()
-    Controller.Console.Open()
+    Controller.Console:Open()
 end
 
 ---executes a TAS console command. this is not the same as the SDV debug commands

@@ -56,7 +56,7 @@ function bfload(file)
 end
 
 ---returns the current game frame
----@return number current frame number
+---@return number @current frame number
 function current_frame()
     return interface:GetCurrentFrame()
 end
@@ -130,7 +130,7 @@ function frame_stack_clear()
 end
 
 ---gets the current real time
----@return System.DateTime @current real time
+---@return DateTimeOffset @current real time
 function real_time()
     return DateTimeOffset.FromUnixTimeSeconds(os.time()):ToLocalTime()
 end

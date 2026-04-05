@@ -56,8 +56,8 @@ function replay.toggle()
 end
 
 --- register keybinds for replay mode
---- @param step_key Microsoft.Xna.Framework.Input.Keys @key to advance one frame
---- @param toggle_key Microsoft.Xna.Framework.Input.Keys @key to toggle pause
+--- @param step_key Keys @key to advance one frame
+--- @param toggle_key Keys @key to toggle pause
 function replay.register_keybinds(step_key, toggle_key)
     replay.enter()
     if step_key == nil or toggle_key == nil then

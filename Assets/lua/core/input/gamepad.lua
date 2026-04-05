@@ -1,12 +1,13 @@
 --- Wraps writing to the GamePadInputQueue
+
 local Gamepad = {}
 Gamepad.__index = Gamepad
 
 ---creates a new gamepad for player index (0 indexed so p1 = 0, p2 = 1, etc)
 ---@param index number the player index for this gamepad (0 indexed so p1 = 0, p2 = 1, etc)
----@return Gamepad - new gamepad object
+---@return Gamepad @new gamepad object
 function Gamepad.new(index)
-    local self = setmetatable({}, Gamepad)
+    local self = setmetatable({}, Gamepad) --[[@as Gamepad]]
     self.buttons = {}
     self.index = index or 1
     return self
@@ -101,7 +102,7 @@ function Gamepad:analog(x, y)
     self.buttons.ry = y
 end
 
----push the current buttons to the input queue and clear the staged buttons
+---push the current buttons to the input queue and clears state
 function Gamepad:push()
     interface:AddGamePadInput(self.index, self.buttons)
     self:clear()

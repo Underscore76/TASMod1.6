@@ -1,11 +1,12 @@
 --- Wraps writing to the GamePadInputQueue
+
 local KeyboardAndMouse = {}
 KeyboardAndMouse.__index = KeyboardAndMouse
 
 ---creates a new keyboard and mouse input object
----@return KeyboardAndMouse - new keyboard and mouse input object
+---@return KeyboardAndMouse @new keyboard and mouse input object
 function KeyboardAndMouse.new()
-    local self = setmetatable({ keys = {}, mouse = {} }, KeyboardAndMouse)
+    local self = setmetatable({ keys = {}, mouse = {} }, KeyboardAndMouse) --[[@as KeyboardAndMouse]]
     return self
 end
 
@@ -16,19 +17,19 @@ function KeyboardAndMouse:clear()
 end
 
 ---press a key
----@param key Microsoft.Xna.Framework.Input.Keys the key to press
+---@param key Keys|number the key to press
 function KeyboardAndMouse:press_key(key)
     self.keys[key] = true
 end
 
 ---release a key
----@param key Microsoft.Xna.Framework.Input.Keys the key to release
+---@param key Keys|number the key to release
 function KeyboardAndMouse:release_key(key)
     self.keys[key] = false
 end
 
 ---press multiple keys
----@param keys table the keys to press
+---@param keys (Keys|number)[] the keys to press
 function KeyboardAndMouse:press_keys(keys)
     for _, key in ipairs(keys) do
         self:press_key(key)

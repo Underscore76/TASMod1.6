@@ -44,9 +44,9 @@ local InventoryKeys = {
 ---returns {} if we are already holding the item with the necessary stack size
 ---returns nil if the item is not found
 ---otherwise returns the keys to press to swap to the item
----@param name string the name of the item to swap to
----@param minStack number|nil the minimum stack size of the item to swap to, defaults to 1
----@return table|nil keys to press
+---@param name string @the name of the item to swap to
+---@param minStack number|nil @the minimum stack size of the item to swap to, defaults to 1
+---@return table<Keys|number>|nil @keys to press
 function inventory.GetInventoryKey(name, minStack)
     if minStack == nil then
         minStack = 1

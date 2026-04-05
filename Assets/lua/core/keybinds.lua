@@ -2,7 +2,7 @@
 
 local keybinds = {}
 ---add a key to the keybind map
----@param key Microsoft.Xna.Framework.Input.Keys @key to bind
+---@param key Keys|number @key to bind
 ---@param func function @function to call when key is pressed
 ---@param name string|nil @name of the keybind
 function keybinds.add(key, func, name)
@@ -14,7 +14,7 @@ function keybinds.add(key, func, name)
 end
 
 ---remove a key from the keybind map
----@param key Microsoft.Xna.Framework.Input.Keys @key to remove
+---@param key Keys|number @key to remove
 function keybinds.remove(key)
     interface:RemoveKeyBind(key)
 end

@@ -1,0 +1,35 @@
+---@meta
+
+---@class Item
+---@field ParentSheetIndex number @the item ID
+---@field Stack number @the number of items in the stack
+---@field Name string @the name of the item
+local Item = {}
+
+---@class NetString
+---@field Value string @the value of the NetString
+local NetString = {}
+
+---@class NetInt
+---@field Value number @the value of the NetInt
+local NetInt = {}
+
+---@class Farmer
+---@field CurrentItem Item|nil
+---@field CurrentTool Item|nil
+---@field FacingDirection number
+---@field skin NetInt
+---@field hair NetInt
+---@field shirt NetString
+---@field pants NetString
+---@field accessory NetInt
+---@field Tile Vec2
+local Farmer = {}
+
+---@class GameLocation
+local GameLocation = {}
+
+---@class Game1
+---@field player Farmer @the current player object
+---@field currentLocation GameLocation @the current location object
+Game1 = {}
