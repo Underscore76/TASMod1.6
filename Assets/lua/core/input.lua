@@ -62,4 +62,18 @@ function input.click_horizontal_slider(rect, value)
     input.click_point(point, true, false)
 end
 
+---get the mouse tile from global coordinates
+---@param tileX number the x coordinate of the tile
+---@param tileY number the y coordinate of the tile
+---@return Vec2 the mouse position in local coordinates
+function input.get_mouse_tile_from_global(tileX, tileY)
+    local tileSize = Game1.tileSize
+    local viewport = RunCS("Game1.viewport")
+    local zoomLevel = RunCS("Game1.options.zoomLevel")
+    local tile = { X = (tileX + 0.5) * tileSize, Y = (tileY + 0.5) * tileSize }
+    local localX = (tile.X - viewport.X) * zoomLevel
+    local localY = (tile.Y - viewport.Y) * zoomLevel
+    return Vector2(localX, localY)
+end
+
 return input

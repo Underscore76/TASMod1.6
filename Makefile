@@ -18,3 +18,6 @@ nettrace:
 
 gcdump:
 	dotnet-gcdump collect --name StardewModdingAPI
+
+luadoc:
+	ldoc .

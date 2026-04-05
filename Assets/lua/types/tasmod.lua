@@ -166,6 +166,7 @@ local KeyboardAndMouse = {}
 
 ---@class GamePadInputQueue
 ---@field Queues table
+---@field SetManualFrameFunction fun(index: number, func: function, name: string, description: string|nil): nil
 GamePadInputQueue = {}
 
 ---@class KeyboardMouseInputQueue
@@ -180,6 +181,7 @@ LuaOverlay = {}
 
 ---@class LuaFunctionRegistry
 ---@field RegisterFunction fun(name: string, func: function, description: string|nil): nil
+---@field Clear fun(): nil
 LuaFunctionRegistry = {}
 
 ---@class Constants

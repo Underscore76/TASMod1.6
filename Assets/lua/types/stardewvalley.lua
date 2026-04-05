@@ -24,6 +24,7 @@ local NetInt = {}
 ---@field pants NetString
 ---@field accessory NetInt
 ---@field Tile Vec2
+---@field Stamina number
 local Farmer = {}
 
 ---@class GameLocation
@@ -32,4 +33,5 @@ local GameLocation = {}
 ---@class Game1
 ---@field player Farmer @the current player object
 ---@field currentLocation GameLocation @the current location object
+---@field tileSize number @the size of a tile in pixels
 Game1 = {}
