@@ -93,10 +93,61 @@ namespace TASMod.Console.Commands
         public override string[] Usage => new string[] {
             string.Format("{0}: get friendship details", Name),
             string.Format("for all npcs: \"{0}\"", Name),
-            string.Format("for specific npc (case insensitive): \"{0} name\"", Name),
+            string.Format("for specific npc (CASE SENSITIVE): \"{0} name\"", Name),
         };
+        private void WriteFriendship(int index, string name)
+        {
+            var friendships = InstanceCurrentPlayer.Get(index).Friendships;
+            if (friendships.TryGetValue(name, out var friendship))
+            {
+                Write(
+                    "{0}: {1} {2} hearts, {3} points", index,
+                    name,
+                    friendship.Points / 250,
+                    friendship.Points
+                );
+            }
+        }
+        private void WriteFriendships(int index)
+        {
+            var friendships = InstanceCurrentPlayer.Get(index).Friendships;
+            foreach (var friendship in friendships.Pairs)
+            {
+                Write(
+                    "{0}: {1} {2} hearts, {3} points", index,
+                    friendship.Key,
+                    friendship.Value.Points / 250,
+                    friendship.Value.Points
+                );
+            }
+        }
         public override void Run(string[] tokens)
         {
+            if (tokens.Length > 1)
+            {
+                Write(HelpText());
+            }
+            else if (tokens.Length == 1)
+            {
+                Write("getting friendship for npc: {0}", tokens[0]);
+                if (Game1.getCharacterFromName(tokens[0], false) == null)
+                {
+                    Write("invalid npc name: npc {0} not found", tokens[0]);
+                    return;
+                }
+                for (int i = 0; i < GameRunner.instance.gameInstances.Count; i++)
+                {
+                    WriteFriendship(i, tokens[0]);
+                }
+            }
+            else
+            {
+                Write("getting friendship for all npcs");
+                for (int i = 0; i < GameRunner.instance.gameInstances.Count; i++)
+                {
+                    WriteFriendships(i);
+                }
+            }
         }
     }
 
@@ -105,8 +156,42 @@ namespace TASMod.Console.Commands
         public override string Name => "player";
         public override string Description => "print details on player including xp/friendship/pos/etc";
 
+        private void WritePlayerInfo(int index)
+        {
+            var player = InstanceCurrentPlayer.Get(index).Player;
+            Write(
+                "{0}: {1} on {2} at tile ({3}, {4}) [raw:({5}, {6})]",
+                index,
+                player.Name,
+                player.currentLocation.Name,
+                player.Tile.X,
+                player.Tile.Y,
+                player.Position.X,
+                player.Position.Y
+            );
+            Write("\tSkills:");
+            for (int i = 0; i < 5; i++)
+            {
+                string skillName = Farmer.getSkillNameFromIndex(i);
+                Write("\t\t{0}: level {1}, xp {2}", skillName, player.GetSkillLevel(i), player.experiencePoints[i]);
+            }
+            Write("\tFriendships:");
+            foreach (var friendship in player.friendshipData.Pairs)
+            {
+                Write(
+                    "\t\t{0}: {1} hearts, {2} points",
+                    friendship.Key,
+                    friendship.Value.Points / 250,
+                    friendship.Value.Points
+                );
+            }
+        }
         public override void Run(string[] tokens)
         {
+            for (int i = 0; i < GameRunner.instance.gameInstances.Count; i++)
+            {
+                WritePlayerInfo(i);
+            }
         }
     }
 
@@ -121,11 +206,9 @@ namespace TASMod.Console.Commands
             if (drops.Count() > 0)
             {
                 Write("Trash Can Drops:");
-                int i = 0;
                 foreach (var drop in drops)
                 {
-                    Write("\t{0:000}\t{1}\t{2}", i, drop.Item1, drop.Item2);
-                    i++;
+                    Write("\t{0}\t({1}, {2})\t{3}", drop.Item1, drop.Item2.X, drop.Item2.Y, drop.Item3);
                 }
             }
         }

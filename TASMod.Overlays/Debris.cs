@@ -55,7 +55,7 @@ namespace TASMod.Overlays
                     continue;
                 if (debris.itemId.Value.Length < 3 || debris.itemId.Value.Substring(0, 3) != "(O)")
                     continue;
-                string name = DropInfo.ObjectName(debris.itemId.Value.Substring(3));
+                string name = DropInfo.ObjectName(debris.itemId.Value.Substring(3), return_unknown: true);
                 if (name == "unknown")
                     continue;
                 if (playerInRange(vec, player))

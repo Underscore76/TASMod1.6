@@ -6,6 +6,8 @@ using Microsoft.Xna.Framework;
 using Netcode;
 using StardewValley;
 using StardewValley.Extensions;
+using StardewValley.GameData.GarbageCans;
+using StardewValley.Internal;
 using StardewValley.Locations;
 using StardewValley.Monsters;
 using StardewValley.Objects;
@@ -74,25 +76,109 @@ namespace TASMod.Helpers
         }
         private static Dictionary<string, Tuple<Vector2, int>> TrashCans = new()
         {
-            {"Jodi  ", new Tuple<Vector2, int>(new Vector2(13, 86), 0)},
-            {"Emily ", new Tuple<Vector2, int>(new Vector2(19, 89), 1)},
-            {"Lewis ", new Tuple<Vector2, int>(new Vector2(56, 85), 2)},
+            {"JodiAndKent", new Tuple<Vector2, int>(new Vector2(13, 86), 0)},
+            {"EmilyAndHaley", new Tuple<Vector2, int>(new Vector2(19, 89), 1)},
+            {"Mayor", new Tuple<Vector2, int>(new Vector2(56, 85), 2)},
             {"Museum", new Tuple<Vector2, int>(new Vector2(108, 91), 3)},
-            {"Clint ", new Tuple<Vector2, int>(new Vector2(97, 80), 4)},
+            {"Blacksmith ", new Tuple<Vector2, int>(new Vector2(97, 80), 4)},
             {"Saloon", new Tuple<Vector2, int>(new Vector2(47, 70), 5)},
-            {"Alex  ", new Tuple<Vector2, int>(new Vector2(52, 63), 6)},
-            {"Joja  ", new Tuple<Vector2, int>(new Vector2(110, 56), 7)}
+            {"Evelyn", new Tuple<Vector2, int>(new Vector2(52, 63), 6)},
+            {"JojaMart", new Tuple<Vector2, int>(new Vector2(110, 56), 7)}
         };
 
-
-        public static List<(string, string)> GetTrashCans()
+        public static List<(string, Vector2, string)> GetTrashCans()
         {
-            List<(string, string)> trash = new();
+            List<(string, Vector2, string)> trash = new();
+            if (Game1.currentLocation == null) return trash;
+
+            var player = InstanceCurrentPlayer.Get(0).Player;
+            var location = Game1.getLocationFromName("Town");
+
             foreach (var can in TrashCans)
             {
-
+                string item = GetGarbageItem(can.Key, location, player);
+                if (item == "")
+                    continue;
+                trash.Add((can.Key, can.Value.Item1, item));
             }
             return trash;
+        }
+
+        private static string GetGarbageItem(string can, GameLocation location, Farmer player)
+        {
+            GarbageCanData allData = DataLoader.GarbageCans(Game1.content);
+            GarbageCanEntryData data = allData.GarbageCans.GetValueOrDefault(can);
+            float baseChance = ((data != null && data.BaseChance > 0f) ? data.BaseChance : allData.DefaultBaseChance);
+            baseChance += (float)player.DailyLuck;
+            if (player.stats.Get("Book_Trash") != 0)
+            {
+                baseChance += 0.2f;
+            }
+            Random garbageRandom = Utility.CreateDaySaveRandom(777 + Game1.hash.GetDeterministicHashCode(can));
+            int prewarm = garbageRandom.Next(0, 100);
+            for (int i = 0; i < prewarm; i++)
+            {
+                garbageRandom.NextDouble();
+            }
+            prewarm = garbageRandom.Next(0, 100);
+            for (int j = 0; j < prewarm; j++)
+            {
+                garbageRandom.NextDouble();
+            }
+            bool baseChancePassed = garbageRandom.NextDouble() < (double)baseChance;
+            ItemQueryContext itemQueryContext = new ItemQueryContext(location, player, garbageRandom, "garbage data '" + can + "'");
+            List<GarbageCanItemData>[] array = new List<GarbageCanItemData>[3]
+            {
+                allData.BeforeAll,
+                data?.Items,
+                allData.AfterAll
+            };
+            foreach (List<GarbageCanItemData> itemList in array)
+            {
+                if (itemList == null)
+                {
+                    continue;
+                }
+                foreach (GarbageCanItemData entry in itemList)
+                {
+                    if (string.IsNullOrWhiteSpace(entry.Id))
+                    {
+                    }
+                    else if ((baseChancePassed || entry.IgnoreBaseChance) && GameStateQuery.CheckConditions(entry.Condition, location, null, null, null, garbageRandom))
+                    {
+                        // try to resolve a random item
+                        string result = TryResolveRandomItem(garbageRandom, entry, itemQueryContext);
+                        switch (result)
+                        {
+                            case "":
+                                continue;
+                            case "RANDOM_BASE_SEASON_ITEM":
+                                return DropInfo.ObjectName(Utility.getRandomItemFromSeason(random: garbageRandom, season: location.GetSeason(), forQuest: false));
+                            case "DISH_OF_THE_DAY":
+                                return Game1.dishOfTheDay.Name;
+                            case "(O)CalicoEgg":
+                                return "Calico Egg";
+                            case "(H)66":
+                                return "Garbage Hat";
+                            case "(F)TrashCatalogue":
+                                return "Trash Catalogue";
+                            default:
+                                return DropInfo.ObjectName(result.Substring(3));
+                        }
+                    }
+                }
+            }
+            return "";
+        }
+        public static string TryResolveRandomItem(Random random, GarbageCanItemData data, ItemQueryContext itemQueryContext)
+        {
+            string itemId = data.ItemId;
+            List<string> randomItemId = data.RandomItemId;
+            if (randomItemId != null && randomItemId.Any())
+            {
+                itemId = random.ChooseFrom(data.RandomItemId);
+            }
+            return itemId;
         }
     }
 

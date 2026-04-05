@@ -230,13 +230,13 @@ There's a ton more but there's a whole generated set of docs for the lua engine 
 
 <h4>Info functions:</h4>
 <p>* <code>forage</code> - print current details about forage (defaults to current location, define specific <code>forage loc</code> or <code>forage all</code>)
-* <code>friendship(TODO)</code> - prints current friendship details
-* <code>player(TODO)</code> - prints details on player including xp/friendship/pos/etc
-* <code>trashcans(TODO)</code> - prints current trash can drops</p>
+* <code>friendship</code> - prints current friendship details
+* <code>player</code> - prints details on player including xp/friendship/pos/etc
+* <code>trashcans</code> - prints current trash can drops</p>
 
 <h4>Misc functions:</h4>
 <p>* <code>blankscreen</code> - turns the screen black
-* <code>screenshot(TODO)</code> - screenshot the current game screen (stored in the StardewTAS1.6 folder)</p>
+* <code>screenshot</code> - screenshot the current game screen (stored in the StardewTAS1.6 folder)</p>
 
 <p><a name="Automation_logic"></a></p>
 <h2>Automation logic</h2>
@@ -247,11 +247,11 @@ There's a ton more but there's a whole generated set of docs for the lua engine 
     <li><code>AdvanceFrozen</code> - advance when character is frozen/picking up an artifact/sleeping emoting</li>
     <li><code>AnimationCancel</code> - advance through frames after swing up to the first cancel frame</li>
     <li><code>DialogueBox</code> - advance to the frame where you can click a dialogue box</li>
-    <li><code>LevelUpMenu(TODO)</code> - advance through level up menu (does not advance profession select)</li>
+    <li><code>LevelUpMenu</code> - advance through level up menu (does not advance profession select)</li>
     <li><code>SaveGame</code> - advance through the save game menu</li>
     <li><code>ScreenFade</code> - advance through frames where the screen is fading in and out of black</li>
-    <li><code>ShippingMenu(TODO)</code> - holds the mouse and advances through shipping menu</li>
-    <li><code>SkipEvent(TODO)</code> - skips events or advances through pause frames up during an event/requires dialogue interaction</li>
+    <li><code>ShippingMenu</code> - holds the mouse and advances through shipping menu</li>
+    <li><code>SkipEvent</code> - skips events or advances through pause frames up during an event/requires dialogue interaction</li>
 </ul>
 
 <p>To implement a new Automation, create a new class that inherits from <code>IAutomatedLogic</code>. All classes that inherit from <code>IAutomatedLogic</code> will be automatically loaded and available in <code>AutomationManager.Get(&apos;...&apos;)</code>.</p>
@@ -262,7 +262,7 @@ There's a ton more but there's a whole generated set of docs for the lua engine 
 
 <ul>
     <li><code>ClayMap</code> - draw the clay tilling map</li>
-    <li><code>CropQuality(TODO)</code> - draw first gold quality day for a tile</li>
+    <li><code>CropQuality</code> - draw first gold quality day for a tile</li>
     <li><code>Debris</code> - draw debris magnetism regions to show in/out of range</li>
     <li><code>DrawPath</code> - draw the current nav path</li>
     <li><code>Fishing</code> - draw a simplified view of the fishing minigame including where the fish wants to go</li>
@@ -276,12 +276,12 @@ There's a ton more but there's a whole generated set of docs for the lua engine 
     <li><code>MinesLadder</code> - draw rock break counts and path to nearest ladder</li>
     <li><code>MinesRocks</code> - Show rocks in mines that have drops</li>
     <li><code>MixedSeed</code> - overlay the seed you'll get if you plant a mixed seed on the next frame</li>
-    <li><code>MonsterDrop(TODO)</code> - displays items a monster will drop</li>
+    <li><code>MonsterDrop</code> - displays items a monster will drop</li>
     <li><code>Mouse</code> - draw your actual mouse onto the screen</li>
     <li><code>MouseData</code> - draws tile, steps, ticks at mouse position</li>
     <li><code>ObjectDrops</code> - draw what items an object will drop</li>
     <li><code>ObjectTiles</code> - draw boundaries around objects</li>
-    <li><code>Sleep(TODO)</code> - draw sleep details given current step count</li>
+    <li><code>Sleep</code> - draw sleep details given current step count</li>
     <li><code>TaskPaths</code> - draw paths for current queued tasks</li>
     <li><code>TileHighlight</code> - draw highlighted tiles</li>
     <li><code>TileText</code> - draw text on tiles</li>
@@ -294,7 +294,7 @@ There's a ton more but there's a whole generated set of docs for the lua engine 
 <p><a name="ImGui_Tools"></a></p>
 <h2>ImGui Tools</h2>
 
-<p>TODO: need to document better how the imgui tool works/how to expose data onto a widget</p>
+<p>Check the lua doc example for registering data/buttons to the imgui overlay <a href="https://underscore76.github.io/TASMod1.6/lua/examples/lua_overlay.lua.html">here</a></p>
 
 
 <p><a name="How_does_this_work_"></a></p>
@@ -348,7 +348,7 @@ luarocks install ldoc
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/lunarmodules/LDoc">LDoc 1.5.0</a></i>
-<i style="float:right;">Last updated 2026-04-04 18:09:34 </i>
+<i style="float:right;">Last updated 2026-04-04 21:40:11 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

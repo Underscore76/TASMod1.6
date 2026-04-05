@@ -117,13 +117,13 @@ Engine state is the current state of overlays/logics. You can save different con
 
 #### Info functions:
 * `forage` - print current details about forage (defaults to current location, define specific `forage loc` or `forage all`)
-* `friendship(TODO)` - prints current friendship details
-* `player(TODO)` - prints details on player including xp/friendship/pos/etc
-* `trashcans(TODO)` - prints current trash can drops
+* `friendship` - prints current friendship details
+* `player` - prints details on player including xp/friendship/pos/etc
+* `trashcans` - prints current trash can drops
 
 #### Misc functions:
 * `blankscreen` - turns the screen black
-* `screenshot(TODO)` - screenshot the current game screen (stored in the StardewTAS1.6 folder)
+* `screenshot` - screenshot the current game screen (stored in the StardewTAS1.6 folder)
 
 ## Automation logic
 Tools for automated frame advance through common actions
@@ -132,11 +132,11 @@ Tools for automated frame advance through common actions
 * `AdvanceFrozen` - advance when character is frozen/picking up an artifact/sleeping emoting
 * `AnimationCancel` - advance through frames after swing up to the first cancel frame
 * `DialogueBox` - advance to the frame where you can click a dialogue box
-* `LevelUpMenu(TODO)` - advance through level up menu (does not advance profession select)
+* `LevelUpMenu` - advance through level up menu (does not advance profession select)
 * `SaveGame` - advance through the save game menu
 * `ScreenFade` - advance through frames where the screen is fading in and out of black
-* `ShippingMenu(TODO)` - holds the mouse and advances through shipping menu
-* `SkipEvent(TODO)` - skips events or advances through pause frames up during an event/requires dialogue interaction
+* `ShippingMenu` - holds the mouse and advances through shipping menu
+* `SkipEvent` - skips events or advances through pause frames up during an event/requires dialogue interaction
 
 To implement a new Automation, create a new class that inherits from `IAutomatedLogic`. All classes that inherit from `IAutomatedLogic` will be automatically loaded and available in `AutomationManager.Get('...')`.
 
@@ -144,7 +144,7 @@ To implement a new Automation, create a new class that inherits from `IAutomated
 Additional info layers to draw on top of the game
 
 * `ClayMap` - draw the clay tilling map
-* `CropQuality(TODO)` - draw first gold quality day for a tile
+* `CropQuality` - draw first gold quality day for a tile
 * `Debris` - draw debris magnetism regions to show in/out of range
 * `DrawPath` - draw the current nav path
 * `Fishing` - draw a simplified view of the fishing minigame including where the fish wants to go
@@ -158,12 +158,12 @@ Additional info layers to draw on top of the game
 * `MinesLadder` - draw rock break counts and path to nearest ladder
 * `MinesRocks` - Show rocks in mines that have drops
 * `MixedSeed` - overlay the seed you'll get if you plant a mixed seed on the next frame
-* `MonsterDrop(TODO)` - displays items a monster will drop
+* `MonsterDrop` - displays items a monster will drop
 * `Mouse` - draw your actual mouse onto the screen
 * `MouseData` - draws tile, steps, ticks at mouse position
 * `ObjectDrops` - draw what items an object will drop
 * `ObjectTiles` - draw boundaries around objects
-* `Sleep(TODO)` - draw sleep details given current step count
+* `Sleep` - draw sleep details given current step count
 * `TaskPaths` - draw paths for current queued tasks
 * `TileHighlight` - draw highlighted tiles
 * `TileText` - draw text on tiles
@@ -174,7 +174,7 @@ To implement a new Overlay, create a new class that inherits from `IOverlay`. Al
 
 ## ImGui Tools
 
-TODO: need to document better how the imgui tool works/how to expose data onto a widget
+Check the lua doc example for registering data/buttons to the imgui overlay [here](https://underscore76.github.io/TASMod1.6/lua/examples/lua_overlay.lua.html)
 
 
 ## How does this work?
