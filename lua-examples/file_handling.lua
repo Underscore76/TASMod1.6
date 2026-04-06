@@ -4,7 +4,7 @@ local fileio = require('core.fileio')
 local testfile = Constants.ScriptsPath .. '/' .. 'test.dat'
 
 -- read some random data from a file, if it doesn't exist it will just return an empty table
-local setup = fileio.ReadFileTable(testfile)
+local setup = fileio.read_file_table(testfile)
 print(setup)
 
 -- modify the data
@@ -12,8 +12,8 @@ setup['test'] = 'hello world'
 setup['number'] = math.random()
 
 -- write the modified data back to the file
-fileio.WriteFileTable(testfile, setup)
+fileio.write_file_table(testfile, setup)
 
 -- read the data back from the file to verify it was written correctly
-local newsetup = fileio.ReadFileTable(testfile)
+local newsetup = fileio.read_file_table(testfile)
 print(newsetup)

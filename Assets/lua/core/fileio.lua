@@ -4,7 +4,7 @@ local fileio = {}
 ---checks if file exists
 ---@param name string the name of the file
 ---@return boolean whether the file exists or not
-function fileio.Exists(name)
+function fileio.exists(name)
     local f = io.open(name, "r")
     if f ~= nil then
         io.close(f)
@@ -17,10 +17,10 @@ end
 ---reads lines from a passed file into a table array
 ---@param fname string the filename to read from
 ---@return table a table that is an array of the lines in the file
-function fileio.ReadFile(fname)
+function fileio.read_file(fname)
     local lines = {}
     -- read the lines in table 'lines'
-    if not fileio.Exists(fname) then
+    if not fileio.exists(fname) then
         return lines
     end
     for line in io.lines(fname) do
@@ -32,7 +32,7 @@ end
 ---writes lines from a table array to a passed file
 ---@param fname string the filename to write to
 ---@param lines table a table that is an array of the lines to write
-function fileio.WriteFile(fname, lines)
+function fileio.write_file(fname, lines)
     io.output(fname)
     for i, line in ipairs(lines) do
         io.write(line .. "\n")
@@ -45,8 +45,8 @@ end
 ---strings that represent numbers will be coerced to number type
 ---@param fname string the filename to read from
 ---@return table a table of key-value pairs read from the file
-function fileio.ReadFileTable(fname)
-    local lines = fileio.ReadFile(fname)
+function fileio.read_file_table(fname)
+    local lines = fileio.read_file(fname)
     local tab = {}
     for i, line in ipairs(lines) do
         local tokens = string.split(line, ':')
@@ -64,12 +64,12 @@ end
 ---writes a table of key-value pairs to a file (simple number/string pairs, not nested)
 ---@param fname string the filename to write to
 ---@param tab table a table of key-value pairs to write
-function fileio.WriteFileTable(fname, tab)
+function fileio.write_file_table(fname, tab)
     local lines = {}
     for k, v in pairs(tab) do
         table.insert(lines, string.format("%s:%s", tostring(k), tostring(v)))
     end
-    fileio.WriteFile(fname, lines)
+    fileio.write_file(fname, lines)
 end
 
 return fileio

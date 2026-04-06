@@ -47,7 +47,7 @@ local InventoryKeys = {
 ---@param name string @the name of the item to swap to
 ---@param minStack number|nil @the minimum stack size of the item to swap to, defaults to 1
 ---@return table<Keys|number>|nil @keys to press
-function inventory.GetInventoryKey(name, minStack)
+function inventory.get_inventory_key(name, minStack)
     if minStack == nil then
         minStack = 1
     end
@@ -64,8 +64,8 @@ function inventory.GetInventoryKey(name, minStack)
     return nil
 end
 
-function inventory.HaveItems(item, minStackSize)
-    local inv = inventory.GetInventoryKey(item, minStackSize)
+function inventory.have_items(item, minStackSize)
+    local inv = inventory.get_inventory_key(item, minStackSize)
     return inv ~= nil
 end
 

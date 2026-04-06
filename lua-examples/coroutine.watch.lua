@@ -11,7 +11,7 @@ local function swap_back()
         local current = Game1.player.CurrentTool
         if current ~= nil and current.Name ~= "Pickaxe" then
             -- figure out the keys to swap to the pickaxe and fire them off
-            local keys = inventory.GetInventoryKey("Pickaxe")
+            local keys = inventory.get_inventory_key("Pickaxe")
             if keys == nil then
                 return
             end
