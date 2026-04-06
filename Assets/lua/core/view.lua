@@ -22,6 +22,7 @@ function view.reset()
 end
 
 ---sets the view to the location
+---@param loc GameLocation location to set the view to
 function view.location(loc)
     interface:ViewLocation(loc)
 end

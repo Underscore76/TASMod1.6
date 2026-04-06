@@ -1,4 +1,4 @@
---- Wraps writing to the GamePadInputQueue
+--- Wraps writing to the KeyboardMouseInputQueue
 
 local KeyboardAndMouse = {}
 KeyboardAndMouse.__index = KeyboardAndMouse
@@ -8,6 +8,12 @@ KeyboardAndMouse.__index = KeyboardAndMouse
 function KeyboardAndMouse.new()
     local self = setmetatable({ keys = {}, mouse = {} }, KeyboardAndMouse) --[[@as KeyboardAndMouse]]
     return self
+end
+
+---gets the number of inputs currently staged in the queue for this gamepad
+---@return number the number of inputs currently staged
+function KeyboardAndMouse:num_staged()
+    return KeyboardMouseInputQueue.Queue.Count
 end
 
 ---clears current keys and mouse buttons

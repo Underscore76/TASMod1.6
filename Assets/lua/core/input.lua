@@ -5,9 +5,9 @@ local clickables = require("core.clickables")
 local input = {}
 
 ---click a point on the screen
----@param point Vec2 @a table with X and Y fields
----@param left boolean @true if you want to left click
----@param right boolean @true if you want to right click
+---@param point Vec2 a table with X and Y fields
+---@param left boolean true if you want to left click
+---@param right boolean true if you want to right click
 function input.click_point(point, left, right)
     local mouse = {
         X = point.X,
@@ -25,13 +25,13 @@ function input.click_point(point, left, right)
 end
 
 ---click the center of a rectangle
----@param rect Rect @a table with Center field or a Rectangle object
+---@param rect Rect a table with Center field or a Rectangle object
 function input.click_rect(rect)
     input.click_point(rect.Center, true, false)
 end
 
 ---click a component by name
----@param name string @the name of the component to click
+---@param name string the name of the component to click
 function input.click_component(name)
     local component = clickables.get_object_by_name(name)
     if component == nil then
@@ -42,8 +42,8 @@ function input.click_component(name)
 end
 
 ---click a slider component by name
----@param name string @the name of the component to click
----@param value number @the value to set the slider to (0-100)
+---@param name string the name of the component to click
+---@param value number the value to set the slider to (0-100)
 function input.click_slider_component(name, value)
     local obj = clickables.get_object_by_name(name)
     if obj ~= nil then
@@ -52,8 +52,8 @@ function input.click_slider_component(name, value)
 end
 
 ---click a horizontal slider
----@param rect table|Rect @a table with X, Y, Width, and Center fields or a Rectangle object
----@param value number @the value to set the slider to (0-100)
+---@param rect table|Rect a table with X, Y, Width, and Center fields or a Rectangle object
+---@param value number the value to set the slider to (0-100)
 function input.click_horizontal_slider(rect, value)
     local point = {
         X = rect.X + rect.Width * value / 100,

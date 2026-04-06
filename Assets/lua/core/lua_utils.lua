@@ -5,7 +5,7 @@
 ---  for tables this is via direct lookup,
 ---  all other objects are via iteration.
 ---@param obj any
----@return number @length of object
+---@return number length of object
 function len(obj)
     if type(obj) == "table" then
         return #obj
@@ -16,7 +16,7 @@ function len(obj)
 end
 
 --- generator for key/value pairs from a dictionary
----@param dict any @dictionary to iterate over
+---@param dict any dictionary to iterate over
 ---@return function,table,nil data key/value pairs to iterate over
 function dict_items(dict)
     local x = dict.Keys:GetEnumerator()
@@ -28,9 +28,9 @@ function dict_items(dict)
 end
 
 ---print key/value pairs from a dictionary
----@param dict any @dictionary to iterate over
----@param itemfunc function|nil @modifier function to apply to each item (defaults to nil)
----@param keyfunc function|nil @modifier function to apply to each key (defaults to nil)
+---@param dict any dictionary to iterate over
+---@param itemfunc function|nil modifier function to apply to each item (defaults to nil)
+---@param keyfunc function|nil modifier function to apply to each key (defaults to nil)
 function print_dict(dict, itemfunc, keyfunc)
     if itemfunc == nil then
         itemfunc = function(item) return item end
@@ -44,14 +44,14 @@ function print_dict(dict, itemfunc, keyfunc)
 end
 
 ---print a dictionary with vector keys
----@param dict any @dictionary to iterate over
----@param itemfunc function|nil @modifier function to apply to each item (defaults to nil)
+---@param dict any dictionary to iterate over
+---@param itemfunc function|nil modifier function to apply to each item (defaults to nil)
 function print_vec_dict(dict, itemfunc)
     print_dict(dict, itemfunc, function(k) return concat(k.X, k.Y) end)
 end
 
 ---generator for items from a list
----@param obj any @list to iterate over
+---@param obj any list to iterate over
 ---@return function,table,nil data items to iterate over
 function list_items(obj)
     local x = obj:GetEnumerator()
@@ -66,8 +66,8 @@ function list_items(obj)
 end
 
 ---print items from a list
----@param obj any @list to iterate over
----@param itemfunc function|nil @modifier function to apply to each item (defaults to nil)
+---@param obj any list to iterate over
+---@param itemfunc function|nil modifier function to apply to each item (defaults to nil)
 function print_list(obj, itemfunc)
     if itemfunc == nil then
         itemfunc = function(item) return item end
@@ -116,8 +116,8 @@ function clamp(x, min, max)
 end
 
 --- computes element index of item in table
----@param list table @table to search
----@param item any @item to search for
+---@param list table table to search
+---@param item any item to search for
 function indexof(list, item)
     if item == nil then
         return nil
@@ -131,8 +131,8 @@ function indexof(list, item)
 end
 
 ---duplicates table
----@param list table @table to copy
----@return table @copy of table
+---@param list table table to copy
+---@return table copy of table
 function copytable(list)
     local n = len(list)
     local v = {}
@@ -144,8 +144,8 @@ end
 
 ---concatenates a list of strings together with tabs
 --example: concat("a", "b", "c") -> "a\tb\tc"
----@param ... string @list of strings to concatenate
----@return string @concatenated string
+---@param ... string list of strings to concatenate
+---@return string concatenated string
 ---
 function concat(...)
     local arg = { ... }
@@ -160,9 +160,9 @@ function concat(...)
 end
 
 ---split a string into a table based on a separator
----@param inputstr string @string to split
----@param sep string @separator to split on
----@return table @split string
+---@param inputstr string string to split
+---@param sep string separator to split on
+---@return table split string
 function string.split(inputstr, sep)
     if sep == nil then
         sep = "%s"
@@ -175,9 +175,9 @@ function string.split(inputstr, sep)
 end
 
 ---join a bunch of items together with a delimiter
----@param delim string @delimiter to join with
----@param items table|string @items to join
----@return string @joined string
+---@param delim string delimiter to join with
+---@param items table|string items to join
+---@return string joined string
 function string.join(delim, items)
     if type(items) == 'table' then
         return table.concat(items, delim)
@@ -194,8 +194,8 @@ function string.join(delim, items)
 end
 
 ---filter a list of items based on if they exist in a table
----@param items table|string @items to filter
----@param filters table @filters to apply
+---@param items table|string items to filter
+---@param filters table filters to apply
 function list_filter(items, filters)
     local t = {}
     if type(items) == 'table' then
@@ -216,8 +216,8 @@ function list_filter(items, filters)
 end
 
 ---print a c# array
----@param x any @array to print
----@return string @string representation of array
+---@param x any array to print
+---@return string string representation of array
 function print_arr(x)
     local n = x.Length
     local res = {}
@@ -230,8 +230,8 @@ end
 
 ---generates a random string of a given length
 ---taken from https://gist.github.com/haggen/2fd643ea9a261fea2094
----@param length number @length of string to generate
----@return string|unknown @random string
+---@param length number length of string to generate
+---@return string|unknown random string
 function string.random(length)
     local charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
     if length > 0 then

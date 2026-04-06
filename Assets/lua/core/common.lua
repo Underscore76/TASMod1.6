@@ -56,20 +56,20 @@ function bfload(file)
 end
 
 ---returns the current game frame
----@return number @current frame number
+---@return number current frame number
 function current_frame()
     return interface:GetCurrentFrame()
 end
 
 ---returns the current game1 random
----@return Random @current game1 random
+---@return Random current game1 random
 function game1_random()
     return interface:GetGame1Random()
 end
 
 ---copies the random object
 ---@param random Random
----@return Random @copied random object
+---@return Random copied random object
 function copy_random(random)
     return interface:CopyRandom(random)
 end
@@ -130,7 +130,7 @@ function frame_stack_clear()
 end
 
 ---gets the current real time
----@return DateTimeOffset @current real time
+---@return DateTimeOffset current real time
 function real_time()
     return DateTimeOffset.FromUnixTimeSeconds(os.time()):ToLocalTime()
 end

@@ -57,6 +57,7 @@
   <li><a href="../modules/core.scripts.newgame.html">core.scripts.newgame</a></li>
   <li><a href="../modules/core.scripts.startup.html">core.scripts.startup</a></li>
   <li><a href="../modules/core.utilities.frame_stack.html">core.utilities.frame_stack</a></li>
+  <li><a href="../modules/core.utilities.input_copy.html">core.utilities.input_copy</a></li>
   <li><a href="../modules/core.view.html">core.view</a></li>
   <li><a href="../modules/prelaunch.html">prelaunch</a></li>
 </ul>
@@ -187,7 +188,7 @@ taken from https://gist.github.com/haggen/2fd643ea9a261fea2094</td>
     <h3>Returns:</h3>
     <ol>
 
-        number @length of object
+        number length of object
     </ol>
 
 
@@ -205,7 +206,7 @@ taken from https://gist.github.com/haggen/2fd643ea9a261fea2094</td>
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">dict</span>
-         any @dictionary to iterate over
+         any dictionary to iterate over
         </li>
     </ul>
 
@@ -230,13 +231,13 @@ taken from https://gist.github.com/haggen/2fd643ea9a261fea2094</td>
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">dict</span>
-         any @dictionary to iterate over
+         any dictionary to iterate over
         </li>
         <li><span class="parameter">itemfunc</span>
-         function|nil @modifier function to apply to each item (defaults to nil)
+         function|nil modifier function to apply to each item (defaults to nil)
         </li>
         <li><span class="parameter">keyfunc</span>
-         function|nil @modifier function to apply to each key (defaults to nil)
+         function|nil modifier function to apply to each key (defaults to nil)
         </li>
     </ul>
 
@@ -256,10 +257,10 @@ taken from https://gist.github.com/haggen/2fd643ea9a261fea2094</td>
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">dict</span>
-         any @dictionary to iterate over
+         any dictionary to iterate over
         </li>
         <li><span class="parameter">itemfunc</span>
-         function|nil @modifier function to apply to each item (defaults to nil)
+         function|nil modifier function to apply to each item (defaults to nil)
         </li>
     </ul>
 
@@ -279,7 +280,7 @@ taken from https://gist.github.com/haggen/2fd643ea9a261fea2094</td>
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">obj</span>
-         any @list to iterate over
+         any list to iterate over
         </li>
     </ul>
 
@@ -304,10 +305,10 @@ taken from https://gist.github.com/haggen/2fd643ea9a261fea2094</td>
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">obj</span>
-         any @list to iterate over
+         any list to iterate over
         </li>
         <li><span class="parameter">itemfunc</span>
-         function|nil @modifier function to apply to each item (defaults to nil)
+         function|nil modifier function to apply to each item (defaults to nil)
         </li>
     </ul>
 
@@ -390,10 +391,10 @@ taken from https://gist.github.com/haggen/2fd643ea9a261fea2094</td>
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">list</span>
-         table @table to search
+         table table to search
         </li>
         <li><span class="parameter">item</span>
-         any @item to search for
+         any item to search for
         </li>
     </ul>
 
@@ -413,14 +414,14 @@ taken from https://gist.github.com/haggen/2fd643ea9a261fea2094</td>
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">list</span>
-         table @table to copy
+         table table to copy
         </li>
     </ul>
 
     <h3>Returns:</h3>
     <ol>
 
-        table @copy of table
+        table copy of table
     </ol>
 
 
@@ -439,14 +440,14 @@ example: concat("a", "b", "c") -> "a\tb\tc"
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">...</span>
-         string @list of strings to concatenate
+         string list of strings to concatenate
         </li>
     </ul>
 
     <h3>Returns:</h3>
     <ol>
 
-        string @concatenated string
+        string concatenated string
     </ol>
 
 
@@ -464,17 +465,17 @@ example: concat("a", "b", "c") -> "a\tb\tc"
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">inputstr</span>
-         string @string to split
+         string string to split
         </li>
         <li><span class="parameter">sep</span>
-         string @separator to split on
+         string separator to split on
         </li>
     </ul>
 
     <h3>Returns:</h3>
     <ol>
 
-        table @split string
+        table split string
     </ol>
 
 
@@ -492,17 +493,17 @@ example: concat("a", "b", "c") -> "a\tb\tc"
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">delim</span>
-         string @delimiter to join with
+         string delimiter to join with
         </li>
         <li><span class="parameter">items</span>
-         table|string @items to join
+         table|string items to join
         </li>
     </ul>
 
     <h3>Returns:</h3>
     <ol>
 
-        string @joined string
+        string joined string
     </ol>
 
 
@@ -520,10 +521,10 @@ example: concat("a", "b", "c") -> "a\tb\tc"
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">items</span>
-         table|string @items to filter
+         table|string items to filter
         </li>
         <li><span class="parameter">filters</span>
-         table @filters to apply
+         table filters to apply
         </li>
     </ul>
 
@@ -543,14 +544,14 @@ example: concat("a", "b", "c") -> "a\tb\tc"
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">x</span>
-         any @array to print
+         any array to print
         </li>
     </ul>
 
     <h3>Returns:</h3>
     <ol>
 
-        string @string representation of array
+        string string representation of array
     </ol>
 
 
@@ -569,14 +570,14 @@ taken from https://gist.github.com/haggen/2fd643ea9a261fea2094
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">length</span>
-         number @length of string to generate
+         number length of string to generate
         </li>
     </ul>
 
     <h3>Returns:</h3>
     <ol>
 
-        string|unknown @random string
+        string|unknown random string
     </ol>
 
 
@@ -590,7 +591,7 @@ taken from https://gist.github.com/haggen/2fd643ea9a261fea2094
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/lunarmodules/LDoc">LDoc 1.5.0</a></i>
-<i style="float:right;">Last updated 2026-04-05 20:47:21 </i>
+<i style="float:right;">Last updated 2026-04-05 21:12:55 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

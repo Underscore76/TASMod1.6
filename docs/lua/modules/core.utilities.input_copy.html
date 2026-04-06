@@ -40,7 +40,7 @@
 <h2>Modules</h2>
 <ul class="nowrap">
   <li><a href="../modules/aliases.html">aliases</a></li>
-  <li><strong>core.clickables</strong></li>
+  <li><a href="../modules/core.clickables.html">core.clickables</a></li>
   <li><a href="../modules/core.collections.deque.html">core.collections.deque</a></li>
   <li><a href="../modules/core.collections.stack.html">core.collections.stack</a></li>
   <li><a href="../modules/core.common.html">core.common</a></li>
@@ -57,7 +57,7 @@
   <li><a href="../modules/core.scripts.newgame.html">core.scripts.newgame</a></li>
   <li><a href="../modules/core.scripts.startup.html">core.scripts.startup</a></li>
   <li><a href="../modules/core.utilities.frame_stack.html">core.utilities.frame_stack</a></li>
-  <li><a href="../modules/core.utilities.input_copy.html">core.utilities.input_copy</a></li>
+  <li><strong>core.utilities.input_copy</strong></li>
   <li><a href="../modules/core.view.html">core.view</a></li>
   <li><a href="../modules/prelaunch.html">prelaunch</a></li>
 </ul>
@@ -83,8 +83,9 @@
 
 <div id="content">
 
-<h1>Module <code>core.clickables</code></h1>
-<p>clickables: a module for finding clickable objects in menus</p>
+<h1>Module <code>core.utilities.input_copy</code></h1>
+<p>clone frame inputs and play them back at a later time
+useful for things like replaying non-rng dependent inputs</p>
 <p>
 
 </p>
@@ -93,16 +94,12 @@
 <h2><a href="#Functions">Functions</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" nowrap><a href="#get_object_by_name">get_object_by_name (name)</a></td>
-	<td class="summary">get a clickable object by name</td>
+	<td class="name" nowrap><a href="#copy">copy (f_start, f_end)</a></td>
+	<td class="summary">copy inputs from the current save state</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#has_object">has_object (name)</a></td>
-	<td class="summary">check if a clickable object exists by name</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#list">list ()</a></td>
-	<td class="summary">list all clickable objects on screen</td>
+	<td class="name" nowrap><a href="#playback">playback ()</a></td>
+	<td class="summary">playback the copied frames from right now</td>
 	</tr>
 </table>
 
@@ -114,17 +111,20 @@
 
     <dl class="function">
     <dt>
-    <a name = "get_object_by_name"></a>
-    <strong>get_object_by_name (name)</strong>
+    <a name = "copy"></a>
+    <strong>copy (f_start, f_end)</strong>
     </dt>
     <dd>
-    get a clickable object by name
+    copy inputs from the current save state
 
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">name</span>
-         string|number the name of the object to get
+        <li><span class="parameter">f_start</span>
+         number the starting frame to copy (inclusive)
+        </li>
+        <li><span class="parameter">f_end</span>
+         number the ending frame to copy (exclusive)
         </li>
     </ul>
 
@@ -134,31 +134,11 @@
 
 </dd>
     <dt>
-    <a name = "has_object"></a>
-    <strong>has_object (name)</strong>
+    <a name = "playback"></a>
+    <strong>playback ()</strong>
     </dt>
     <dd>
-    check if a clickable object exists by name
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">name</span>
-         string the name of the object to check
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "list"></a>
-    <strong>list ()</strong>
-    </dt>
-    <dd>
-    list all clickable objects on screen
+    playback the copied frames from right now
 
 
 

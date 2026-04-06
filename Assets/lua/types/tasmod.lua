@@ -164,12 +164,16 @@ local KeyboardAndMouse = {}
 ---@class KeyboardAndMouseModule
 ---@field new fun(): KeyboardAndMouse
 
+---@class csQueue
+---@field Count number @number of items in the queue
+
 ---@class GamePadInputQueue
----@field Queues table
+---@field Queues csQueue[]
 ---@field SetManualFrameFunction fun(index: number, func: function, name: string, description: string|nil): nil
 GamePadInputQueue = {}
 
 ---@class KeyboardMouseInputQueue
+---@field Queue csQueue
 ---@field PushNamedFunction fun(name: string): nil
 ---@field PushFunction fun(func: function, name: string, description: string|nil): nil
 KeyboardMouseInputQueue = {}

@@ -5,7 +5,7 @@ Gamepad.__index = Gamepad
 
 ---creates a new gamepad for player index (0 indexed so p1 = 0, p2 = 1, etc)
 ---@param index number the player index for this gamepad (0 indexed so p1 = 0, p2 = 1, etc)
----@return Gamepad @new gamepad object
+---@return Gamepad new gamepad object
 function Gamepad.new(index)
     local self = setmetatable({}, Gamepad) --[[@as Gamepad]]
     self.buttons = {}

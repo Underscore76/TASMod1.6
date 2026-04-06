@@ -44,9 +44,9 @@ local InventoryKeys = {
 ---returns {} if we are already holding the item with the necessary stack size
 ---returns nil if the item is not found
 ---otherwise returns the keys to press to swap to the item
----@param name string @the name of the item to swap to
----@param minStack number|nil @the minimum stack size of the item to swap to, defaults to 1
----@return table<Keys|number>|nil @keys to press
+---@param name string the name of the item to swap to
+---@param minStack number|nil the minimum stack size of the item to swap to, defaults to 1
+---@return table<Keys|number>|nil keys to press
 function inventory.get_inventory_key(name, minStack)
     if minStack == nil then
         minStack = 1
@@ -64,6 +64,10 @@ function inventory.get_inventory_key(name, minStack)
     return nil
 end
 
+---check if the player has the specified item with the minimum stack size
+---@param item string the name of the item to check
+---@param minStackSize number|nil the minimum stack size of the item, defaults to 1
+---@return boolean true if the player has the item with the required stack size, false otherwise
 function inventory.have_items(item, minStackSize)
     local inv = inventory.get_inventory_key(item, minStackSize)
     return inv ~= nil
