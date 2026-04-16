@@ -15,6 +15,8 @@ local StateList = {}
 ---@field Count number @number of frames in the save state
 ---@field ReRecords number @number of re-records for the save state
 ---@field FrameStates StateList @list of frame states
+---@field Frame0RandomSeed number @the random seed at the start of the save state
+---@field Frame0RandomIndex number @the random index at the start of the save state
 local SaveState = {}
 
 ---@class Console
@@ -85,6 +87,7 @@ TASView = {
 ---@field ResetView fun(self: interface): nil @reset the view to the base
 ---@field ViewLocation fun(self: interface, location: GameLocation): nil @set the view location to the specified coordinates
 ---@field Print fun(self: interface, message: string): nil @print a message to the console
+---@field Kill fun(self: interface): nil @kill the game instance
 interface = {}
 
 ---@enum TASMode

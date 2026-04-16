@@ -28,10 +28,13 @@ local NetInt = {}
 local Farmer = {}
 
 ---@class GameLocation
+---@field Name string @the name of the location
+---@field terrainFeatures any
 local GameLocation = {}
 
 ---@class Game1
 ---@field player Farmer @the current player object
 ---@field currentLocation GameLocation @the current location object
 ---@field tileSize number @the size of a tile in pixels
+---@field locations GameLocation[] @list of all locations in the game
 Game1 = {}
