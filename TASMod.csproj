@@ -60,7 +60,7 @@
       <TargetPath>libcimgui.so</TargetPath>
     </ContentWithTargetPath>
   </ItemGroup>
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="$([MSBuild]::IsOSPlatform('OSX'))">
   	<Exec Command="xattr -dr com.apple.quarantine $(OutDir)" />
   </Target>
 </Project>
