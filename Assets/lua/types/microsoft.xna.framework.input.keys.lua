@@ -52,3 +52,15 @@
 ---@field RightShift number
 ---@field Tab number
 Keys = {}
+
+
+---@class MouseState
+---@field X number
+---@field Y number
+---@field LeftMouseClicked boolean
+---@field RightMouseClicked boolean
+MouseState = {}
+
+---@class Mouse
+---@field GetState fun():MouseState
+Mouse = {}

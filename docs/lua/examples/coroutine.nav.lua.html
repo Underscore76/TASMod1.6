@@ -31,12 +31,24 @@
   <li><a href="../index.html">Index</a></li>
 </ul>
 
-<h2>Contents</h2>
-<ul>
-<li><a href="#Functions">Functions</a></li>
+
+
+<h2>Examples</h2>
+<ul class="nowrap">
+  <li><a href="../examples/boot.lua.html">boot.lua</a></li>
+  <li><a href="../examples/coroutine.basic.lua.html">coroutine.basic.lua</a></li>
+  <li><a href="../examples/coroutine.infiniteloop.lua.html">coroutine.infiniteloop.lua</a></li>
+  <li><strong>coroutine.nav.lua</strong></li>
+  <li><a href="../examples/coroutine.toggle.lua.html">coroutine.toggle.lua</a></li>
+  <li><a href="../examples/coroutine.watch.lua.html">coroutine.watch.lua</a></li>
+  <li><a href="../examples/create_char.lua.html">create_char.lua</a></li>
+  <li><a href="../examples/file_handling.lua.html">file_handling.lua</a></li>
+  <li><a href="../examples/init.lua.html">init.lua</a></li>
+  <li><a href="../examples/lua_overlay.lua.html">lua_overlay.lua</a></li>
+  <li><a href="../examples/newgame.lua.html">newgame.lua</a></li>
+  <li><a href="../examples/screenfade.lua.html">screenfade.lua</a></li>
+  <li><a href="../examples/use_keybinds.lua.html">use_keybinds.lua</a></li>
 </ul>
-
-
 <h2>Modules</h2>
 <ul class="nowrap">
   <li><a href="../modules/aliases.html">aliases</a></li>
@@ -44,7 +56,7 @@
   <li><a href="../modules/core.collections.deque.html">core.collections.deque</a></li>
   <li><a href="../modules/core.collections.stack.html">core.collections.stack</a></li>
   <li><a href="../modules/core.common.html">core.common</a></li>
-  <li><strong>core.console</strong></li>
+  <li><a href="../modules/core.console.html">core.console</a></li>
   <li><a href="../modules/core.coroutines.keyboard_utils.html">core.coroutines.keyboard_utils</a></li>
   <li><a href="../modules/core.coroutines.mouse_utils.html">core.coroutines.mouse_utils</a></li>
   <li><a href="../modules/core.coroutines.nav.html">core.coroutines.nav</a></li>
@@ -69,135 +81,37 @@
 <ul class="nowrap">
   <li><a href="../readme/README.md.html">README</a></li>
 </ul>
-<h2>Examples</h2>
-<ul class="nowrap">
-  <li><a href="../examples/boot.lua.html">boot.lua</a></li>
-  <li><a href="../examples/coroutine.basic.lua.html">coroutine.basic.lua</a></li>
-  <li><a href="../examples/coroutine.infiniteloop.lua.html">coroutine.infiniteloop.lua</a></li>
-  <li><a href="../examples/coroutine.nav.lua.html">coroutine.nav.lua</a></li>
-  <li><a href="../examples/coroutine.toggle.lua.html">coroutine.toggle.lua</a></li>
-  <li><a href="../examples/coroutine.watch.lua.html">coroutine.watch.lua</a></li>
-  <li><a href="../examples/create_char.lua.html">create_char.lua</a></li>
-  <li><a href="../examples/file_handling.lua.html">file_handling.lua</a></li>
-  <li><a href="../examples/init.lua.html">init.lua</a></li>
-  <li><a href="../examples/lua_overlay.lua.html">lua_overlay.lua</a></li>
-  <li><a href="../examples/newgame.lua.html">newgame.lua</a></li>
-  <li><a href="../examples/screenfade.lua.html">screenfade.lua</a></li>
-  <li><a href="../examples/use_keybinds.lua.html">use_keybinds.lua</a></li>
-</ul>
 
 </div>
 
 <div id="content">
 
-<h1>Module <code>core.console</code></h1>
-<p>defines wrapper object around the TAS console</p>
-<p>
+    <h2>coroutine.nav.lua</h2>
+<pre>
+<span class="comment">--- adds a triggerable coroutine where if you press the J key, it will walk to the tile you are moused over
+</span><span class="keyword">local</span> nav = <span class="global">require</span>(<span class="string">'core.coroutines.nav'</span>) <span class="comment">-- see this file for details on the generation/walk logic
+</span><span class="keyword">local</span> keybinds = <span class="global">require</span>(<span class="string">"core.keybinds"</span>)
+<span class="keyword">local</span> input = <span class="global">require</span>(<span class="string">"core.input"</span>)
 
-</p>
+<span class="comment">-- add a new keybind
+</span><span class="keyword">local</span> name = <span class="string">"walk_to_mouse_tile"</span>
+<span class="keyword">local</span> key = Keys.J
 
+<span class="comment">-- clean up existing keybind if it exists
+</span>keybinds.<span class="function-name">remove</span>(key)
+keybinds.<span class="function-name">add</span>(
+    key,
+    <span class="keyword">function</span>()
+        <span class="comment">-- convert current mouse coordinate to tile position
+</span>        <span class="keyword">local</span> m = Mouse.<span class="function-name">GetState</span>()
+        <span class="keyword">local</span> t = input.<span class="function-name">get_tile_from_local</span>(<span class="function-name">Vector2</span>(m.X, m.Y))
+        <span class="comment">-- push a coroutine for generating a path and walking to the tile
+</span>        KeyboardMouseInputQueue.<span class="function-name">PushFunction</span>(nav.<span class="function-name">walk_to_tile</span>(t), name)
+    <span class="keyword">end</span>,
+    name
+)
 
-<h2><a href="#Functions">Functions</a></h2>
-<table class="function_list">
-	<tr>
-	<td class="name" nowrap><a href="#close">close ()</a></td>
-	<td class="summary">closes the console</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#open">open ()</a></td>
-	<td class="summary">opens the console</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#playback">playback (func)</a></td>
-	<td class="summary">plays back a function with the console closed</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#exec">exec (command)</a></td>
-	<td class="summary">executes a TAS console command.</td>
-	</tr>
-</table>
-
-<br/>
-<br/>
-
-
-    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
-
-    <dl class="function">
-    <dt>
-    <a name = "close"></a>
-    <strong>close ()</strong>
-    </dt>
-    <dd>
-    closes the console
-
-
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "open"></a>
-    <strong>open ()</strong>
-    </dt>
-    <dd>
-    opens the console
-
-
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "playback"></a>
-    <strong>playback (func)</strong>
-    </dt>
-    <dd>
-    plays back a function with the console closed
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">func</span>
-
-
-
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "exec"></a>
-    <strong>exec (command)</strong>
-    </dt>
-    <dd>
-    executes a TAS console command.  this is not the same as the SDV debug commands
-see docs for a list of commands or try <code>help</code> or <code>list</code>
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">command</span>
-
-
-
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-</dl>
+<span class="keyword">return</span> nav</pre>
 
 
 </div> <!-- id="content" -->

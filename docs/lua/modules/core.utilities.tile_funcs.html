@@ -1,0 +1,456 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>TAS Mod Lua Docs</title>
+    <link rel="stylesheet" href="../ldoc_new.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>TASMod 1.6</h1>
+
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Functions">Functions</a></li>
+</ul>
+
+
+<h2>Modules</h2>
+<ul class="nowrap">
+  <li><a href="../modules/aliases.html">aliases</a></li>
+  <li><a href="../modules/core.clickables.html">core.clickables</a></li>
+  <li><a href="../modules/core.collections.deque.html">core.collections.deque</a></li>
+  <li><a href="../modules/core.collections.stack.html">core.collections.stack</a></li>
+  <li><a href="../modules/core.common.html">core.common</a></li>
+  <li><a href="../modules/core.console.html">core.console</a></li>
+  <li><a href="../modules/core.coroutines.keyboard_utils.html">core.coroutines.keyboard_utils</a></li>
+  <li><a href="../modules/core.coroutines.mouse_utils.html">core.coroutines.mouse_utils</a></li>
+  <li><a href="../modules/core.coroutines.nav.html">core.coroutines.nav</a></li>
+  <li><a href="../modules/core.engine.html">core.engine</a></li>
+  <li><a href="../modules/core.fileio.html">core.fileio</a></li>
+  <li><a href="../modules/core.input.html">core.input</a></li>
+  <li><a href="../modules/core.input.gamepad.html">core.input.gamepad</a></li>
+  <li><a href="../modules/core.input.kbm.html">core.input.kbm</a></li>
+  <li><a href="../modules/core.inventory.html">core.inventory</a></li>
+  <li><a href="../modules/core.keybinds.html">core.keybinds</a></li>
+  <li><a href="../modules/core.lua_utils.html">core.lua_utils</a></li>
+  <li><a href="../modules/core.replay.html">core.replay</a></li>
+  <li><a href="../modules/core.scripts.newgame.html">core.scripts.newgame</a></li>
+  <li><a href="../modules/core.scripts.startup.html">core.scripts.startup</a></li>
+  <li><a href="../modules/core.utilities.frame_stack.html">core.utilities.frame_stack</a></li>
+  <li><a href="../modules/core.utilities.input_copy.html">core.utilities.input_copy</a></li>
+  <li><strong>core.utilities.tile_funcs</strong></li>
+  <li><a href="../modules/core.view.html">core.view</a></li>
+  <li><a href="../modules/prelaunch.html">prelaunch</a></li>
+</ul>
+<h2>Readme</h2>
+<ul class="nowrap">
+  <li><a href="../readme/README.md.html">README</a></li>
+</ul>
+<h2>Examples</h2>
+<ul class="nowrap">
+  <li><a href="../examples/boot.lua.html">boot.lua</a></li>
+  <li><a href="../examples/coroutine.basic.lua.html">coroutine.basic.lua</a></li>
+  <li><a href="../examples/coroutine.infiniteloop.lua.html">coroutine.infiniteloop.lua</a></li>
+  <li><a href="../examples/coroutine.nav.lua.html">coroutine.nav.lua</a></li>
+  <li><a href="../examples/coroutine.toggle.lua.html">coroutine.toggle.lua</a></li>
+  <li><a href="../examples/coroutine.watch.lua.html">coroutine.watch.lua</a></li>
+  <li><a href="../examples/create_char.lua.html">create_char.lua</a></li>
+  <li><a href="../examples/file_handling.lua.html">file_handling.lua</a></li>
+  <li><a href="../examples/init.lua.html">init.lua</a></li>
+  <li><a href="../examples/lua_overlay.lua.html">lua_overlay.lua</a></li>
+  <li><a href="../examples/newgame.lua.html">newgame.lua</a></li>
+  <li><a href="../examples/screenfade.lua.html">screenfade.lua</a></li>
+  <li><a href="../examples/use_keybinds.lua.html">use_keybinds.lua</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Module <code>core.utilities.tile_funcs</code></h1>
+<p>methods for working with positioning inside of a tile</p>
+<p>
+
+</p>
+
+
+<h2><a href="#Functions">Functions</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#tileFuncs.ContainedRect">tileFuncs.ContainedRect (rect, tile)</a></td>
+	<td class="summary">is the rect fully inside the tile</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#tileFuncs.ContainedCenter">tileFuncs.ContainedCenter (rect, tile)</a></td>
+	<td class="summary">is the center inside the tile</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#tileFuncs.ContainedRectCentered">tileFuncs.ContainedRectCentered (rect, tile)</a></td>
+	<td class="summary">is the rect centered in the tile</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#tileFuncs.CenteredWithinTileWidth">tileFuncs.CenteredWithinTileWidth (vec, tile)</a></td>
+	<td class="summary">offset direction to center the player box horizontally in the tile</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#tileFuncs.CenteredWithinTileHeight">tileFuncs.CenteredWithinTileHeight (vec, tile)</a></td>
+	<td class="summary">offset direction to center the player box vertically in the tile</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#tileFuncs.FullyWithinTileWidth">tileFuncs.FullyWithinTileWidth (vec, tile)</a></td>
+	<td class="summary">offset direction to have the player box fully inside the tile horizontally</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#tileFuncs.FullyWithinTileHeight">tileFuncs.FullyWithinTileHeight (vec, tile)</a></td>
+	<td class="summary">offset direction to have the player box fully inside the tile vertically</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#tileFuncs.VecWithinTileWidth">tileFuncs.VecWithinTileWidth (vec, tile)</a></td>
+	<td class="summary">check if the x coordinate of the vector is within the tile bound</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#tileFuncs.VecWithinTileHeight">tileFuncs.VecWithinTileHeight (vec, tile)</a></td>
+	<td class="summary">check if the y coordinate of the vector within the tile bound</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#tileFuncs.PlayerBBoxCenter">tileFuncs.PlayerBBoxCenter ()</a></td>
+	<td class="summary">returns the center of the players bounding box</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#tileFuncs.PlayerPosition">tileFuncs.PlayerPosition ()</a></td>
+	<td class="summary">returns the position of the player</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "tileFuncs.ContainedRect"></a>
+    <strong>tileFuncs.ContainedRect (rect, tile)</strong>
+    </dt>
+    <dd>
+    is the rect fully inside the tile
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">rect</span>
+         Rect
+        </li>
+        <li><span class="parameter">tile</span>
+         Vec2|table
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        boolean true if the rect is fully inside the tile, false otherwise
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "tileFuncs.ContainedCenter"></a>
+    <strong>tileFuncs.ContainedCenter (rect, tile)</strong>
+    </dt>
+    <dd>
+    is the center inside the tile
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">rect</span>
+         Rect
+        </li>
+        <li><span class="parameter">tile</span>
+         Vec2|table
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        boolean true if the center is inside the tile, false otherwise
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "tileFuncs.ContainedRectCentered"></a>
+    <strong>tileFuncs.ContainedRectCentered (rect, tile)</strong>
+    </dt>
+    <dd>
+    is the rect centered in the tile
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">rect</span>
+         Rect
+        </li>
+        <li><span class="parameter">tile</span>
+         Vec2|table
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        boolean true if the rect is centered in the tile, false otherwise
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "tileFuncs.CenteredWithinTileWidth"></a>
+    <strong>tileFuncs.CenteredWithinTileWidth (vec, tile)</strong>
+    </dt>
+    <dd>
+    offset direction to center the player box horizontally in the tile
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">vec</span>
+         Vec2
+        </li>
+        <li><span class="parameter">tile</span>
+         Vec2|table
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        integer 1 if the x position is to the left of the center, -1 if to the right of the center, 0 if centered
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "tileFuncs.CenteredWithinTileHeight"></a>
+    <strong>tileFuncs.CenteredWithinTileHeight (vec, tile)</strong>
+    </dt>
+    <dd>
+    offset direction to center the player box vertically in the tile
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">vec</span>
+         Vec2
+        </li>
+        <li><span class="parameter">tile</span>
+         Vec2|table
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        integer 1 if the y position is above the center, -1 if below the center, 0 if centered
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "tileFuncs.FullyWithinTileWidth"></a>
+    <strong>tileFuncs.FullyWithinTileWidth (vec, tile)</strong>
+    </dt>
+    <dd>
+    offset direction to have the player box fully inside the tile horizontally
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">vec</span>
+         Vec2
+        </li>
+        <li><span class="parameter">tile</span>
+         Vec2|table
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        integer 1 if the player box is to the left of the center, -1 if to the right of the center, 0 if centered
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "tileFuncs.FullyWithinTileHeight"></a>
+    <strong>tileFuncs.FullyWithinTileHeight (vec, tile)</strong>
+    </dt>
+    <dd>
+    offset direction to have the player box fully inside the tile vertically
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">vec</span>
+         Vec2
+        </li>
+        <li><span class="parameter">tile</span>
+         Vec2|table
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        integer 1 if the player box is above the center, -1 if below the center, 0 if centered
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "tileFuncs.VecWithinTileWidth"></a>
+    <strong>tileFuncs.VecWithinTileWidth (vec, tile)</strong>
+    </dt>
+    <dd>
+    check if the x coordinate of the vector is within the tile bound
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">vec</span>
+         Vec2
+        </li>
+        <li><span class="parameter">tile</span>
+         Vec2|table
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        integer 1 if the x position is to the left of the tile, -1 if to the right of the tile, 0 if within the tile
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "tileFuncs.VecWithinTileHeight"></a>
+    <strong>tileFuncs.VecWithinTileHeight (vec, tile)</strong>
+    </dt>
+    <dd>
+    check if the y coordinate of the vector within the tile bound
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">vec</span>
+         Vec2
+        </li>
+        <li><span class="parameter">tile</span>
+         Vec2|table
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        integer 1 if the y position is above the tile, -1 if below the tile, 0 if within the tile
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "tileFuncs.PlayerBBoxCenter"></a>
+    <strong>tileFuncs.PlayerBBoxCenter ()</strong>
+    </dt>
+    <dd>
+    returns the center of the players bounding box
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+        Vec2 the center of the players bounding box
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "tileFuncs.PlayerPosition"></a>
+    <strong>tileFuncs.PlayerPosition ()</strong>
+    </dt>
+    <dd>
+    returns the position of the player
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+        Vec2 the position of the player
+    </ol>
+
+
+
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/lunarmodules/LDoc">LDoc 1.5.0</a></i>
+<i style="float:right;">Last updated 2026-04-18 03:10:45 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>

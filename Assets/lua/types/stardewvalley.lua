@@ -26,6 +26,8 @@ local NetInt = {}
 ---@field Tile Vec2
 ---@field Stamina number
 ---@field GetBoundingBox fun(self: Farmer): Rect
+---@field Position Vec2
+---@field getMovementSpeed fun(self: Farmer): number
 local Farmer = {}
 
 ---@class GameLocation

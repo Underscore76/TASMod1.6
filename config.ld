@@ -3,7 +3,8 @@ file = "Assets/lua"
 file = {
     "Assets/lua",
     exclude = {
-        "Assets/lua/types"
+        "Assets/lua/types",
+        "Assets/lua/core/data/click_maps.lua"
     }
 }
 project = "TASMod 1.6"

@@ -45,7 +45,7 @@
   <li><a href="../modules/core.collections.stack.html">core.collections.stack</a></li>
   <li><a href="../modules/core.common.html">core.common</a></li>
   <li><a href="../modules/core.console.html">core.console</a></li>
-  <li><a href="../modules/core.coroutines.keyboard_utils.html">core.coroutines.keyboard_utils</a></li>
+  <li><strong>core.coroutines.keyboard_utils</strong></li>
   <li><a href="../modules/core.coroutines.mouse_utils.html">core.coroutines.mouse_utils</a></li>
   <li><a href="../modules/core.coroutines.nav.html">core.coroutines.nav</a></li>
   <li><a href="../modules/core.engine.html">core.engine</a></li>
@@ -53,7 +53,7 @@
   <li><a href="../modules/core.input.html">core.input</a></li>
   <li><a href="../modules/core.input.gamepad.html">core.input.gamepad</a></li>
   <li><a href="../modules/core.input.kbm.html">core.input.kbm</a></li>
-  <li><strong>core.inventory</strong></li>
+  <li><a href="../modules/core.inventory.html">core.inventory</a></li>
   <li><a href="../modules/core.keybinds.html">core.keybinds</a></li>
   <li><a href="../modules/core.lua_utils.html">core.lua_utils</a></li>
   <li><a href="../modules/core.replay.html">core.replay</a></li>
@@ -90,8 +90,8 @@
 
 <div id="content">
 
-<h1>Module <code>core.inventory</code></h1>
-<p>Inventory helper functions</p>
+<h1>Module <code>core.coroutines.keyboard_utils</code></h1>
+<p>methods for working with keyboard input in coroutines</p>
 <p>
 
 </p>
@@ -100,22 +100,8 @@
 <h2><a href="#Functions">Functions</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" nowrap><a href="#get_inventory_key">get_inventory_key (name, minStack)</a></td>
-	<td class="summary">get the necessary keys to swap to an item
-returns {} if we are already holding the item with the necessary stack size
-returns nil if the item is not found
-otherwise returns the keys to press to swap to the item</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#get_tool_key">get_tool_key (name)</a></td>
-	<td class="summary">get the necessary keys to swap to a tool type
-returns {} if we are already holding the tool
-returns nil if the tool is not found
-otherwise returns the keys to press to swap to the tool</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#have_items">have_items (item, minStackSize)</a></td>
-	<td class="summary">check if the player has the specified item with the minimum stack size</td>
+	<td class="name" nowrap><a href="#handle_inventory_swap">handle_inventory_swap (kbm, tool)</a></td>
+	<td class="summary">press keys to swap to a specified tool</td>
 	</tr>
 </table>
 
@@ -127,86 +113,27 @@ otherwise returns the keys to press to swap to the tool</td>
 
     <dl class="function">
     <dt>
-    <a name = "get_inventory_key"></a>
-    <strong>get_inventory_key (name, minStack)</strong>
+    <a name = "handle_inventory_swap"></a>
+    <strong>handle_inventory_swap (kbm, tool)</strong>
     </dt>
     <dd>
-    get the necessary keys to swap to an item
-returns {} if we are already holding the item with the necessary stack size
-returns nil if the item is not found
-otherwise returns the keys to press to swap to the item
+    press keys to swap to a specified tool
 
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">name</span>
-         string the name of the item to swap to
+        <li><span class="parameter">kbm</span>
+         KeyboardAndMouse
         </li>
-        <li><span class="parameter">minStack</span>
-         number|nil the minimum stack size of the item to swap to, defaults to 1
+        <li><span class="parameter">tool</span>
+         string name of the tool or tool type to swap to
         </li>
     </ul>
 
     <h3>Returns:</h3>
     <ol>
 
-        table<Keys|number>|nil keys to press
-    </ol>
-
-
-
-
-</dd>
-    <dt>
-    <a name = "get_tool_key"></a>
-    <strong>get_tool_key (name)</strong>
-    </dt>
-    <dd>
-    get the necessary keys to swap to a tool type
-returns {} if we are already holding the tool
-returns nil if the tool is not found
-otherwise returns the keys to press to swap to the tool
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">name</span>
-         string the name of the tool type to swap to (e.g. "Axe", "Pickaxe", "Hoe", "Watering Can", "Scythe")
-        </li>
-    </ul>
-
-    <h3>Returns:</h3>
-    <ol>
-
-        table<Keys|number>|nil keys to press
-    </ol>
-
-
-
-
-</dd>
-    <dt>
-    <a name = "have_items"></a>
-    <strong>have_items (item, minStackSize)</strong>
-    </dt>
-    <dd>
-    check if the player has the specified item with the minimum stack size
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">item</span>
-         string the name of the item to check
-        </li>
-        <li><span class="parameter">minStackSize</span>
-         number|nil the minimum stack size of the item, defaults to 1
-        </li>
-    </ul>
-
-    <h3>Returns:</h3>
-    <ol>
-
-        boolean true if the player has the item with the required stack size, false otherwise
+        boolean return true if an update is needed due to staged inputs
     </ol>
 
 
