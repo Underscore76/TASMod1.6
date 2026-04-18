@@ -25,6 +25,7 @@ local NetInt = {}
 ---@field accessory NetInt
 ---@field Tile Vec2
 ---@field Stamina number
+---@field GetBoundingBox fun(self: Farmer): Rect
 local Farmer = {}
 
 ---@class GameLocation

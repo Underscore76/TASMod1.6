@@ -157,7 +157,6 @@ namespace TASMod.Scripting
             }
             catch (LuaScriptException e)
             {
-                ModEntry.Console.Log(Constants.StripUsername(e.Message), StardewModdingAPI.LogLevel.Warn);
                 return FormatError(e.Message, e.InnerException?.InnerException ?? e.InnerException);
             }
             catch (TypeInitializationException e)

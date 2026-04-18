@@ -98,8 +98,8 @@ namespace TASMod.Console.Commands
                 }
                 catch (LuaScriptException e)
                 {
-                    result = LuaEngine.FormatError(e.Message, e.InnerException);
-                    ModEntry.Console.Log(Constants.StripUsername(result));
+                    result = LuaEngine.FormatError(Constants.StripUsername(e.Message), e.InnerException);
+                    ModEntry.Console.Log(result);
                 }
                 Write(result);
                 Clear();

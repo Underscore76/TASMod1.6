@@ -64,6 +64,24 @@ function inventory.get_inventory_key(name, minStack)
     return nil
 end
 
+---get the necessary keys to swap to a tool type
+---returns {} if we are already holding the tool
+---returns nil if the tool is not found
+---otherwise returns the keys to press to swap to the tool
+---@param name string the name of the tool type to swap to (e.g. "Axe", "Pickaxe", "Hoe", "Watering Can", "Scythe")
+---@return table<Keys|number>|nil keys to press
+function inventory.get_tool_key(name)
+    if Game1.player.CurrentTool ~= nil and Game1.player.CurrentTool:GetType().Name == name then
+        return {}
+    end
+    for i = 0, Game1.player.MaxItems - 1 do
+        if Game1.player.Items[i] ~= nil and Game1.player.Items[i]:GetType().Name == name then
+            return InventoryKeys[i]
+        end
+    end
+    return nil
+end
+
 ---check if the player has the specified item with the minimum stack size
 ---@param item string the name of the item to check
 ---@param minStackSize number|nil the minimum stack size of the item, defaults to 1

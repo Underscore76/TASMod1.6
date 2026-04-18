@@ -66,8 +66,8 @@ end
 ---@param x number the x position of the mouse
 ---@param y number the y position of the mouse
 function KeyboardAndMouse:mouse_position(x, y)
-    self.mouse.x = x
-    self.mouse.y = y
+    self.mouse.X = x
+    self.mouse.Y = y
 end
 
 ---pushes current keys and mouse buttons to the input queue and clears them
@@ -80,6 +80,12 @@ function KeyboardAndMouse:push()
     end
     interface:AddKeyboardMouseInput({ keyboard = keyboard, mouse = self.mouse })
     self:clear()
+end
+
+---check if any inputs are currently staged
+---@return boolean true if there are inputs staged, false otherwise
+function KeyboardAndMouse:has_pending()
+    return next(self.keys) ~= nil or next(self.mouse) ~= nil
 end
 
 return KeyboardAndMouse

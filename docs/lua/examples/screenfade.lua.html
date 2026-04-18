@@ -39,13 +39,13 @@
   <li><a href="../examples/coroutine.basic.lua.html">coroutine.basic.lua</a></li>
   <li><a href="../examples/coroutine.infiniteloop.lua.html">coroutine.infiniteloop.lua</a></li>
   <li><a href="../examples/coroutine.toggle.lua.html">coroutine.toggle.lua</a></li>
-  <li><strong>coroutine.watch.lua</strong></li>
+  <li><a href="../examples/coroutine.watch.lua.html">coroutine.watch.lua</a></li>
   <li><a href="../examples/create_char.lua.html">create_char.lua</a></li>
   <li><a href="../examples/file_handling.lua.html">file_handling.lua</a></li>
   <li><a href="../examples/init.lua.html">init.lua</a></li>
   <li><a href="../examples/lua_overlay.lua.html">lua_overlay.lua</a></li>
   <li><a href="../examples/newgame.lua.html">newgame.lua</a></li>
-  <li><a href="../examples/screenfade.lua.html">screenfade.lua</a></li>
+  <li><strong>screenfade.lua</strong></li>
   <li><a href="../examples/use_keybinds.lua.html">use_keybinds.lua</a></li>
 </ul>
 <h2>Modules</h2>
@@ -81,42 +81,14 @@
 
 <div id="content">
 
-    <h2>coroutine.watch.lua</h2>
+    <h2>screenfade.lua</h2>
 <pre>
-<span class="comment">--- Register a coroutine that watches for behavior and reacts to it
-</span>
-<span class="comment">-- example of a coroutine that watches for when the player is not holding a pickaxe and then swaps back to it
-</span><span class="keyword">local</span> inventory = <span class="global">require</span>(<span class="string">'core.inventory'</span>)
-<span class="keyword">local</span> KeyboardAndMouse = <span class="global">require</span>(<span class="string">"core.input.kbm"</span>)
-
-<span class="keyword">local</span> <span class="keyword">function</span> <span class="function-name">swap_back</span>()
-    <span class="keyword">local</span> kbm = KeyboardAndMouse.<span class="function-name">new</span>()
-    <span class="keyword">while</span> <span class="keyword">true</span> <span class="keyword">do</span>
-        <span class="comment">-- if the player is holding a pickaxe, just yield and check again next frame
-</span>        <span class="keyword">local</span> current = Game1.player.CurrentTool
-        <span class="keyword">if</span> current ~= <span class="keyword">nil</span> <span class="keyword">and</span> current.Name ~= <span class="string">"Pickaxe"</span> <span class="keyword">then</span>
-            <span class="comment">-- figure out the keys to swap to the pickaxe and fire them off
-</span>            <span class="keyword">local</span> keys = inventory.<span class="function-name">get_inventory_key</span>(<span class="string">"Pickaxe"</span>)
-            <span class="keyword">if</span> keys == <span class="keyword">nil</span> <span class="keyword">then</span>
-                <span class="keyword">return</span>
-            <span class="keyword">end</span>
-            kbm:<span class="function-name">press_keys</span>(keys)
-            kbm:<span class="function-name">push</span>()
-        <span class="keyword">end</span>
-        <span class="global">coroutine</span>.<span class="function-name">yield</span>()
+<span class="keyword">local</span> <span class="keyword">function</span> <span class="function-name">advance_fade</span>()
+    <span class="keyword">local</span> sf = InstanceScreenFade.<span class="function-name">Get</span>(<span class="number">0</span>) <span class="comment">-- 0 here is the first player index, in case you were doing something in multiplayer
+</span>    <span class="keyword">while</span> sf.FadeIn <span class="keyword">or</span> sf.FadeToBlack <span class="keyword">do</span>
+        <span class="function-name">advance</span>()
     <span class="keyword">end</span>
-<span class="keyword">end</span>
-
-LuaOverlay.<span class="function-name">AddButton</span>(
-    <span class="string">"Swap to Pickaxe When Equipped"</span>,
-    <span class="keyword">function</span>()
-        KeyboardMouseInputQueue.<span class="function-name">PushFunction</span>(
-            swap_back,
-            <span class="string">"swap_back"</span>,
-            <span class="string">"will swap back to the previous tool"</span>
-        )
-    <span class="keyword">end</span>
-)</pre>
+<span class="keyword">end</span></pre>
 
 
 </div> <!-- id="content" -->

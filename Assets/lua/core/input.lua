@@ -16,7 +16,7 @@ function input.click_point(point, left, right)
         right = false
     }
     local last_mouse = Controller.LastFrameMouse()
-    if last_mouse.X ~= mouse.X or last_mouse.Y ~= mouse.Y or (last_mouse.LeftMouseClicked and left) or (last_mouse.RightMouseClicked and right) then
+    if last_mouse.MouseX ~= mouse.X or last_mouse.MouseY ~= mouse.Y or (last_mouse.LeftMouseClicked and left) or (last_mouse.RightMouseClicked and right) then
         advance({ mouse = mouse })
     end
     mouse.left = left
@@ -62,11 +62,11 @@ function input.click_horizontal_slider(rect, value)
     input.click_point(point, true, false)
 end
 
----get the mouse tile from global coordinates
+---get local coordinates from tile coordinates
 ---@param tileX number the x coordinate of the tile
 ---@param tileY number the y coordinate of the tile
----@return Vec2 the mouse position in local coordinates
-function input.get_mouse_tile_from_global(tileX, tileY)
+---@return Vec2 local coordinates of the center of the tile
+function input.get_local_from_tile(tileX, tileY)
     local tileSize = Game1.tileSize
     local viewport = RunCS("Game1.viewport")
     local zoomLevel = RunCS("Game1.options.zoomLevel")
@@ -74,6 +74,23 @@ function input.get_mouse_tile_from_global(tileX, tileY)
     local localX = (tile.X - viewport.X) * zoomLevel
     local localY = (tile.Y - viewport.Y) * zoomLevel
     return Vector2(localX, localY)
+end
+
+---get tile coordinates from local coordinates
+---@param vec Vec2 the vector to get the tile of
+---@return Vec2 tile coordinates of the vector
+function input.get_tile_from_local(vec)
+    local coords = Vector2(vec.X / Game1.options.zoomLevel + Game1.viewport.X,
+        vec.Y / Game1.options.zoomLevel + Game1.viewport.Y)
+    local mTile = Vector2(coords.X // Game1.tileSize, coords.Y // Game1.tileSize)
+    return mTile
+end
+
+---get previous mouse tile
+---@return Vec2 tile coordinates of the previous mouse position
+function input.get_prev_mouse_tile()
+    local mouse = Controller.LastFrameMouse()
+    return input.get_tile_from_local(Vector2(mouse.MouseX, mouse.MouseY))
 end
 
 return input

@@ -1,0 +1,6 @@
+local function advance_fade()
+    local sf = InstanceScreenFade.Get(0) -- 0 here is the first player index, in case you were doing something in multiplayer
+    while sf.FadeIn or sf.FadeToBlack do
+        advance()
+    end
+end

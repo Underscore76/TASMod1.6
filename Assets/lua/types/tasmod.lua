@@ -33,8 +33,8 @@ local SaveState = {}
 local Console = {}
 
 ---@class TASMouseState
----@field X number @mouse x position
----@field Y number @mouse y position
+---@field MouseX number @mouse x position
+---@field MouseY number @mouse y position
 ---@field LeftMouseClicked boolean @whether the left mouse button was clicked
 ---@field RightMouseClicked boolean @whether the right mouse button was clicked
 local TASMouseState = {}
@@ -162,6 +162,7 @@ local Gamepad = {}
 ---@field mouse_right_up fun(self: KeyboardAndMouse) @release the right mouse button
 ---@field mouse_position fun(self: KeyboardAndMouse, x: number, y: number) @set the mouse position
 ---@field push fun(self: KeyboardAndMouse) @pushes current keys and mouse buttons to the input queue and clears state
+---@field has_pending fun(self: KeyboardAndMouse): boolean @check if any inputs are currently staged
 local KeyboardAndMouse = {}
 
 ---@class KeyboardAndMouseModule
