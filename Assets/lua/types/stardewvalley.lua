@@ -4,6 +4,7 @@
 ---@field ParentSheetIndex number @the item ID
 ---@field Stack number @the number of items in the stack
 ---@field Name string @the name of the item
+---@field GetType fun(self: Item): SystemType @returns the type of the item
 local Item = {}
 
 ---@class NetString
@@ -33,6 +34,9 @@ local Farmer = {}
 ---@class GameLocation
 ---@field Name string @the name of the location
 ---@field terrainFeatures any
+---@field Objects any
+---@field IsFarm boolean @whether this location is a farm
+---@field isTilePassable fun(self: GameLocation, tile: Vec2): boolean
 local GameLocation = {}
 
 ---@class Game1
@@ -40,4 +44,6 @@ local GameLocation = {}
 ---@field currentLocation GameLocation @the current location object
 ---@field tileSize number @the size of a tile in pixels
 ---@field locations GameLocation[] @list of all locations in the game
+---@field options any
+---@field viewport Vec2
 Game1 = {}

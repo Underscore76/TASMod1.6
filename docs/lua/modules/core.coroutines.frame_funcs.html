@@ -1,0 +1,421 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>TAS Mod Lua Docs</title>
+    <link rel="stylesheet" href="../ldoc_new.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>TASMod 1.6</h1>
+
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Functions">Functions</a></li>
+</ul>
+
+
+<h2>Modules</h2>
+<ul class="nowrap">
+  <li><a href="../modules/aliases.html">aliases</a></li>
+  <li><a href="../modules/core.clickables.html">core.clickables</a></li>
+  <li><a href="../modules/core.collections.deque.html">core.collections.deque</a></li>
+  <li><a href="../modules/core.collections.stack.html">core.collections.stack</a></li>
+  <li><a href="../modules/core.common.html">core.common</a></li>
+  <li><a href="../modules/core.console.html">core.console</a></li>
+  <li><strong>core.coroutines.frame_funcs</strong></li>
+  <li><a href="../modules/core.coroutines.keyboard_utils.html">core.coroutines.keyboard_utils</a></li>
+  <li><a href="../modules/core.coroutines.mouse_utils.html">core.coroutines.mouse_utils</a></li>
+  <li><a href="../modules/core.coroutines.nav.html">core.coroutines.nav</a></li>
+  <li><a href="../modules/core.engine.html">core.engine</a></li>
+  <li><a href="../modules/core.fileio.html">core.fileio</a></li>
+  <li><a href="../modules/core.input.html">core.input</a></li>
+  <li><a href="../modules/core.input.gamepad.html">core.input.gamepad</a></li>
+  <li><a href="../modules/core.input.kbm.html">core.input.kbm</a></li>
+  <li><a href="../modules/core.inventory.html">core.inventory</a></li>
+  <li><a href="../modules/core.keybinds.html">core.keybinds</a></li>
+  <li><a href="../modules/core.lua_utils.html">core.lua_utils</a></li>
+  <li><a href="../modules/core.replay.html">core.replay</a></li>
+  <li><a href="../modules/core.scripts.newgame.html">core.scripts.newgame</a></li>
+  <li><a href="../modules/core.scripts.startup.html">core.scripts.startup</a></li>
+  <li><a href="../modules/core.utilities.frame_stack.html">core.utilities.frame_stack</a></li>
+  <li><a href="../modules/core.utilities.input_copy.html">core.utilities.input_copy</a></li>
+  <li><a href="../modules/core.utilities.tile_funcs.html">core.utilities.tile_funcs</a></li>
+  <li><a href="../modules/core.view.html">core.view</a></li>
+  <li><a href="../modules/prelaunch.html">prelaunch</a></li>
+</ul>
+<h2>Readme</h2>
+<ul class="nowrap">
+  <li><a href="../readme/README.md.html">README</a></li>
+</ul>
+<h2>Examples</h2>
+<ul class="nowrap">
+  <li><a href="../examples/boot.lua.html">boot.lua</a></li>
+  <li><a href="../examples/coroutine.basic.lua.html">coroutine.basic.lua</a></li>
+  <li><a href="../examples/coroutine.infiniteloop.lua.html">coroutine.infiniteloop.lua</a></li>
+  <li><a href="../examples/coroutine.nav.lua.html">coroutine.nav.lua</a></li>
+  <li><a href="../examples/coroutine.toggle.lua.html">coroutine.toggle.lua</a></li>
+  <li><a href="../examples/coroutine.watch.lua.html">coroutine.watch.lua</a></li>
+  <li><a href="../examples/create_char.lua.html">create_char.lua</a></li>
+  <li><a href="../examples/file_handling.lua.html">file_handling.lua</a></li>
+  <li><a href="../examples/init.lua.html">init.lua</a></li>
+  <li><a href="../examples/lua_overlay.lua.html">lua_overlay.lua</a></li>
+  <li><a href="../examples/newgame.lua.html">newgame.lua</a></li>
+  <li><a href="../examples/screenfade.lua.html">screenfade.lua</a></li>
+  <li><a href="../examples/use_keybinds.lua.html">use_keybinds.lua</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Module <code>core.coroutines.frame_funcs</code></h1>
+<p>functions that can be injected as part of navigation or as standalone input handlers
+ WARNING: the output signature of some of these functions are subject to change as I futz with overlapping inputs better
+ ideally the function returning true should mean that there are some staged inputs that need to be addressed</p>
+<p>
+
+</p>
+
+
+<h2><a href="#Functions">Functions</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#mouse_over_tile">mouse_over_tile (tile)</a></td>
+	<td class="summary">move the mouse over the desired tile</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#swap_to_tool">swap_to_tool (tool, tile)</a></td>
+	<td class="summary">coroutine to swap to specified tool</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#swing_tool">swing_tool (tool, tile)</a></td>
+	<td class="summary">coroutine to swing a specific tool at a tile</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#place_item">place_item (item, tile)</a></td>
+	<td class="summary">coroutine to use a specific item at a tile</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#hoe_ground">hoe_ground ()</a></td>
+	<td class="summary">coroutine to hoe the ground around the player</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#break_stones">break_stones ()</a></td>
+	<td class="summary">coroutine to break stones around the player</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#break_twigs">break_twigs ()</a></td>
+	<td class="summary">coroutine to break twigs around the player</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#water_dirt">water_dirt ()</a></td>
+	<td class="summary">coroutine to water HoeDirt around the player</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#break_weeds">break_weeds ()</a></td>
+	<td class="summary">coroutine to break weeds around the player</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#scythe_grass">scythe_grass ()</a></td>
+	<td class="summary">coroutine to break grass around the player
+todo: this really tries to reach for grass that's far away so it looks a little whack</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#plant_seeds">plant_seeds (seed)</a></td>
+	<td class="summary">coroutine to plant seeds around the player
+todo: right now this will lose 1 frame per plant since it doesn't overlap plant and mouse movement and it blocks on player movement</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "mouse_over_tile"></a>
+    <strong>mouse_over_tile (tile)</strong>
+    </dt>
+    <dd>
+    move the mouse over the desired tile
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">tile</span>
+         Vec2|table
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        fun(kbm: KeyboardAndMouse):boolean
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "swap_to_tool"></a>
+    <strong>swap_to_tool (tool, tile)</strong>
+    </dt>
+    <dd>
+    coroutine to swap to specified tool
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">tool</span>
+         string the class of tool to swap to (e.g. "Hoe", "Pickaxe", "Axe", "WateringCan", "Weapon")
+        </li>
+        <li><span class="parameter">tile</span>
+         Vec2|table the tile to move the mouse over after swapping
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        fun(kbm: KeyboardAndMouse):boolean coroutine
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "swing_tool"></a>
+    <strong>swing_tool (tool, tile)</strong>
+    </dt>
+    <dd>
+    coroutine to swing a specific tool at a tile
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">tool</span>
+         string the class of tool to swing (e.g. "Hoe", "Pickaxe", "Axe", "WateringCan", "Weapon")
+        </li>
+        <li><span class="parameter">tile</span>
+         Vec2|table the tile to swing the tool at
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        fun(kbm: KeyboardAndMouse):boolean coroutine
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "place_item"></a>
+    <strong>place_item (item, tile)</strong>
+    </dt>
+    <dd>
+    coroutine to use a specific item at a tile
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">item</span>
+         string the name of the item to use
+        </li>
+        <li><span class="parameter">tile</span>
+         Vec2|table the tile to use the item at
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        fun(kbm: KeyboardAndMouse):boolean coroutine
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "hoe_ground"></a>
+    <strong>hoe_ground ()</strong>
+    </dt>
+    <dd>
+    coroutine to hoe the ground around the player
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+        fun(kbm: KeyboardAndMouse):boolean coroutine
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "break_stones"></a>
+    <strong>break_stones ()</strong>
+    </dt>
+    <dd>
+    coroutine to break stones around the player
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+        fun(kbm: KeyboardAndMouse):boolean coroutine
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "break_twigs"></a>
+    <strong>break_twigs ()</strong>
+    </dt>
+    <dd>
+    coroutine to break twigs around the player
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+        fun(kbm: KeyboardAndMouse):boolean coroutine
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "water_dirt"></a>
+    <strong>water_dirt ()</strong>
+    </dt>
+    <dd>
+    coroutine to water HoeDirt around the player
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+        fun(kbm: KeyboardAndMouse):boolean coroutine
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "break_weeds"></a>
+    <strong>break_weeds ()</strong>
+    </dt>
+    <dd>
+    coroutine to break weeds around the player
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+        fun(kbm: KeyboardAndMouse):boolean coroutine
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "scythe_grass"></a>
+    <strong>scythe_grass ()</strong>
+    </dt>
+    <dd>
+    coroutine to break grass around the player
+todo: this really tries to reach for grass that's far away so it looks a little whack
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+        fun(kbm: KeyboardAndMouse):boolean coroutine
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "plant_seeds"></a>
+    <strong>plant_seeds (seed)</strong>
+    </dt>
+    <dd>
+    coroutine to plant seeds around the player
+todo: right now this will lose 1 frame per plant since it doesn't overlap plant and mouse movement and it blocks on player movement
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">seed</span>
+         string the name of the seed to plant
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        fun(kbm: KeyboardAndMouse):boolean coroutine
+    </ol>
+
+
+
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/lunarmodules/LDoc">LDoc 1.5.0</a></i>
+<i style="float:right;">Last updated 2026-04-18 20:49:56 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>

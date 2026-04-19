@@ -86,7 +86,7 @@ end
 ---@param item string the name of the item to check
 ---@param minStackSize number|nil the minimum stack size of the item, defaults to 1
 ---@return boolean true if the player has the item with the required stack size, false otherwise
-function inventory.have_items(item, minStackSize)
+function inventory.have_item(item, minStackSize)
     local inv = inventory.get_inventory_key(item, minStackSize)
     return inv ~= nil
 end

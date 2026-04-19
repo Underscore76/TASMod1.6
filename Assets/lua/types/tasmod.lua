@@ -43,6 +43,7 @@ local TASMouseState = {}
 ---@field State SaveState
 ---@field Console Console
 ---@field LastFrameMouse fun(): TASMouseState @returns the mouse state from the last frame
+---@field PathFinder any @the path finder object
 Controller = {}
 
 ---@class TASDateTime

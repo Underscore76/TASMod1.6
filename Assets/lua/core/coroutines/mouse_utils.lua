@@ -17,6 +17,27 @@ function mouse_utils.handle_mouseover(kbm, tile)
     return true
 end
 
+---swing weapon for specified number of frames
+---@param kbm KeyboardAndMouse
+---@param nframes number number of frames to swing for (default: 1)
+function mouse_utils.swing_weapon(kbm, nframes)
+    if nframes == nil or nframes < 1 then
+        nframes = 1
+    end
+    if Controller.LastFrameMouse().LeftMouseClicked then
+        kbm:press_key(Keys.C)
+    else
+        kbm:mouse_left_down()
+    end
+    kbm:push()
+    coroutine.yield()
+    for _ = 1, nframes - 1 do
+        kbm:push()
+        coroutine.yield()
+    end
+    kbm:press_keys({ Keys.RightShift, Keys.R, Keys.Delete })
+end
+
 ---swings/animation cancels assuming that the mouse is in correct position and desired tool is equipped
 ---@param kbm KeyboardAndMouse
 ---@param cancel boolean whether to cancel the swing after

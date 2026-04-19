@@ -18,7 +18,7 @@ local function stage_for_next_tile(kbm, nextTool, nextTile, position, xfunc, yfu
     local speed = Game1.player:getMovementSpeed()
     -- pre-swap to tool/mouseover
     if nextTool ~= "" then
-        keyboard_utils.handle_inventory_swap(kbm, nextTool)
+        keyboard_utils.handle_tool_swap(kbm, nextTool)
         mouse_utils.handle_mouseover(kbm, nextTile)
     end
     -- we want to thin in the direction of the next tile
@@ -71,8 +71,12 @@ end
 
 ---returns a coroutine function that generates and walks a path to the selected tile
 ---@param x Vec2
----@return function coroutine function to walk to the tile
-function nav.walk_to_tile(x)
+---@param frame_func fun(kbm: KeyboardAndMouse):boolean optional function to call each frame
+--- the function should push any inputs it wants to be sent on the same frame,
+--- if it returns true, the nav function will skip straight to the end of the frame (skipping any movement input),
+--- allowing the frame function to control movement or pause current pathing for other actions
+---@return function @coroutine function to walk to the tile
+function nav.walk_to_tile(x, frame_func)
     return function()
         local kbm = KeyboardAndMouse.new()
         nav.generate_path(x)
@@ -103,18 +107,31 @@ function nav.walk_to_tile(x)
                 local tool = Controller.PathFinder:GetToolString(moveTile)
 
                 if tool ~= "" then
-                    local swapped_inventory = keyboard_utils.handle_inventory_swap(kbm, tool)
+                    local swapped_inventory = keyboard_utils.handle_tool_swap(kbm, tool)
                     local moved_mouse = mouse_utils.handle_mouseover(kbm, moveTile)
                     if swapped_inventory or moved_mouse then
-                        goto setup_tools
+                        kbm:push()
+                        coroutine.yield()
+                        goto endofframe
                     end
                     -- would only happen if animation cancel inputs are staged from last swing
                     if kbm:has_pending() then
                         kbm:push()
                         coroutine.yield()
                     end
-                    mouse_utils.swing(kbm, tool ~= "Weapon")
-                    goto swing
+                    if tool == "Weapon" then
+                        mouse_utils.swing_weapon(kbm, 12)
+                    else
+                        mouse_utils.swing(kbm, true)
+                    end
+                    goto endofframe
+                end
+
+                -- run the frame function if it exists
+                -- frame functions should push any inputs they want to be sent on the same frame
+                -- if they return true, we should yield all control and skip to the end of the frame
+                if frame_func and frame_func(kbm) then
+                    goto endofframe
                 end
 
                 -- want to walk toward our current planned tile
@@ -138,11 +155,11 @@ function nav.walk_to_tile(x)
                     stage_for_next_tile(kbm, nextTool, nextTile, p, tile_funcs.FullyWithinTileWidth,
                         tile_funcs.FullyWithinTileHeight, xdir, ydir, moveTile)
                 end
-
-                ::setup_tools::
+                -- run the movement inputs for this frame
                 kbm:push()
                 coroutine.yield()
-                ::swing::
+
+                ::endofframe::
             end
             Controller.PathFinder:PopFront()
         end

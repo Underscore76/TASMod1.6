@@ -33,3 +33,7 @@ GCCollectionMode = {
 ---@class GC
 ---@field Collect fun(generation: number, mode: GCCollectionMode, blocking: boolean, compacting: boolean): nil @forces garbage collection
 GC = {}
+
+---@class SystemType
+---@field Name string @the name of the type
+SystemType = {}
