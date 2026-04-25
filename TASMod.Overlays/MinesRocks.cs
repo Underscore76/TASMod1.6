@@ -24,6 +24,12 @@ namespace TASMod.Overlays
         private int currentLocationNumObjects = -1;
         public Dictionary<Vector2, List<string>> objectsThatHaveDrops;
 
+        public Dictionary<Vector2, List<string>> GetSpecificItems(List<string> items)
+        {
+            return objectsThatHaveDrops.Where(kv => kv.Value.Any(i => items.Contains(i)))
+                .ToDictionary(kv => kv.Key, kv => kv.Value);
+        }
+
         public MinesRocks()
         {
             Active = true;

@@ -19,7 +19,7 @@ namespace TASMod.Overlays
         private int last_luckLevel = -1;
         private int last_stonesLeftOnThisLevel = -1;
         private int last_characterCount = -1;
-        private Dictionary<Vector2, int> rockCounters;
+        public Dictionary<Vector2, int> rockCounters;
 
         public int lineThickness = 2;
         public bool hasLadder;
@@ -33,6 +33,46 @@ namespace TASMod.Overlays
             Reset();
         }
 
+        public void DoUpdate(int index)
+        {
+            var locationInfo = InstanceCurrentLocation.Get(index);
+            var playerInfo = InstanceCurrentPlayer.Get(index);
+            rockCounters = new Dictionary<Vector2, int>();
+            last_mineLevel = locationInfo.MineLevel;
+            last_miningLevel = playerInfo.Player.MiningLevel;
+            last_luckLevel = playerInfo.Player.LuckLevel;
+            last_stonesLeftOnThisLevel = locationInfo.StonesLeftOnThisLevel();
+            last_characterCount = locationInfo.EnemyCount;
+
+            foreach (
+                KeyValuePair<Vector2, StardewValley.Object> current in locationInfo.Location
+                    .Objects
+                    .Pairs
+            )
+            {
+                if (current.Value.Name == "Stone")
+                {
+                    rockCounters.Add(
+                        current.Key,
+                        EvalTile(index, locationInfo.Location as MineShaft, current.Key)
+                    );
+                }
+            }
+        }
+
+        public bool HasLadder(int index)
+        {
+            var locationInfo = InstanceCurrentLocation.Get(index);
+            return locationInfo.HasLadder(out _);
+        }
+
+        public Vector2 GetLadder(int index)
+        {
+            var locationInfo = InstanceCurrentLocation.Get(index);
+            locationInfo.HasLadder(out var ladder);
+            return ladder;
+        }
+
         public override void ActiveUpdate()
         {
             int index = ActiveInstance.InstanceIndex;
@@ -40,27 +80,7 @@ namespace TASMod.Overlays
             var playerInfo = InstanceCurrentPlayer.Get(index);
             if (ShouldUpdate(locationInfo, playerInfo))
             {
-                rockCounters = new Dictionary<Vector2, int>();
-                last_mineLevel = locationInfo.MineLevel;
-                last_miningLevel = playerInfo.Player.MiningLevel;
-                last_luckLevel = playerInfo.Player.LuckLevel;
-                last_stonesLeftOnThisLevel = locationInfo.StonesLeftOnThisLevel();
-                last_characterCount = locationInfo.EnemyCount;
-
-                foreach (
-                    KeyValuePair<Vector2, StardewValley.Object> current in locationInfo.Location
-                        .Objects
-                        .Pairs
-                )
-                {
-                    if (current.Value.Name == "Stone")
-                    {
-                        rockCounters.Add(
-                            current.Key,
-                            EvalTile(index, locationInfo.Location as MineShaft, current.Key)
-                        );
-                    }
-                }
+                DoUpdate(index);
             }
             if (locationInfo.IsMines)
             {

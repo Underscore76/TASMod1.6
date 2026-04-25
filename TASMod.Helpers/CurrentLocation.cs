@@ -251,19 +251,22 @@ namespace TASMod.Helpers
         public bool HasLadder(out Vector2 location)
         {
             location = Vector2.Zero;
-            if (Location is MineShaft mine && mine.ladderHasSpawned)
+            if (Location is MineShaft mine)
             {
-                // have to find it...
-                xTile.Dimensions.Size mapDims = mine.map.Layers[0].LayerSize;
-                for (int i = 0; i < mapDims.Width; i++)
+                if (mine.ladderHasSpawned || mine.loadedMapNumber == 10 || mine.loadedMapNumber == 20)
                 {
-                    for (int j = 0; j < mapDims.Height; j++)
+                    // have to find it...
+                    xTile.Dimensions.Size mapDims = mine.map.Layers[0].LayerSize;
+                    for (int i = 0; i < mapDims.Width; i++)
                     {
-                        int index = mine.getTileIndexAt(i, j, "Buildings");
-                        if (index == 173 || index == 174)
+                        for (int j = 0; j < mapDims.Height; j++)
                         {
-                            location = new Vector2(i, j);
-                            return true;
+                            int index = mine.getTileIndexAt(i, j, "Buildings");
+                            if (index == 173 || index == 174)
+                            {
+                                location = new Vector2(i, j);
+                                return true;
+                            }
                         }
                     }
                 }

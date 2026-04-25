@@ -89,6 +89,9 @@ TASView = {
 ---@field ViewLocation fun(self: interface, location: GameLocation): nil @set the view location to the specified coordinates
 ---@field Print fun(self: interface, message: string): nil @print a message to the console
 ---@field Kill fun(self: interface): nil @kill the game instance
+---@field TableToStringList fun(self: interface, table: table): List<string> @convert a table to a string list for printing
+---@field TableToIntList fun(self: interface, table: table): List<int> @convert a table to an int list
+---@field TableToVector2List fun(self: interface, table: table): List<Vec2> @convert a table to a Vector2 list
 interface = {}
 
 ---@enum TASMode

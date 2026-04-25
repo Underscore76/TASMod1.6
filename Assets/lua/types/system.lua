@@ -37,3 +37,10 @@ GC = {}
 ---@class SystemType
 ---@field Name string @the name of the type
 SystemType = {}
+
+---@class List
+---@field Count number @the number of items in the list
+---@field Add fun(self: List, item: any): nil @adds an item to the list
+---@field Clear fun(self: List): nil @clears the list
+---@field Get fun(self: List, index: number): any @gets the item at the specified index
+List = {}

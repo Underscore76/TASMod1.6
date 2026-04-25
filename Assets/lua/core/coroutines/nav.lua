@@ -71,14 +71,15 @@ end
 
 ---returns a coroutine function that generates and walks a path to the selected tile
 ---@param x Vec2
----@param frame_func fun(kbm: KeyboardAndMouse):boolean optional function to call each frame
+---@param frame_func nil|fun(kbm: KeyboardAndMouse):boolean optional function to call each frame
 --- the function should push any inputs it wants to be sent on the same frame,
 --- if it returns true, the nav function will skip straight to the end of the frame (skipping any movement input),
 --- allowing the frame function to control movement or pause current pathing for other actions
----@return function @coroutine function to walk to the tile
-function nav.walk_to_tile(x, frame_func)
-    return function()
-        local kbm = KeyboardAndMouse.new()
+---@param escape_function nil|fun():boolean optional function to call each frame to determine if the pathing should be aborted
+---@return fun(kbm: KeyboardAndMouse|nil):nil @coroutine function to walk to the tile
+function nav.walk_to_tile(x, frame_func, escape_function)
+    return function(kbm)
+        if kbm == nil then kbm = KeyboardAndMouse.new() end
         nav.generate_path(x)
         if not Controller.PathFinder.hasPath then
             error(string.format("failed to generate path to tile %d,%d", x.X, x.Y))
@@ -119,6 +120,12 @@ function nav.walk_to_tile(x, frame_func)
                         kbm:push()
                         coroutine.yield()
                     end
+                    -- need to track if we're currently blocked from swinging
+                    if Game1.fadeToBlack then
+                        kbm:push()
+                        coroutine.yield()
+                        goto endofframe
+                    end
                     if tool == "Weapon" then
                         mouse_utils.swing_weapon(kbm, 12)
                     else
@@ -132,6 +139,11 @@ function nav.walk_to_tile(x, frame_func)
                 -- if they return true, we should yield all control and skip to the end of the frame
                 if frame_func and frame_func(kbm) then
                     goto endofframe
+                end
+
+                -- check escape function to see if we should abort the pathing
+                if escape_function and escape_function() then
+                    return
                 end
 
                 -- want to walk toward our current planned tile

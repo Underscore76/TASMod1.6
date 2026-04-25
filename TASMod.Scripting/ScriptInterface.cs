@@ -671,5 +671,72 @@ namespace TASMod.Scripting
         {
             GameRunner.LoadInstance(GameRunner.instance.gameInstances[index], true);
         }
+
+        private static List<T> TableToList<T>(LuaTable table, Func<object, T> convert, Action<object, Exception> onError = null)
+        {
+            var result = new List<T>();
+            if (table == null) return result;
+
+            foreach (var value in table.Values)
+            {
+                if (value == null) continue;
+                try
+                {
+                    result.Add(convert(value));
+                }
+                catch (Exception ex)
+                {
+                    onError?.Invoke(value, ex);
+                }
+            }
+
+            return result;
+        }
+
+        public List<string> TableToStringList(LuaTable table)
+        {
+            return TableToList(table, Convert.ToString, (value, ex) =>
+            {
+                Console.PushResult($"failed to convert value {value} to string: {ex.Message}");
+            });
+        }
+
+        public List<int> TableToIntList(LuaTable table)
+        {
+            return TableToList(table, Convert.ToInt32, (value, ex) =>
+            {
+                Console.PushResult($"failed to convert value {value} to int: {ex.Message}");
+            });
+        }
+
+        public List<Vector2> TableToVector2List(LuaTable table)
+        {
+            return TableToList(table, value =>
+            {
+                if (value is Vector2 vec)
+                {
+                    return vec;
+                }
+                else if (value is LuaTable vecTable && vecTable["X"] != null && vecTable["Y"] != null)
+                {
+                    try
+                    {
+                        float x = Convert.ToSingle(vecTable["X"]);
+                        float y = Convert.ToSingle(vecTable["Y"]);
+                        return new Vector2(x, y);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.PushResult($"failed to convert table {vecTable} to Vector2: {ex.Message}");
+                        return Vector2.Zero;
+                    }
+                }
+                else
+                {
+                    Console.PushResult($"value {value} is not a valid Vector2 table");
+                    return Vector2.Zero;
+                }
+            });
+        }
     }
 }
