@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
@@ -36,7 +37,7 @@ namespace TASMod.Overlays
                 return;
             foreach (var debris in currentLocation.debris)
             {
-                Vector2 vec = approximatePosition(debris);
+                Vector2 vec = ApproximatePosition(debris);
                 /*
                     |X + 32 - pX| < radius
                     if X + 32 - pX < 0
@@ -58,7 +59,7 @@ namespace TASMod.Overlays
                 string name = DropInfo.ObjectName(debris.itemId.Value.Substring(3), return_unknown: true);
                 if (name == "unknown")
                     continue;
-                if (playerInRange(vec, player))
+                if (PlayerInRange(vec, player))
                 {
                     DrawRectOutline(index, spriteBatch, rect, Color.Green, 2);
                 }
@@ -77,7 +78,7 @@ namespace TASMod.Overlays
             }
         }
 
-        public Vector2 approximatePosition(Debris debris)
+        public Vector2 ApproximatePosition(Debris debris)
         {
             Vector2 vector = default(Vector2);
             foreach (Chunk chunk in debris.Chunks)
@@ -88,7 +89,7 @@ namespace TASMod.Overlays
             return vector / debris.Chunks.Count;
         }
 
-        private bool playerInRange(Vector2 position, Farmer farmer)
+        public bool PlayerInRange(Vector2 position, Farmer farmer)
         {
             int appliedMagneticRadius = farmer.GetAppliedMagneticRadius();
             Point standingPixel = farmer.StandingPixel;
@@ -98,6 +99,44 @@ namespace TASMod.Overlays
             }
 
             return false;
+        }
+
+        public bool WillMoveTowardPlayer(int index, Debris debris)
+        {
+            var player = InstanceCurrentPlayer.Get(index).Player;
+            Vector2 vec = ApproximatePosition(debris);
+            return PlayerInRange(vec, player);
+        }
+
+        public List<Debris> GetItemDebris(int index)
+        {
+            var currentLocation = InstanceCurrentLocation.Get(index).Location;
+            List<Debris> debris = new();
+            foreach (var d in currentLocation.debris)
+            {
+                if (d.debrisType.Value == Debris.DebrisType.OBJECT || d.debrisType.Value == Debris.DebrisType.RESOURCE || d.debrisType.Value == Debris.DebrisType.ARCHAEOLOGY)
+                {
+                    debris.Add(d);
+                }
+            }
+            return debris;
+        }
+        public List<Debris> GetInactiveItemDebris(int index)
+        {
+            var currentLocation = InstanceCurrentLocation.Get(index).Location;
+            List<Debris> debris = new();
+            foreach (var d in currentLocation.debris)
+            {
+                if (d.debrisType.Value != Debris.DebrisType.OBJECT && d.debrisType.Value != Debris.DebrisType.RESOURCE && d.debrisType.Value != Debris.DebrisType.ARCHAEOLOGY)
+                {
+                    continue;
+                }
+                if (!d.chunksMoveTowardPlayer)
+                {
+                    debris.Add(d);
+                }
+            }
+            return debris;
         }
     }
 }

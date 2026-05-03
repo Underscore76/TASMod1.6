@@ -39,6 +39,23 @@ local Farmer = {}
 ---@field isTilePassable fun(self: GameLocation, tile: Vec2): boolean
 local GameLocation = {}
 
+---@enum DebrisType
+DebrisType = {
+    CHUNKS = 0,
+    LETTERS = 1,
+    ARCHAEOLOGY = 3,
+    OBJECT = 4,
+    SPRITECHUNKS = 5,
+    RESOURCE = 6,
+    NUMBERS = 7
+}
+
+---@class Debris
+---@field debrisType DebrisType
+---@field Chunks any[]
+Debris = {}
+
+
 ---@class Game1
 ---@field player Farmer @the current player object
 ---@field currentLocation GameLocation @the current location object

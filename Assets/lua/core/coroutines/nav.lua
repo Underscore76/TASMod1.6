@@ -76,11 +76,12 @@ end
 --- if it returns true, the nav function will skip straight to the end of the frame (skipping any movement input),
 --- allowing the frame function to control movement or pause current pathing for other actions
 ---@param escape_function nil|fun():boolean optional function to call each frame to determine if the pathing should be aborted
+---@param use_tool_to_move boolean|nil whether to use tools to clear a path if needed, defaults to true
 ---@return fun(kbm: KeyboardAndMouse|nil):nil @coroutine function to walk to the tile
-function nav.walk_to_tile(x, frame_func, escape_function)
+function nav.walk_to_tile(x, frame_func, escape_function, use_tool_to_move)
     return function(kbm)
         if kbm == nil then kbm = KeyboardAndMouse.new() end
-        nav.generate_path(x)
+        nav.generate_path(x, use_tool_to_move)
         if not Controller.PathFinder.hasPath then
             error(string.format("failed to generate path to tile %d,%d", x.X, x.Y))
         end
@@ -106,7 +107,6 @@ function nav.walk_to_tile(x, frame_func, escape_function)
                 local xdir = tile_funcs.FullyWithinTileWidth(p, moveTile)
                 local ydir = tile_funcs.FullyWithinTileHeight(p, moveTile)
                 local tool = Controller.PathFinder:GetToolString(moveTile)
-
                 if tool ~= "" then
                     local swapped_inventory = keyboard_utils.handle_tool_swap(kbm, tool)
                     local moved_mouse = mouse_utils.handle_mouseover(kbm, moveTile)

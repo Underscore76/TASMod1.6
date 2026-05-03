@@ -9,12 +9,10 @@ local mouse_utils = {}
 ---@return boolean true if mouse was moved, false if already there
 function mouse_utils.handle_mouseover(kbm, tile)
     local m = input.get_prev_mouse_tile()
-    if m.X == tile.X and m.Y == tile.Y then
-        return false
-    end
+    local same_tile = m.X == tile.X and m.Y == tile.Y
     local next_mouse = input.get_local_from_tile(tile.X, tile.Y)
     kbm:mouse_position(next_mouse.X, next_mouse.Y)
-    return true
+    return not same_tile
 end
 
 ---swing weapon for specified number of frames

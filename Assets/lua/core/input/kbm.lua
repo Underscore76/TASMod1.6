@@ -88,4 +88,8 @@ function KeyboardAndMouse:has_pending()
     return next(self.keys) ~= nil or next(self.mouse) ~= nil
 end
 
+function KeyboardAndMouse:yield()
+    coroutine.yield()
+end
+
 return KeyboardAndMouse

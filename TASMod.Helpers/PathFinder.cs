@@ -160,6 +160,22 @@ namespace TASMod.Helpers
                     }
                 }
             }
+            if (location is MineShaft mineShaft)
+            {
+                foreach (ResourceClump current in mineShaft.resourceClumps)
+                {
+                    Rectangle rect = new Rectangle(
+                        (int)current.Tile.X,
+                        (int)current.Tile.Y,
+                        current.width.Value,
+                        current.height.Value
+                    );
+                    if (rect.Intersects(new Rectangle((int)tile.X, (int)tile.Y, 1, 1)))
+                    {
+                        return "Pickaxe";
+                    }
+                }
+            }
             return "";
         }
 

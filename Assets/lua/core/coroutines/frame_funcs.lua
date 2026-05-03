@@ -77,6 +77,26 @@ local function _place_item(kbm, item, tile)
     end
 end
 
+---swing pickup item at tile
+---@param kbm KeyboardAndMouse
+---@param tile Vec2|table
+local function _swing_pickup(kbm, tile)
+    while _swap_to_tool(kbm, "Weapon", tile) do
+        kbm:push()
+        coroutine.yield()
+    end
+    -- right click
+    kbm:mouse_right_down()
+    kbm:push()
+    coroutine.yield()
+    -- left click
+    kbm:mouse_left_down()
+    kbm:push()
+    coroutine.yield()
+    -- cancel
+    kbm:press_keys({ Keys.RightShift, Keys.R, Keys.Delete })
+end
+
 
 ---calc a basic offset tile to put the mouse too based
 ---@param p Vec2|table player tile
@@ -371,6 +391,23 @@ function frame_funcs.plant_seeds(seed)
                 end
                 ::continue::
             end
+        end
+        return false
+    end
+end
+
+---coroutine to swing and pickup an item at a tile
+---@param tile Vec2|table the tile to pickup at
+---@return fun(kbm: KeyboardAndMouse):boolean coroutine
+function frame_funcs.swing_pickup(tile)
+    return function(kbm)
+        if Game1.currentLocation.Objects:ContainsKey(tile) then
+            local obj = Game1.currentLocation.Objects[tile]
+            if not obj:isForage() then
+                return false
+            end
+            _swing_pickup(kbm, tile)
+            return true -- click action is staged
         end
         return false
     end

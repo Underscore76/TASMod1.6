@@ -11,59 +11,14 @@ namespace TASMod.Overlays
     public class MinesLadder : IOverlay
     {
         public override string Name => "MinesLadder";
-
         public override string Description => "Shows the best rock to break in the mines";
 
-        private int last_mineLevel = -1;
-        private int last_miningLevel = -1;
-        private int last_luckLevel = -1;
-        private int last_stonesLeftOnThisLevel = -1;
-        private int last_characterCount = -1;
-        public Dictionary<Vector2, int> rockCounters;
-
+        public MinesFloor minesFloor;
         public int lineThickness = 2;
-        public bool hasLadder;
-        public int minRockCount;
-        public Vector2 minLocation;
-        public Vector2 ladderLocation;
-
         public MinesLadder()
         {
             Active = true;
-            Reset();
-        }
-
-        public void DoUpdate(int index)
-        {
-            var locationInfo = InstanceCurrentLocation.Get(index);
-            var playerInfo = InstanceCurrentPlayer.Get(index);
-            rockCounters = new Dictionary<Vector2, int>();
-            last_mineLevel = locationInfo.MineLevel;
-            last_miningLevel = playerInfo.Player.MiningLevel;
-            last_luckLevel = playerInfo.Player.LuckLevel;
-            last_stonesLeftOnThisLevel = locationInfo.StonesLeftOnThisLevel();
-            last_characterCount = locationInfo.EnemyCount;
-
-            foreach (
-                KeyValuePair<Vector2, StardewValley.Object> current in locationInfo.Location
-                    .Objects
-                    .Pairs
-            )
-            {
-                if (current.Value.Name == "Stone")
-                {
-                    rockCounters.Add(
-                        current.Key,
-                        EvalTile(index, locationInfo.Location as MineShaft, current.Key)
-                    );
-                }
-            }
-        }
-
-        public bool HasLadder(int index)
-        {
-            var locationInfo = InstanceCurrentLocation.Get(index);
-            return locationInfo.HasLadder(out _);
+            minesFloor = new MinesFloor(0);
         }
 
         public Vector2 GetLadder(int index)
@@ -76,45 +31,8 @@ namespace TASMod.Overlays
         public override void ActiveUpdate()
         {
             int index = ActiveInstance.InstanceIndex;
-            var locationInfo = InstanceCurrentLocation.Get(index);
-            var playerInfo = InstanceCurrentPlayer.Get(index);
-            if (ShouldUpdate(locationInfo, playerInfo))
-            {
-                DoUpdate(index);
-            }
-            if (locationInfo.IsMines)
-            {
-                hasLadder = locationInfo.HasLadder(out ladderLocation);
-                Vector2 baseTile = playerInfo.CurrentTile;
-                if (locationInfo.Name != playerInfo.Player.currentLocation.Name)
-                {
-                    baseTile = (locationInfo.Location as MineShaft).tileBeneathLadder;
-                }
-                if (!hasLadder)
-                {
-                    float minDistance = float.MaxValue;
-                    int minCount = Int32.MaxValue;
-                    foreach (var rock in rockCounters)
-                    {
-                        if (rock.Value < minCount)
-                        {
-                            minDistance = (rock.Key - baseTile).Length();
-                            minCount = rock.Value;
-                            minLocation = rock.Key;
-                        }
-                        else if (rock.Value == minCount)
-                        {
-                            float distance = (rock.Key - baseTile).Length();
-                            if (distance < minDistance)
-                            {
-                                minDistance = distance;
-                                minLocation = rock.Key;
-                            }
-                        }
-                    }
-                    minRockCount = minCount;
-                }
-            }
+            minesFloor.SetIndex(index);
+            minesFloor.UpdateLadders();
         }
 
         private Color GetRockColor(int value)
@@ -148,23 +66,23 @@ namespace TASMod.Overlays
                 baseTile = (locationInfo.Location as MineShaft).tileBeneathLadder;
             }
             // draw best line
-            if (hasLadder)
+            if (minesFloor.HasLadder())
             {
-                DrawLineBetweenTiles(index, b, baseTile, ladderLocation, Color.LightCyan, lineThickness);
+                DrawLineBetweenTiles(index, b, baseTile, minesFloor.GetLadderTile(), Color.LightCyan, lineThickness);
             }
-            else if (minRockCount != Int32.MaxValue)
+            else if (minesFloor.GetMinLadderCount() != Int32.MaxValue)
             {
-                foreach (KeyValuePair<Vector2, int> current in rockCounters)
+                foreach (KeyValuePair<Vector2, int> current in minesFloor.GetLadderCounts())
                 {
-                    if (current.Value <= minRockCount + 10)
+                    if (current.Value <= minesFloor.GetMinLadderCount() + 10)
                         DrawDepth(index, b, current.Key, current.Value);
                 }
                 DrawLineBetweenTiles(
                     index,
                     b,
                     baseTile,
-                    minLocation,
-                    GetRockColor(minRockCount),
+                    minesFloor.GetLadderTile(),
+                    GetRockColor(minesFloor.GetMinLadderCount()),
                     lineThickness
                 );
             }
@@ -173,64 +91,6 @@ namespace TASMod.Overlays
         private void DrawDepth(int index, SpriteBatch spriteBatch, Vector2 tile, int depth)
         {
             DrawCenteredTextInTile(index, spriteBatch, tile, depth.ToString(), GetRockColor(depth));
-        }
-
-        public int EvalTile(int index, MineShaft mine, Vector2 tile)
-        {
-            var playerInfo = InstanceCurrentPlayer.Get(index);
-            if (mine.ladderHasSpawned || mine.stonesLeftOnThisLevel == 0)
-            {
-                return -1;
-            }
-            int farmerLuckLevel = playerInfo.Player.LuckLevel;
-            double chanceForLadderDown =
-                0.02 + (double)farmerLuckLevel / 100.0 + playerInfo.Player.DailyLuck / 5.0;
-            if (mine.EnemyCount == 0)
-            {
-                chanceForLadderDown += 0.04;
-            }
-            for (int i = 0; i < mine.stonesLeftOnThisLevel; i++)
-            {
-                Random r = Utility.CreateDaySaveRandom(tile.X * 1000, tile.Y, mine.mineLevel);
-                r.NextDouble();
-                if (
-                    r.NextDouble()
-                    < chanceForLadderDown
-                        + 1.0 / (double)Math.Max(1, mine.stonesLeftOnThisLevel - i)
-                )
-                {
-                    return i;
-                }
-            }
-            return -1;
-        }
-
-        public bool ShouldUpdate(LocationInfo CurrentLocation, PlayerInfo CurrentPlayer)
-        {
-            if (CurrentLocation.IsMines)
-            {
-                return (last_mineLevel != CurrentLocation.MineLevel)
-                    || (last_miningLevel != CurrentPlayer.Player.MiningLevel)
-                    || (last_luckLevel != CurrentPlayer.Player.LuckLevel)
-                    || (last_stonesLeftOnThisLevel != CurrentLocation.StonesLeftOnThisLevel())
-                    || (last_characterCount != CurrentLocation.EnemyCount);
-            }
-            return false;
-        }
-
-        public override void Reset()
-        {
-            hasLadder = false;
-            last_mineLevel = -1;
-            last_miningLevel = -1;
-            last_luckLevel = -1;
-            last_stonesLeftOnThisLevel = -1;
-            last_characterCount = -1;
-            rockCounters = new Dictionary<Vector2, int>();
-            hasLadder = false;
-            minLocation = Vector2.Zero;
-            ladderLocation = Vector2.Zero;
-            minRockCount = int.MaxValue;
         }
     }
 }

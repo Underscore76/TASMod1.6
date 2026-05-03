@@ -60,6 +60,18 @@ namespace TASMod.Overlays
             }
         }
 
+        public bool IsWalkable(Vector2 tile)
+        {
+            if (TileGroups == null)
+                return true;
+            foreach (TileGroup tileGroup in TileGroups)
+            {
+                if (tileGroup.Type != "passable" && tileGroup.Tiles.Any(t => t.Position == tile))
+                    return false;
+            }
+            return true;
+        }
+
         private TileGroup[] GetGroups(xTile.Dimensions.Rectangle viewport, GameLocation location, IEnumerable<Vector2> visibleTiles)
         {
             TileData[] tiles = GetTiles(viewport, location, visibleTiles).ToArray();

@@ -305,6 +305,29 @@ namespace TASMod.Helpers.Pathing
             return neighbors;
         }
 
+        public List<Region> GetAnyNeighbors(Region r)
+        {
+            HashSet<int> neighborIds = new();
+            List<Region> neighbors = new();
+            foreach (var edge in RegionList[r])
+            {
+                foreach (var otherEdge in EdgeList.Keys)
+                {
+                    if (!edge.Overlaps(otherEdge))
+                        continue;
+                    foreach (var neighbor in EdgeList[otherEdge])
+                    {
+                        if (neighbor.Id != r.Id && !neighborIds.Contains(neighbor.Id))
+                        {
+                            neighbors.Add(neighbor);
+                            neighborIds.Add(neighbor.Id);
+                        }
+                    }
+                }
+            }
+            return neighbors;
+        }
+
         public double GetRegionDistance(Region r1, Region r2)
         {
             var x = Math.Abs(r1.Center.X - r2.Center.X);

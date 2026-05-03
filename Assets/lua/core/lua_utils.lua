@@ -16,8 +16,12 @@ function len(obj)
 end
 
 --- generator for key/value pairs from a dictionary
----@param dict any dictionary to iterate over
----@return function,table,nil data key/value pairs to iterate over
+---@generic TKey
+---@generic TValue
+---@param dict Dictionary<TKey, TValue> dictionary to iterate over
+---@return fun(state: Dictionary<TKey,TValue>): (TKey, TValue) data key/value pairs to iterate over
+---@return Dictionary<TKey, TValue>
+---@return nil
 function dict_items(dict)
     local x = dict.Keys:GetEnumerator()
     return function(dict)
@@ -28,9 +32,11 @@ function dict_items(dict)
 end
 
 ---print key/value pairs from a dictionary
----@param dict any dictionary to iterate over
----@param itemfunc function|nil modifier function to apply to each item (defaults to nil)
----@param keyfunc function|nil modifier function to apply to each key (defaults to nil)
+---@generic TKey
+---@generic TValue
+---@param dict Dictionary<TKey, TValue> dictionary to iterate over
+---@param itemfunc fun(item: TValue): any|nil modifier function to apply to each item (defaults to nil)
+---@param keyfunc fun(key: TKey): any|nil modifier function to apply to each key (defaults to nil)
 function print_dict(dict, itemfunc, keyfunc)
     if itemfunc == nil then
         itemfunc = function(item) return item end
@@ -51,8 +57,11 @@ function print_vec_dict(dict, itemfunc)
 end
 
 ---generator for items from a list
----@param obj any list to iterate over
----@return function,table,nil data items to iterate over
+---@generic T
+---@param obj List<T> list to iterate over
+---@return fun(state: List<T>): (number, T) @data items to iterate over
+---@return List<T>
+---@return nil
 function list_items(obj)
     local x = obj:GetEnumerator()
     local i = 0

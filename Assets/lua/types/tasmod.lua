@@ -90,7 +90,7 @@ TASView = {
 ---@field Print fun(self: interface, message: string): nil @print a message to the console
 ---@field Kill fun(self: interface): nil @kill the game instance
 ---@field TableToStringList fun(self: interface, table: table): List<string> @convert a table to a string list for printing
----@field TableToIntList fun(self: interface, table: table): List<int> @convert a table to an int list
+---@field TableToIntList fun(self: interface, table: table): List<number> @convert a table to an int list
 ---@field TableToVector2List fun(self: interface, table: table): List<Vec2> @convert a table to a Vector2 list
 interface = {}
 
@@ -184,6 +184,7 @@ GamePadInputQueue = {}
 ---@field Queue csQueue
 ---@field PushNamedFunction fun(name: string): nil
 ---@field PushFunction fun(func: function, name: string, description: string|nil): nil
+---@field HasCoroutine fun(): boolean @whether there is a coroutine currently running
 KeyboardMouseInputQueue = {}
 
 ---@class LuaOverlay
@@ -203,3 +204,27 @@ LuaFunctionRegistry = {}
 ---@field ExportsPath string @path to exports folder
 ---@field ScreenshotPath string @path to screenshots folder
 Constants = {}
+
+---@class MinesFloor
+---@field SetIndex fun(self: MinesFloor, index: number): nil @set the index of the floor for overlay purposes
+---@field Update fun(self: MinesFloor): nil @update
+---@field Reset fun(self: MinesFloor): nil @reset the floor state
+---@field HasLadder fun(self: MinesFloor): boolean @whether the floor has a ladder
+---@field GetLadderTile fun(self: MinesFloor): Vec2 @get the tile position of the ladder if it exists
+---@field GetLadderCounts fun(self: MinesFloor): Dictionary<Vec2, number> @get the ladder counts for each tile
+---@field GetMinLadderCount fun(self: MinesFloor): number @get the minimum ladder count across all tiles
+---@field GetSortedLadderTiles fun(self: MinesFloor): List<Pair<Vec2,number>> @get the ladder tiles sorted by ladder count
+---@field GetStoneContents fun(self: MinesFloor): Dictionary<Vec2, List<Pair<string, number>>> @get the contents of each stone
+---@field EstimatePathCost fun(self: MinesFloor, end: Vec2): Pair<boolean, number> @estimate the path cost to a tile, returns a tuple of whether a path exists and the cost if it does
+---@field NearestNeighbor fun(self: MinesFloor, tile: Vec2): Vec2 @get the nearest neighbor tile to the specified tile based on path cost
+---@field NearestRock fun(self: MinesFloor, minBound: number, maxBound: number): Vec2 @get the nearest rock tile that falls within the specified bounds (inclusive)
+---@field LinearClosestRock fun(self: MinesFloor): Vec2 @get the closest rock tile based on linear distance
+---@field ClosestRock fun(self: MinesFloor): Vec2 @get the closest rock tile based on flood fill distance
+---@field ClosestRockBounded fun(self: MinesFloor, minBound: number): Vec2 @get the closest rock tile that is >= the specified ladder threshold
+---@field GetStonesWithinRadius fun(self: MinesFloor, radius: number): Dictionary<Vec2, List<Pair<string, number>>> @get the contents of each stone within a specified radius
+---@field GetDebrisWithinRadius fun(self: MinesFloor, radius: number): List<Debris> @get the debris within a specified radius
+---@field ApproximateDebrisCenter fun(self: MinesFloor, debris: Debris): Vec2 @get the approximate center position of the debris item
+---@field ApproximateDebrisTile fun(self: MinesFloor, debris: Debris): Vec2 @get the approximate tile position of the debris item
+---@field PlayerInRange fun(self: MinesFloor, position: Vec2, farmer: Farmer): boolean @check if a player is within range of a position
+---@field WillMoveTowardPlayer fun(self: MinesFloor, index: number, debris: Debris): boolean @check if a debris will move toward a player
+MinesFloor = {}
