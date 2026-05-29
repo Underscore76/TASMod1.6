@@ -51,30 +51,35 @@ namespace TASMod.Overlays
         }
         public override void ActiveDraw(SpriteBatch spriteBatch)
         {
+            var viewport = InstanceViewport.Get(0);
             foreach (var r in PathMap.Regions)
             {
+                var rect = new Rectangle(
+                    (int)(r.Bounds.Left * Game1.tileSize),
+                    (int)(r.Bounds.Top * Game1.tileSize),
+                     r.Bounds.Width * Game1.tileSize,
+                     r.Bounds.Height * Game1.tileSize
+                );
+                if (!TransformToLocal(0, rect).Intersects(viewport.Window))
+                    continue;
                 Color color = r.Walkable ? Color.Green * 0.5f : Color.Red * 0.5f;
                 foreach (var tile in r.tiles)
                 {
                     DrawFilledTile(0, spriteBatch, tile, color);
                 }
-                DrawTextAtTile(0, spriteBatch, r.Id.ToString(), r.tiles.First(), Color.White, color);
             }
             foreach (var pair in PathMap.EdgeList)
             {
-                DrawEdge(spriteBatch, pair.Key, pair.Value);
+                Rectangle rect = new(
+                    (int)(pair.Key.X * Game1.tileSize),
+                    (int)(pair.Key.Y * Game1.tileSize),
+                    pair.Key.Horizontal ? (int)(pair.Key.Length * Game1.tileSize) : 2,
+                    pair.Key.Horizontal ? 2 : (int)(pair.Key.Length * Game1.tileSize)
+                );
+                if (!TransformToLocal(0, rect).Intersects(viewport.Window))
+                    continue;
+                DrawTileEdge(spriteBatch, pair.Key, Color.Blue);
             }
-        }
-        public void DrawEdge(SpriteBatch spriteBatch, Edge edge, List<Region> regions)
-        {
-            DrawTileEdge(spriteBatch, edge, Color.Blue);
-            if (regions.Count > 2 || regions.Count == 0)
-            {
-                Console.Trace($"Edge {edge} has {regions.Count} regions");
-            }
-            string text = string.Join(",", regions.Select(r => r.Id));
-            Vector2 edgeCenter = new Vector2(edge.X + (edge.Horizontal ? edge.Length / 2f : 0), edge.Y + (edge.Horizontal ? 0 : edge.Length / 2f)) * Game1.tileSize;
-            DrawTextGlobal(0, spriteBatch, text, edgeCenter, Color.White, Color.Black);
         }
         public void DrawTileEdge(SpriteBatch spriteBatch, Edge edge, Color color)
         {

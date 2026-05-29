@@ -269,6 +269,28 @@ namespace TASMod.Helpers.Pathing
             return false;
         }
 
+        public bool AreNeighbors(Region r1, Region r2)
+        {
+            if (r1.Id == r2.Id)
+                return true;
+            foreach (var edge in RegionList[r1])
+            {
+                foreach (var otherEdge in EdgeList.Keys)
+                {
+                    if (!edge.Overlaps(otherEdge))
+                        continue;
+                    foreach (var neighbor in EdgeList[otherEdge])
+                    {
+                        if (neighbor.Id == r2.Id)
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+
         public Region GetRegion(Vector2 tile)
         {
             foreach (var region in Regions)
@@ -465,6 +487,34 @@ namespace TASMod.Helpers.Pathing
             );
             var tilePath = astarTiles.Search(0, start, end, out double tileCost);
             return tilePath;
+        }
+
+        public Vector2 FloodFillNearest(Vector2 start, List<Vector2> targets)
+        {
+            HashSet<Vector2> targetSet = new(targets);
+            Queue<Vector2> queue = new();
+            HashSet<Vector2> visited = new();
+            queue.Enqueue(start);
+            var loc = InstanceCurrentLocation.Get(0).Location;
+            while (queue.Count > 0)
+            {
+                Vector2 current = queue.Dequeue();
+                if (targetSet.Contains(current))
+                    return current;
+                if (visited.Contains(current))
+                    continue;
+                visited.Add(current);
+                if (!IsWalkable(loc, (int)current.X, (int)current.Y))
+                    continue;
+                foreach (var neighbor in Utility.getAdjacentTileLocations(current))
+                {
+                    if (!visited.Contains(neighbor))
+                    {
+                        queue.Enqueue(neighbor);
+                    }
+                }
+            }
+            return new Vector2(-1, -1);
         }
     }
 }

@@ -46,6 +46,7 @@ namespace TASMod.Scripting
             ModEntry.Console.Log("\tLoading TASMod", StardewModdingAPI.LogLevel.Trace);
             LuaState.DoString("import ('TASMod')");
             LuaState.DoString("import ('TASMod.Helpers')");
+            LuaState.DoString("import ('TASMod.Helpers.Pathing')");
             LuaState.DoString("import ('TASMod.Extensions')");
             LuaState.DoString("import ('TASMod.Overlays')");
             LuaState.DoString("import ('TASMod.Inputs')");
