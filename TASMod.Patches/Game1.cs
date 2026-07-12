@@ -329,4 +329,47 @@ namespace TASMod.Patches
             AmbientLocationSounds.InitShared();
         }
     }
+
+    public class Game1_GetSaveGameName : IPatch
+    {
+        public override string Name => "Game1.GetSaveGameName";
+
+        public override void Patch(Harmony harmony)
+        {
+            harmony.Patch(
+                original: AccessTools.Method(typeof(Game1), "GetSaveGameName"),
+                postfix: new HarmonyMethod(this.GetType(), nameof(this.Postfix))
+            );
+        }
+
+        public static void Postfix(ref string __result)
+        {
+            if (Controller.State.SaveFilePrefix != "")
+            {
+                __result = Controller.State.SaveFilePrefix;
+            }
+        }
+    }
+
+    public class Game1_SetSaveName : IPatch
+    {
+        public override string Name => "Game1.SetSaveName";
+
+        public override void Patch(Harmony harmony)
+        {
+            harmony.Patch(
+                original: AccessTools.Method(typeof(Game1), "SetSaveName"),
+                prefix: new HarmonyMethod(this.GetType(), nameof(this.Prefix))
+            );
+        }
+
+        public static bool Prefix(ref string new_save_name)
+        {
+            if (Controller.State.SaveFilePrefix != "")
+            {
+                new_save_name = Controller.State.SaveFilePrefix;
+            }
+            return true;
+        }
+    }
 }

@@ -37,6 +37,12 @@ namespace TASMod.Recording
         [JsonProperty]
         public int Frame0RandomIndex = 0;
 
+        [JsonProperty]
+        public string LoadFilePrefix = "";
+
+        [JsonProperty]
+        public string SaveFilePrefix = "";
+
         // public GameState LastSave;
 
         public SaveState()
