@@ -99,10 +99,17 @@ namespace TASMod
                     ExecutingLogic = logic.Name;
                 }
             }
+            if (!flag)
+            {
+                if (KeyboardMouseInputQueue.HasInput() || KeyboardMouseInputQueue.HasCoroutine())
+                {
+                    flag = true;
+                }
+            }
             if (flag)
             {
                 for (int i = 1; i <= NetworkState.NumConnections; i++)
-                    flag &= GamePadInputQueue.HasInput(i) || GamePadInputQueue.HasPlayerCoroutine(i);
+                    flag &= GamePadInputQueue.HasInput(i) || GamePadInputQueue.HasCoroutine(i);
             }
             // ActiveInstance.Pop();
             return flag;
@@ -144,6 +151,12 @@ namespace TASMod
                 {
                     ExecutingLogic = logic.Name;
                 }
+            }
+            if (!flag && KeyboardMouseInputQueue.GetNextInput(out TASKeyboardState queuedKeys, out TASMouseState queuedMouse))
+            {
+                TASInputState.SetKeyboard(queuedKeys);
+                TASInputState.SetMouse(queuedMouse);
+                flag = true;
             }
             return flag;
         }

@@ -1,0 +1,364 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>TAS Mod Lua Docs</title>
+    <link rel="stylesheet" href="../ldoc_new.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>TASMod 1.6</h1>
+
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Basic_controls">Basic controls </a></li>
+<li><a href="#Console_commands">Console commands </a></li>
+<li><a href="#Automation_logic">Automation logic </a></li>
+<li><a href="#Overlays">Overlays </a></li>
+<li><a href="#ImGui_Tools">ImGui Tools </a></li>
+<li><a href="#How_does_this_work_">How does this work? </a></li>
+<li><a href="#Build_Issues">Build Issues </a></li>
+<li><a href="#Generating_Lua_Docs">Generating Lua Docs </a></li>
+</ul>
+
+
+<h2>Readme</h2>
+<ul class="nowrap">
+  <li><strong>README</strong></li>
+</ul>
+<h2>Modules</h2>
+<ul class="nowrap">
+  <li><a href="../modules/aliases.html">aliases</a></li>
+  <li><a href="../modules/core.clickables.html">core.clickables</a></li>
+  <li><a href="../modules/core.collections.deque.html">core.collections.deque</a></li>
+  <li><a href="../modules/core.collections.stack.html">core.collections.stack</a></li>
+  <li><a href="../modules/core.common.html">core.common</a></li>
+  <li><a href="../modules/core.console.html">core.console</a></li>
+  <li><a href="../modules/core.coroutines.frame_funcs.html">core.coroutines.frame_funcs</a></li>
+  <li><a href="../modules/core.coroutines.keyboard_utils.html">core.coroutines.keyboard_utils</a></li>
+  <li><a href="../modules/core.coroutines.mouse_utils.html">core.coroutines.mouse_utils</a></li>
+  <li><a href="../modules/core.coroutines.nav.html">core.coroutines.nav</a></li>
+  <li><a href="../modules/core.engine.html">core.engine</a></li>
+  <li><a href="../modules/core.fileio.html">core.fileio</a></li>
+  <li><a href="../modules/core.input.html">core.input</a></li>
+  <li><a href="../modules/core.input.gamepad.html">core.input.gamepad</a></li>
+  <li><a href="../modules/core.input.kbm.html">core.input.kbm</a></li>
+  <li><a href="../modules/core.inventory.html">core.inventory</a></li>
+  <li><a href="../modules/core.keybinds.html">core.keybinds</a></li>
+  <li><a href="../modules/core.lua_utils.html">core.lua_utils</a></li>
+  <li><a href="../modules/core.replay.html">core.replay</a></li>
+  <li><a href="../modules/core.scripts.newgame.html">core.scripts.newgame</a></li>
+  <li><a href="../modules/core.scripts.startup.html">core.scripts.startup</a></li>
+  <li><a href="../modules/core.utilities.frame_stack.html">core.utilities.frame_stack</a></li>
+  <li><a href="../modules/core.utilities.input_copy.html">core.utilities.input_copy</a></li>
+  <li><a href="../modules/core.utilities.tile_funcs.html">core.utilities.tile_funcs</a></li>
+  <li><a href="../modules/core.view.html">core.view</a></li>
+  <li><a href="../modules/prelaunch.html">prelaunch</a></li>
+</ul>
+<h2>Examples</h2>
+<ul class="nowrap">
+  <li><a href="../examples/boot.lua.html">boot.lua</a></li>
+  <li><a href="../examples/coroutine.basic.lua.html">coroutine.basic.lua</a></li>
+  <li><a href="../examples/coroutine.infiniteloop.lua.html">coroutine.infiniteloop.lua</a></li>
+  <li><a href="../examples/coroutine.nav.lua.html">coroutine.nav.lua</a></li>
+  <li><a href="../examples/coroutine.toggle.lua.html">coroutine.toggle.lua</a></li>
+  <li><a href="../examples/coroutine.watch.lua.html">coroutine.watch.lua</a></li>
+  <li><a href="../examples/create_char.lua.html">create_char.lua</a></li>
+  <li><a href="../examples/file_handling.lua.html">file_handling.lua</a></li>
+  <li><a href="../examples/init.lua.html">init.lua</a></li>
+  <li><a href="../examples/lua_overlay.lua.html">lua_overlay.lua</a></li>
+  <li><a href="../examples/newgame.lua.html">newgame.lua</a></li>
+  <li><a href="../examples/screenfade.lua.html">screenfade.lua</a></li>
+  <li><a href="../examples/use_keybinds.lua.html">use_keybinds.lua</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+
+<h1>Stardew Valley TAS Mod</h1>
+<p><a href="#build-issues">Build Issues?</a></p>
+
+
+<p>NOTE: Use of this mod will create a folder <code>StardewTAS1.6</code> in your <code>Documents</code> folder. This folder will contain your save states, scripts, screenshots, etc.</p>
+
+<p><a name="Basic_controls"></a></p>
+<h2>Basic controls</h2>
+<p>Basic Framework for a TAS Mod, includes
+* frame advance (press <code>q</code> or <code>/</code> for 1 frame, hold <code>.</code> for real time)
+* reset (press <code>|</code> for normal speed, ']' for fast speed)
+* AC keybind (hold <code>r</code> to simulate ac keys)
+* Console (Ctrl+\<code>) or (⌘+\</code>) to open/close the console (\<code> is above tab on US keyboards, may function as </code>~` if using another keyboard layout...)</p>
+
+<pre>
+* you cannot manually input <span class="keyword">while</span> the console is up
+</pre>
+
+<p>Hold the keys you want and then advance a frame to store those inputs (simulate AC with <code>r</code>)</p>
+
+<p><a name="Console_commands"></a></p>
+<h2>Console commands</h2>
+
+<p>Console supports scrolling, entry selection, normal copy and paste (or it should, LET ME KNOW because it works on mac fine). Console font has no support for non-ascii, so will print <code>?</code>.</p>
+
+<p>**There is a basic attempt to replace your computer's username to avoid potential doxxing scenarios but you might want to try an example like <code>require(&apos;intential-crash&apos;)</code> in the lua console to see what is output. Ping me if it doesn't capture your username correctly and we can tweak the replacement.**</p>
+
+<h3>Lua Support</h3>
+
+<p>Docs Website: <a href="https://underscore76.github.io/TASMod1.6/lua/index.html">https://underscore76.github.io/TASMod1.6/lua/index.html</a></p>
+
+<p>Scripting in this TAS is done with Lua! By typing <code>lua</code> onto the console you'll enter into a Lua REPL (read-eval-print-loop), which will allow you to run arbitrary lua code. Documentation for the core lua engine functions can be found by navigating locally to docs/ldoc/index.html or you can browse the <code>TASMod/Assets/lua</code> folder where the lua files are stored.</p>
+
+<p>There is an example <a href="../examples/init.lua.html#">init.lua</a> file in the <code>lua-examples</code> folder. The TASMod will look for a file called <a href="../examples/init.lua.html#">init.lua</a> in the <code>StardewTAS1.6/Scripts/</code> folder and will run that file when first launching into the lua console. This allows you to define custom functions and aliases that you can use in the console. For example, you can define a function called <code>myfunc</code> in <a href="../examples/init.lua.html#">init.lua</a> and then call it from the lua console with <code>myfunc()</code>. You can also do things like auto-load into a specific save state or configure the engine state by toggling overlays/logic etc (or loading a particular engine state).</p>
+
+<h4>Visual Studio Code Support</h4>
+<p>If you are using Visual Studio Code for editing files in your local <code>StardewTAS1.6/Scripts</code> folder, I recommend installing the <a href="https://marketplace.visualstudio.com/items?itemName=sumneko.lua">Lua language server</a> extension to get type annotations and autocomplete for Lua. To include all the base engine lua files, open the workspace settings (Shift + Command + P (Mac) / Ctrl + Shift + P (Windows/Linux) to open the command palette) and search for <code>lua.workspace.library</code>, click Add Item, and then paste the path to the <code>lua</code> folder from the mod install.</p>
+
+<p>Default Steam install paths (if you are on linux let me know the path!):
+* Mac: <code>~/Library/Application Support/Steam/steamapps/common/Stardew Valley/Contents/MacOS/Mods/TASMod/assets/lua/</code>
+* Windows: <code>C:\Program Files (x86)\Steam\steamapps\common\Stardew Valley\Mods\TASMod\assets\lua\</code></p>
+
+<p>You don't need to do this (the mod will correctly link the files), but it will give you intellisense for the base engine code.</p>
+
+<h4>Key Lua Helper</h4>
+<p>* <code>advance({keyboard={keys to press}, mouse={X=int, Y=int, left=bool, right=bool}, text=string})</code> - advance a frame with the given keyboard/mouse inputs. This should then pause while any existing automation is running. Example for holding down and right and clicking the mouse:</p>
+
+<pre>
+<span class="function-name">advance</span>({keyboard={Keys.S, Keys.D}, mouse={X=<span class="number">100</span>, Y=<span class="number">100</span>, left=<span class="keyword">true</span>}})
+</pre>
+
+
+<p>or for textbox input</p>
+
+<pre>
+<span class="function-name">advance</span>({text=<span class="string">"howdy"</span>})
+</pre>
+
+
+<ul>
+    <li>Global frame stack
+
+<pre>
+* <span class="backtick"><code>current_frame()</code></span> - returns the current frame actual frame
+* <span class="backtick"><code>fs_push(f)</code></span> - pushes a frame onto the frame stack
+* <span class="backtick"><code>fs_push()</code></span> <span class="keyword">or</span> <span class="backtick"><code>gcf()</code></span> - pushes the current frame onto the frame stack
+* <span class="backtick"><code>f = fs_pop()</code></span> - pops a frame off the frame stack
+* <span class="backtick"><code>f = fs_peek()</code></span> - peek at the top frame on the frame stack without popping it
+* <span class="backtick"><code>fs_items()</code></span> - get a <span class="global">table</span> of the current items <span class="keyword">in</span> the frame stack
+* <span class="backtick"><code>rw()</code></span> - rewinds to the frame on the top of the frame stack
+* <span class="backtick"><code>brw()</code></span> - blocking rewind to the frame on the top of the frame stack
+* <span class="backtick"><code>frame_stack_clear()</code></span> - clears the frame stack
+* <span class="backtick"><code>pgcf()</code></span> - <span class="global">print</span> the global frame stack
+</pre>
+</li>
+    <li>reset functions (blocking forces lua to wait until the reset is complete, others can occur async)
+
+<pre>
+* <span class="backtick"><code>reset()</code></span> - reset to the current frame
+* <span class="backtick"><code>freset()</code></span> - fast reset to the current frame
+* <span class="backtick"><code>reset(f)</code></span> - reset to the given frame
+* <span class="backtick"><code>freset(f)</code></span> - fast reset to the given frame
+* <span class="backtick"><code>breset()</code></span> - blocking reset to the current frame
+* <span class="backtick"><code>breset(f)</code></span> - blocking reset to the given frame
+* <span class="backtick"><code>bfreset()</code></span> - blocking fast reset to the current frame
+* <span class="backtick"><code>bfreset(f)</code></span> - blocking fast reset to the given frame
+</pre>
+</li>
+    <li>save state functions
+
+<pre>
+* <span class="backtick"><code>save()</code></span> - save the current state to file
+* <span class="backtick"><code>saveas(f)</code></span> <span class="keyword">or</span> <span class="backtick"><code>save(f)</code></span> - save the current state to a new file
+* <span class="backtick"><code>load(f)</code></span> - <span class="global">load</span> a save state <span class="keyword">and</span> advance to final frame
+* <span class="backtick"><code>fload(f)</code></span> - <span class="global">load</span> a save state <span class="keyword">and</span> fast advance to final frame
+* <span class="backtick"><code>view()</code></span> - swap between view modes
+* <span class="backtick"><code>exec(&quot;...&quot;)</code></span> - execute a command on the base <span class="function-name">console</span> (e.g. <span class="backtick"><code>exec(&quot;overlay off Layers&quot;)</code></span>)
+</pre>
+
+There's a ton more but there's a whole generated set of docs for the lua engine that you can find in the docs folder.</li>
+</ul>
+
+<h3>Core Console Functions</h3>
+
+<h4>Helper Functions:</h4>
+<p>Any function that is callable through this top level console has some help text associated with its use, and you can discover different tools through the list command.
+* <code>help</code> - allows you to check command description/usage
+* <code>list</code> - lists available overlays/logics/commands, to find available options
+* <code>overlay</code> - print or modify the status of TAS overlays
+* <code>logic</code> - print or modify the status of TAS automation logic
+* <code>clr</code> - clear the current console screen
+* <code>exit</code> - exit the game</p>
+
+<h4>File System functions:</h4>
+<p>Tries to mimic basic linux command line methods
+* <code>ls</code> - list save states (allows for wildcard search)
+* <code>cp</code> - copy save state to new file
+* <code>rm</code> - delete a save state file
+* <code>mv</code> - rename a save state file</p>
+
+<h4>Save State functions:</h4>
+<p>Basic functions for manipulating the save state including loading, saving, and resetting.
+* <code>frame</code> - print the current frame
+* <code>stateinfo</code> - print some details about the current save state
+* <code>reset</code> - reset to the desired frame
+* <code>freset</code> - fast reset to the desired frame
+* <a href="https://www.lua.org/manual/5.4/manual.html#pdf-load">load</a> - load a save state and advance to final frame
+* <code>fload</code> -  load a save state and fast advance to final frame
+* <code>save</code> - save the current state to file
+* <code>saveas</code> - save the current state to a new file
+* <code>newgame</code> - setup a new save state file and fill in details</p>
+
+<h4>Engine State functions:</h4>
+<p>Engine state is the current state of overlays/logics. You can save different configurations if you find that you often want to switch between different setups.
+* <code>saveengine</code> - save the current engine state to file
+* <code>loadengine</code> - load engine state from file
+* <code>alias</code> - allows you to define custom commands based on other commands <code>alias set ss=screenshot</code> will set <code>ss</code> to call the <code>screenshot</code> function</p>
+
+<h4>Info functions:</h4>
+<p>* <code>forage</code> - print current details about forage (defaults to current location, define specific <code>forage loc</code> or <code>forage all</code>)
+* <code>friendship</code> - prints current friendship details
+* <code>player</code> - prints details on player including xp/friendship/pos/etc
+* <code>trashcans</code> - prints current trash can drops</p>
+
+<h4>Misc functions:</h4>
+<p>* <code>blankscreen</code> - turns the screen black
+* <code>screenshot</code> - screenshot the current game screen (stored in the StardewTAS1.6 folder)</p>
+
+<p><a name="Automation_logic"></a></p>
+<h2>Automation logic</h2>
+<p>Tools for automated frame advance through common actions</p>
+
+<ul>
+    <li><code>AcceptSleep</code> - auto advance when the frame for the sleep menu is popping up and approve the sleep question</li>
+    <li><code>AdvanceFrozen</code> - advance when character is frozen/picking up an artifact/sleeping emoting</li>
+    <li><code>AnimationCancel</code> - advance through frames after swing up to the first cancel frame</li>
+    <li><code>DialogueBox</code> - advance to the frame where you can click a dialogue box</li>
+    <li><code>LevelUpMenu</code> - advance through level up menu (does not advance profession select)</li>
+    <li><code>SaveGame</code> - advance through the save game menu</li>
+    <li><code>ScreenFade</code> - advance through frames where the screen is fading in and out of black</li>
+    <li><code>ShippingMenu</code> - holds the mouse and advances through shipping menu</li>
+    <li><code>SkipEvent</code> - skips events or advances through pause frames up during an event/requires dialogue interaction</li>
+</ul>
+
+<p>To implement a new Automation, create a new class that inherits from <code>IAutomatedLogic</code>. All classes that inherit from <code>IAutomatedLogic</code> will be automatically loaded and available in <code>AutomationManager.Get(&apos;...&apos;)</code>.</p>
+
+<p><a name="Overlays"></a></p>
+<h2>Overlays</h2>
+<p>Additional info layers to draw on top of the game</p>
+
+<ul>
+    <li><code>ClayMap</code> - draw the clay tilling map</li>
+    <li><code>CropQuality</code> - draw first gold quality day for a tile</li>
+    <li><code>Debris</code> - draw debris magnetism regions to show in/out of range</li>
+    <li><code>DrawPath</code> - draw the current nav path</li>
+    <li><code>Fishing</code> - draw a simplified view of the fishing minigame including where the fish wants to go</li>
+    <li><code>GameInMenu</code> - draw a red rectangle in top left when game is in an ItemGrabMenu</li>
+    <li><code>Grid</code> - draw the tile grid outlines</li>
+    <li><code>Hitbox</code> - draw hitboxes for all characters</li>
+    <li><code>ImGuiOverlay</code> - core ImGui overlay that also triggers other ImGui widgets and windows to draw</li>
+    <li><code>JotPK</code> - draw detailed info for Journey of the Prairie King</li>
+    <li><code>Layers</code> - highlight all of the unwalkable tiles</li>
+    <li><code>LuaOverlay</code> - draw information registered via lua script/registered lua functions to execute</li>
+    <li><code>MinesLadder</code> - draw rock break counts and path to nearest ladder</li>
+    <li><code>MinesRocks</code> - Show rocks in mines that have drops</li>
+    <li><code>MixedSeed</code> - overlay the seed you'll get if you plant a mixed seed on the next frame</li>
+    <li><code>MonsterDrop</code> - displays items a monster will drop</li>
+    <li><code>Mouse</code> - draw your actual mouse onto the screen</li>
+    <li><code>MouseData</code> - draws tile, steps, ticks at mouse position</li>
+    <li><code>ObjectDrops</code> - draw what items an object will drop</li>
+    <li><code>ObjectTiles</code> - draw boundaries around objects</li>
+    <li><code>Sleep</code> - draw sleep details given current step count</li>
+    <li><code>TaskPaths</code> - draw paths for current queued tasks</li>
+    <li><code>TileHighlight</code> - draw highlighted tiles</li>
+    <li><code>TileText</code> - draw text on tiles</li>
+    <li><code>TimerPanel</code> - draw a timer panel in the top left corner</li>
+    <li><code>WeaponGuide</code> - draw a guide for weapon hitboxes</li>
+</ul>
+
+<p>To implement a new Overlay, create a new class that inherits from <code>IOverlay</code>. All classes that inherit from <code>IOverlay</code> will be automatically loaded and available in <code>OverlayManager.Get(&apos;...)</code>.</p>
+
+<p><a name="ImGui_Tools"></a></p>
+<h2>ImGui Tools</h2>
+
+<p>Check the lua doc example for registering data/buttons to the imgui overlay <a href="https://underscore76.github.io/TASMod1.6/lua/examples/lua_overlay.lua.html">here</a></p>
+
+
+<p><a name="How_does_this_work_"></a></p>
+<h2>How does this work?</h2>
+
+<p>A ton of harmony patches (including patching SMAPI inputs, base System.DateTime and System.Random, the AudioEngine, network stack, etc.) to rewrap functionality and control all parts of the update/draw loop. Added some additional fields to System.Random to trace random calls for debugging purposes.</p>
+
+
+<p><a name="Build_Issues"></a></p>
+<h2>Build Issues</h2>
+<p>If you have Stardew installed at a non-standard location, you'll need to modify the StardewModConfig build config which can be found at:</p>
+
+<p><code>C:\Users\&lt;User&gt;.nuget\packages\pathoschild.stardew.modbuildconfig\4.1.0\build\find-game-folder.targets</code></p>
+
+<p><strong>NOTE</strong>: you may need to try building and failing once before this file will exist.</p>
+
+<p>At the bottom of the file you can add</p>
+
+<pre>
+&lt;GamePath Condition=<span class="string">"!Exists('$(GamePath)')"</span>&gt;Path-To-Stardew-Directory&lt;/GamePath&gt;
+</pre>
+
+
+<p>(Thanks to @PianoAddict for finding these details!)</p>
+
+
+<p><a name="Generating_Lua_Docs"></a></p>
+<h2>Generating Lua Docs</h2>
+<p>This project uses <a href="https://github.com/lunarmodules/ldoc">LDoc</a> to generate documentation for the lua files. To generate the docs, run the following command from the root directory of the project:</p>
+
+
+<pre>
+ldoc .
+</pre>
+
+
+<p>You'll need Lua/LuaRocks installed to run this command, which will vary by system. On Mac you can install Lua/LuaRocks with the following command:</p>
+
+
+<pre>
+brew install lua luarocks
+luarocks install penlight
+luarocks install ldoc
+</pre>
+
+
+<p>Looking for someone on windows to give guidance on how to install Lua/LuaRocks :).</p>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/lunarmodules/LDoc">LDoc 1.5.0</a></i>
+<i style="float:right;">Last updated 2026-04-18 20:49:56 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>

@@ -27,7 +27,21 @@ namespace TASMod.Overlays
                         Controller.PathFinder.path[i].toVector2(),
                         Controller.PathFinder.path[i + 1].toVector2(),
                         color,
-                        thickness
+                        thickness + 2
+                    );
+                }
+            }
+            if (OverlayManager.Overlays["RegionMap"] is RegionMap regionMap && regionMap.path != null)
+            {
+                for (int i = 0; i < regionMap.path.Count - 1; i++)
+                {
+                    DrawLineBetweenTiles(
+                        ActiveInstance.InstanceIndex,
+                        spriteBatch,
+                        regionMap.path[i],
+                        regionMap.path[i + 1],
+                        Color.Yellow,
+                        thickness - 2
                     );
                 }
             }

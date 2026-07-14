@@ -1,3 +1,4 @@
+--- defines functions for controlling toggling map view and base view
 local view = {}
 
 ---swaps between different view states (base, map)
@@ -21,6 +22,7 @@ function view.reset()
 end
 
 ---sets the view to the location
+---@param loc GameLocation location to set the view to
 function view.location(loc)
     interface:ViewLocation(loc)
 end

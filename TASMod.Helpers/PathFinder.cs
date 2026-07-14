@@ -6,8 +6,11 @@ using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using StardewValley;
 using StardewValley.Buildings;
+using StardewValley.Extensions;
 using StardewValley.Locations;
+using StardewValley.Objects;
 using StardewValley.TerrainFeatures;
+using StardewValley.Tools;
 using xTile.Dimensions;
 using xTile.ObjectModel;
 using Object = StardewValley.Object;
@@ -90,7 +93,7 @@ namespace TASMod.Helpers
         public GameLocation location;
         public AStar<Tile> solver;
 
-        public bool hasPath;
+        public bool hasPath => path != null && path.Count > 0;
         public List<Tile> path;
         public double cost;
         public int maxCost = 5000;
@@ -100,22 +103,9 @@ namespace TASMod.Helpers
             solver = new AStar<Tile>(this.GetNeighbors, this.DistanceStep, this.DistanceHeuristic);
         }
 
-        private bool TileValid(Tile pos)
+        public bool IsValidVector2(int index, Vector2 vec)
         {
-            {
-                Vector2 tile = new Vector2(pos.X, pos.Y);
-                foreach (var b in location.buildings)
-                {
-                    if (b.occupiesTile(tile))
-                        return false;
-                }
-            }
-            {
-                Location tile = new Location(pos.X, pos.Y);
-                if (!Game1.currentLocation.isTilePassable(tile, Game1.viewport))
-                    return false;
-            }
-            return true;
+            return IsValid(index, new Tile() { X = (int)vec.X, Y = (int)vec.Y });
         }
 
         public void Update(int index, Tile start, Tile end, bool useTool = true)
@@ -126,18 +116,145 @@ namespace TASMod.Helpers
             if (!IsValid(index, end))
             {
                 path = null;
-                hasPath = false;
                 return;
             }
             try
             {
                 path = solver.Search(index, start, end, out cost, maxCost);
-                hasPath = path != null;
             }
             catch
             {
-                hasPath = false;
+                path = null;
             }
+        }
+
+        public string GetToolString(Vector2 tile)
+        {
+            Object obj = location.getObjectAtTile((int)tile.X, (int)tile.Y);
+            if (obj != null)
+            {
+                if (obj.Name.Contains("Stone"))
+                {
+                    return $"Pickaxe";
+                }
+                else if (obj.Name.Contains("Weed"))
+                {
+                    return "Weapon";
+                }
+                else if (obj.Name.Contains("Twig"))
+                {
+                    return "Axe";
+                }
+            }
+            TerrainFeature tf;
+            if (location.terrainFeatures.TryGetValue(tile, out tf))
+            {
+                if (!tf.isPassable() && tf is Tree tree)
+                {
+                    switch (tree.growthStage.Value)
+                    {
+                        case 1:
+                        case 2:
+                            return "Weapon";
+                        default:
+                            return "Axe";
+                    }
+                }
+            }
+            if (location is MineShaft mineShaft)
+            {
+                foreach (ResourceClump current in mineShaft.resourceClumps)
+                {
+                    Rectangle rect = new Rectangle(
+                        (int)current.Tile.X,
+                        (int)current.Tile.Y,
+                        current.width.Value,
+                        current.height.Value
+                    );
+                    if (rect.Intersects(new Rectangle((int)tile.X, (int)tile.Y, 1, 1)))
+                    {
+                        return "Pickaxe";
+                    }
+                }
+            }
+            else
+            {
+                foreach (ResourceClump current in location.resourceClumps)
+                {
+                    Rectangle rect = new Rectangle(
+                        (int)current.Tile.X,
+                        (int)current.Tile.Y,
+                        current.width.Value,
+                        current.height.Value
+                    );
+                    if (rect.Intersects(new Rectangle((int)tile.X, (int)tile.Y, 1, 1)))
+                    {
+                        switch (current.parentSheetIndex.Value)
+                        {
+                            case 600: // stump
+                            case 602: // hollow log
+                                return "Axe";
+                            case 622: // meteorite
+                            case 672: // boulder
+                            case 752: // mines rocks
+                            case 754: // mines rocks
+                            case 756: // mines rocks
+                            case 758: // mines rocks
+                                return "Pickaxe";
+                        }
+                    }
+                }
+            }
+            return "";
+        }
+
+        public bool HasValidTool(Farmer player, ResourceClump clump, out string tool)
+        {
+            tool = "";
+            if (clump == null)
+                return true;
+            switch (clump.parentSheetIndex.Value)
+            {
+                case 600: // stump
+                    if (player.Items.Any(i => i is Axe axe && axe.UpgradeLevel > 0))
+                    {
+                        tool = "Axe";
+                        return true;
+                    }
+                    return false;
+                case 602: // hollow log
+                    if (player.Items.Any(i => i is Axe axe && axe.UpgradeLevel > 1))
+                    {
+                        tool = "Axe";
+                        return true;
+                    }
+                    return false;
+                case 622: // meteorite
+                    if (player.Items.Any(i => i is Pickaxe pickaxe && pickaxe.UpgradeLevel > 2))
+                    {
+                        tool = "Pickaxe";
+                        return true;
+                    }
+                    return false;
+                case 672: // boulder
+                    if (player.Items.Any(i => i is Pickaxe pickaxe && pickaxe.UpgradeLevel > 1))
+                    {
+                        tool = "Pickaxe";
+                        return true;
+                    }
+                    return false;
+                case 752: // mines rocks
+                case 754: // mines rocks
+                case 756: // mines rocks
+                case 758: // mines rocks
+                    if (player.Items.Any(i => i is Pickaxe))
+                    {
+                        tool = "Pickaxe";
+                        return true;
+                    }
+                    return false;
+            }
+            return false;
         }
 
         public void Update(int index, int endX, int endY, bool useTool)
@@ -224,7 +341,7 @@ namespace TASMod.Helpers
                 if (rect.Intersects(tileRect))
                     return false;
             }
-
+            var player = InstanceCurrentPlayer.Get(index).Player;
             if (location is MineShaft mineShaft)
             {
                 foreach (ResourceClump current in mineShaft.resourceClumps)
@@ -235,8 +352,10 @@ namespace TASMod.Helpers
                         current.width.Value * Game1.tileSize,
                         current.height.Value * Game1.tileSize
                     );
-                    if (rect.Intersects(tileRect))
-                        return true;
+                    if (rect.Intersects(tileRect) && !HasValidTool(player, current, out _))
+                    {
+                        return useTools;
+                    }
                 }
             }
             if (location is Farm farm)
@@ -249,18 +368,14 @@ namespace TASMod.Helpers
                         current.width.Value * Game1.tileSize,
                         current.height.Value * Game1.tileSize
                     );
-                    if (rect.Intersects(tileRect))
-                        return false;
+                    if (rect.Intersects(tileRect) && !HasValidTool(player, current, out _))
+                    {
+                        return useTools;
+                    }
                 }
                 foreach (Building building in farm.buildings)
                 {
-                    Rectangle rect = new Rectangle(
-                        (int)(building.tileX.Value * Game1.tileSize),
-                        (int)(building.tileY.Value * Game1.tileSize),
-                        building.tilesWide.Value * Game1.tileSize,
-                        building.tilesHigh.Value * Game1.tileSize
-                    );
-                    if (rect.Intersects(tileRect))
+                    if (building.intersects(tileRect) && !building.isTilePassable(tile.toVector2()))
                         return false;
                 }
             }
@@ -272,40 +387,33 @@ namespace TASMod.Helpers
             if (location.Objects.ContainsKey(tile.toVector2()))
             {
                 Object obj = location.Objects[tile.toVector2()];
-                return obj.isPassable();
+                if (!obj.isDebrisOrForage())
+                    return false;
+                return true;
             }
             // check furniture
-            if (location.GetFurnitureAt(tile.toVector2()) != null)
-                return false;
-            // check layer properties
-            var viewport = InstanceViewport.Get(index);
-            if (
-                location.isTilePassable(
-                    new xTile.Dimensions.Location(tile.X, tile.Y),
-                    viewport.Viewport
-                )
-            )
-                return true;
-            // allow bridges
-            if (location.doesTileHaveProperty(tile.X, tile.Y, "Passable", "Buildings") != null)
+            if (location.GetFurnitureAt(tile.toVector2()) is Furniture f)
             {
-                var backTile = location
-                    .map.GetLayer("Back")
-                    .PickTile(
-                        new xTile.Dimensions.Location(tileRect.X, tileRect.Y),
-                        viewport.Viewport.Size
-                    );
-                if (
-                    backTile == null
-                    || !backTile.TileIndexProperties.TryGetValue(
-                        "Passable",
-                        out PropertyValue value
-                    )
-                    || value != "F"
-                )
+                if (f.IntersectsForCollision(tileRect) && !f.isPassable())
+                    return false;
+            }
+            // check layer properties
+            if (!location.isTilePassable(tile.toVector2()))
+                return false;
+            // allow bridges
+            if (location.doesTileHaveProperty(tile.X, tile.Y, "Passable", "Buildings") == "T")
+            {
+                var result = location.doesTileHaveProperty(tile.X, tile.Y, "Passable", "Back");
+                if (result == null || result == "T")
                     return true;
             }
-            return false;
+            var viewport = InstanceViewport.Get(index);
+            tileRect = new Rectangle(tile.X * Game1.tileSize + 24, tile.Y * Game1.tileSize + 24, 16, 16);
+            if (location.isCollidingPosition(tileRect, viewport.Viewport, true, 0, false, Game1.player))
+            {
+                return false;
+            }
+            return true;
         }
 
         public double DistanceStep(int index, Tile start, Tile end)
@@ -476,7 +584,6 @@ namespace TASMod.Helpers
         public void Reset()
         {
             location = null;
-            hasPath = false;
             path = null;
             cost = 0;
         }

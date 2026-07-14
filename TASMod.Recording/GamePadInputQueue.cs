@@ -7,28 +7,8 @@ using TASMod.Scripting;
 
 namespace TASMod.Recording
 {
-    public class NamedLuaFunction
-    {
-        public string Name;
-        public string Description;
-        public LuaFunction function;
-
-        public NamedLuaFunction(string name, LuaFunction func, string description = "")
-        {
-            Name = name;
-            function = func;
-            Description = description;
-        }
-
-        public LuaCoroutine CreateCoroutine(int playerIndex)
-        {
-            return new LuaCoroutine(LuaEngine.LuaState, function, playerIndex, Name, Description);
-        }
-    }
-
     public static class GamePadInputQueue
     {
-
         public static Queue<TASGamePadState>[] Queues = new Queue<TASGamePadState>[4]
         {
             new Queue<TASGamePadState>(),
@@ -37,7 +17,7 @@ namespace TASMod.Recording
             new Queue<TASGamePadState>()
         };
 
-        public static LuaCoroutine[] PlayerCoroutines = new LuaCoroutine[4]
+        public static LuaCoroutine[] GamePadCoroutines = new LuaCoroutine[4]
         {
             null,
             null,
@@ -45,27 +25,13 @@ namespace TASMod.Recording
             null
         };
 
-        public static List<string> FrameFunctionNames = new List<string>();
-        public static Dictionary<string, NamedLuaFunction> NamedFunctions = new Dictionary<string, NamedLuaFunction>();
-
-        public static NamedLuaFunction GetFunctionByName(string name)
-        {
-            if (NamedFunctions.ContainsKey(name))
-            {
-                return NamedFunctions[name];
-            }
-            return null;
-        }
-
         public static void Clear()
         {
             for (int i = 0; i < 4; i++)
             {
                 Queues[i].Clear();
             }
-            ClearPlayerCoroutines();
-            NamedFunctions.Clear();
-            FrameFunctionNames.Clear();
+            ClearCoroutines();
         }
 
         public static void ClearQueue(int index)
@@ -77,7 +43,7 @@ namespace TASMod.Recording
             Queues[index].Clear();
         }
 
-        public static void PushGamePadInput(
+        public static void PushInput(
             int index,
             TASGamePadState state
         )
@@ -120,16 +86,16 @@ namespace TASMod.Recording
                 return Queues[index].Dequeue();
             }
             // no frame function, just return current state
-            if (PlayerCoroutines[index] == null)
+            if (GamePadCoroutines[index] == null)
             {
                 return TASInputState.gState[index];
             }
 
-            LuaCoroutine func = PlayerCoroutines[index];
+            LuaCoroutine func = GamePadCoroutines[index];
             if (func.Resume() != LuaCoroutineStatus.Suspended)
             {
                 func.Dispose();
-                PlayerCoroutines[index] = null;
+                GamePadCoroutines[index] = null;
             }
             if (Queues[index].Count > 0)
             {
@@ -148,36 +114,27 @@ namespace TASMod.Recording
             return states;
         }
 
-        public static void RegisterFunction(string name, LuaFunction func, string description = "")
-        {
-            if (NamedFunctions.ContainsKey(name))
-            {
-                Controller.Console.PushResult($"Overriding existing function '{name}'");
-            }
-            if (!FrameFunctionNames.Contains(name))
-            {
-                FrameFunctionNames.Add(name);
-            }
-            NamedFunctions[name] = new NamedLuaFunction(name, func, description);
-        }
 
-        public static void SetPlayerCoroutine(int index, string name)
+        public static void SetCoroutine(int index, string name)
         {
             if (index < 0 || index >= 4)
             {
                 Controller.Console.PushResult($"Invalid controller index {index}");
                 return;
             }
-            if (!NamedFunctions.ContainsKey(name))
+            if (!LuaFunctionRegistry.ContainsKey(name))
             {
                 Controller.Console.PushResult($"No such function '{name}'");
                 return;
             }
-            if (PlayerCoroutines[index] != null)
+            if (GamePadCoroutines[index] != null)
             {
-                PlayerCoroutines[index].Dispose();
+                GamePadCoroutines[index].Dispose();
             }
-            PlayerCoroutines[index] = NamedFunctions[name].CreateCoroutine(index);
+            if (LuaFunctionRegistry.TryGetFunction(name, out NamedLuaFunction func))
+            {
+                GamePadCoroutines[index] = func.CreateCoroutine(index);
+            }
         }
 
         public static void SetManualFrameFunction(int index, LuaFunction func, string name, string description = "")
@@ -187,62 +144,62 @@ namespace TASMod.Recording
                 Controller.Console.PushResult($"Invalid controller index {index}");
                 return;
             }
-            if (PlayerCoroutines[index] != null)
+            if (GamePadCoroutines[index] != null)
             {
-                PlayerCoroutines[index].Dispose();
+                GamePadCoroutines[index].Dispose();
             }
-            PlayerCoroutines[index] = new LuaCoroutine(LuaEngine.LuaState, func, index, name, description);
+            GamePadCoroutines[index] = new LuaCoroutine(LuaEngine.LuaState, func, index, name, description);
         }
 
-        public static void ClearPlayerCoroutines()
+        public static void ClearCoroutines()
         {
             for (int i = 0; i < 4; i++)
             {
-                if (PlayerCoroutines[i] != null)
+                if (GamePadCoroutines[i] != null)
                 {
-                    PlayerCoroutines[i].Close();
+                    GamePadCoroutines[i].Close();
                 }
-                PlayerCoroutines[i] = null;
+                GamePadCoroutines[i] = null;
             }
         }
-        public static void ClearPlayerCoroutine(int index)
+        public static void ClearCoroutine(int index)
         {
             if (index < 0 || index >= 4)
             {
                 return;
             }
-            if (PlayerCoroutines[index] != null)
+            if (GamePadCoroutines[index] != null)
             {
-                PlayerCoroutines[index].Close();
+                GamePadCoroutines[index].Close();
             }
-            PlayerCoroutines[index] = null;
+            GamePadCoroutines[index] = null;
         }
 
-        public static bool HasPlayerCoroutine(int index)
+        public static bool HasCoroutine(int index)
         {
             if (index < 0 || index >= 4)
             {
                 return false;
             }
-            return PlayerCoroutines[index] != null;
+            return GamePadCoroutines[index] != null;
         }
 
-        public static string GetPlayerCoroutineName(int i)
+        public static string GetCoroutineName(int i)
         {
             if (i < 0 || i >= 4)
             {
                 return null;
             }
-            return PlayerCoroutines[i]?.Name;
+            return GamePadCoroutines[i]?.Name;
         }
 
-        public static LuaCoroutine GetPlayerCoroutine(int i)
+        public static LuaCoroutine GetCoroutine(int i)
         {
             if (i < 0 || i >= 4)
             {
                 return null;
             }
-            return PlayerCoroutines[i];
+            return GamePadCoroutines[i];
         }
     }
 }

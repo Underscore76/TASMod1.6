@@ -25,7 +25,7 @@ namespace TASMod.Simulators.GemNode
 
     public class GemNode
     {
-        public static MinesRocks minesRocks = new MinesRocks();
+        public static MinesFloor minesFloor = new MinesFloor(0);
         public static int CurrentFrame = -1;
         public static List<GemNodeHit> Hits = new List<GemNodeHit> { new(), new(), new(), new() };
 
@@ -105,7 +105,8 @@ namespace TASMod.Simulators.GemNode
             {
                 r.NextDouble();
             }
-            return minesRocks.BreakStone("44", x, y, who, loc, r).Aggregate((a, b) => a + "," + b);
+            var contents = minesFloor.BreakStone("44", x, y, who, loc, r);
+            return contents.FirstOrDefault()?.Item1 ?? "";
         }
     }
 }

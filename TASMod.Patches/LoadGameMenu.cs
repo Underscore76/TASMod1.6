@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Reflection.Emit;
 using HarmonyLib;
+using StardewValley;
+using StardewValley.Extensions;
 using StardewValley.Menus;
 
 namespace TASMod.Patches
@@ -20,7 +22,8 @@ namespace TASMod.Patches
                     BaseKey.Split(".")[1],
                     new Type[] { typeof(string) }
                 ),
-                transpiler: new HarmonyMethod(this.GetType(), nameof(this.Transpiler))
+                transpiler: new HarmonyMethod(this.GetType(), nameof(this.Transpiler)),
+                postfix: new HarmonyMethod(this.GetType(), nameof(this.Postfix))
             );
         }
 
@@ -49,6 +52,15 @@ namespace TASMod.Patches
         public static string Override()
         {
             return Constants.SavesPath;
+        }
+
+        public static void Postfix(ref List<Farmer> __result)
+        {
+            if (__result == null || Controller.State.LoadFilePrefix == "")
+            {
+                return;
+            }
+            __result.RemoveWhere(f => f == null || f.slotName == null || f.slotName == "" || !f.slotName.StartsWith(Controller.State.LoadFilePrefix));
         }
     }
 }

@@ -12,6 +12,7 @@ namespace TASMod.Helpers
             public double dailyLuck;
             public string friend;
             public int numRequired;
+            public bool receiveGift;
         }
 
         public static (string itemId, int count) UpdateDishOfTheDay(Random random)
@@ -52,6 +53,7 @@ namespace TASMod.Helpers
             r.Next(); //rarecrow
 
             double dailyLuck = Math.Min(0.10000000149011612, (double)r.Next(-100, 101) / 1000.0);
+
             return new()
             {
                 dishOfTheDay = dish,
@@ -59,6 +61,7 @@ namespace TASMod.Helpers
                 friend = friend,
                 numRequired = required,
                 dailyLuck = dailyLuck,
+                receiveGift = player.getFriendshipLevelForNPC(friend) >= required
             };
         }
 

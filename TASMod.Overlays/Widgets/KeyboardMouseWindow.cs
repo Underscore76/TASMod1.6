@@ -4,6 +4,7 @@ using ImGuiVector4 = System.Numerics.Vector4;
 using TASMod.Patches;
 using TASMod.Inputs;
 using StardewValley;
+using TASMod.Extensions;
 
 namespace TASMod.Overlays.Widgets
 {
@@ -41,6 +42,7 @@ namespace TASMod.Overlays.Widgets
             {
                 ImGui.TextColored(new ImGuiVector4(0.6f, 0.6f, 0.6f, 1), "o No Queued Input");
             }
+            ImGui.TextColored(new ImGuiVector4(1, 0.5f, 0, 1), $"Coroutine (FPS: {GameRunnerExtensions.ApproximateFPS:F2})");
 
             ImGui.SeparatorText("Last Frame Input");
             if (Controller.State.FrameStates.Count > 0)

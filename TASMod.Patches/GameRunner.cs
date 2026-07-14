@@ -8,6 +8,8 @@ using StardewModdingAPI;
 using StardewValley;
 using TASMod.Extensions;
 using TASMod.Networking;
+using TASMod.Recording;
+using TASMod.Scripting;
 using TASMod.System;
 using TASMod.Views;
 
@@ -182,6 +184,12 @@ namespace TASMod.Patches
                 {
                     Controller.FastAdvance = false;
                 }
+                return false;
+            }
+            if (KeyboardMouseInputQueue.HasCoroutine() && !GameRunnerExtensions.InCoroutineLoop)
+            {
+                ModEntry.Console.Log("Running KeyboardMouseInputQueue", LogLevel.Trace);
+                __instance.RunCoroutine();
                 return false;
             }
             if (GameRunner_Draw.Counter != Counter)

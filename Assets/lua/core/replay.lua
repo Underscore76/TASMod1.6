@@ -1,3 +1,4 @@
+--- defines functions for controlling replay mode
 local replay = {}
 local keybinds = require('core.keybinds')
 
@@ -16,7 +17,7 @@ function replay.exit()
 end
 
 --- pause the game (on a specific frame if desired)
---- @param frame number|nil @frame to pause on (default: nil)
+--- @param frame number|nil frame to pause on (default: nil)
 function replay.pause(frame)
     replay.enter()
     if frame == nil then
@@ -27,7 +28,7 @@ function replay.pause(frame)
 end
 
 --- run the game until the specified frame
---- @param frame number @frame to run to
+--- @param frame number frame to run to
 function replay.runto(frame)
     if frame == nil then
         print("ERROR: runto requires a frame number")
@@ -39,7 +40,7 @@ function replay.runto(frame)
 end
 
 --- advance the game in replay mode
---- @param frame number|nil @number of frames to advance (default: 1)
+--- @param frame number|nil number of frames to advance (default: 1)
 function replay.step(frame)
     if frame == nil then
         frame = 1
@@ -55,8 +56,8 @@ function replay.toggle()
 end
 
 --- register keybinds for replay mode
---- @param step_key Microsoft.Xna.Framework.Input.Keys @key to advance one frame
---- @param toggle_key Microsoft.Xna.Framework.Input.Keys @key to toggle pause
+--- @param step_key Keys key to advance one frame
+--- @param toggle_key Keys key to toggle pause
 function replay.register_keybinds(step_key, toggle_key)
     replay.enter()
     if step_key == nil or toggle_key == nil then

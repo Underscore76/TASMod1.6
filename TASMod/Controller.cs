@@ -140,7 +140,6 @@ namespace TASMod
             {
                 return true;
             }
-
             // if sp then just update if the automation has something to do
             if (NetworkState.NumConnections == 0)
             {
@@ -265,6 +264,7 @@ namespace TASMod
                     }
                 }
             }
+
         }
 
         private static bool HandleRealInput()

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework.Input;
+using TASMod.Recording;
 
 namespace TASMod.Inputs
 {
@@ -15,6 +16,13 @@ namespace TASMod.Inputs
         // used in command console, not in game
         public static int scrollWheelDiff;
 
+        public static bool BreakExecution()
+        {
+            return IsKeyDown(Keys.OemMinus)
+                && IsKeyDown(Keys.OemPlus)
+                && (KeyboardMouseInputQueue.HasInput() || KeyboardMouseInputQueue.HasCoroutine())
+                && !Controller.Console.IsOpen;
+        }
         public static void Reset()
         {
             oldMouseState = Mouse.GetState();
@@ -34,6 +42,12 @@ namespace TASMod.Inputs
             keyboardState = Keyboard.GetState();
 
             scrollWheelDiff = mouseState.ScrollWheelValue - oldMouseState.ScrollWheelValue;
+
+            if (BreakExecution())
+            {
+                Controller.Console.Trace("Breaking execution");
+                KeyboardMouseInputQueue.Clear();
+            }
         }
 
         public static bool KeyTriggered(Keys key)

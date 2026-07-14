@@ -126,9 +126,9 @@ namespace TASMod.Scripting
 
         public void WaitPrefix()
         {
-        // uses the same logic as https://github.com/MonoGame/MonoGame/blob/develop/MonoGame.Framework/Game.cs#L58
-        // idea is to force a sleep until the next tick should fire
-        // not super accurate but from testing reaches pretty close to 60fps
+            // uses the same logic as https://github.com/MonoGame/MonoGame/blob/develop/MonoGame.Framework/Game.cs#L58
+            // idea is to force a sleep until the next tick should fire
+            // not super accurate but from testing reaches pretty close to 60fps
         PrefixTicks:
             var currentTicks = _gameTimer.Elapsed.Ticks;
             _accumulatedElapsedTime += TimeSpan.FromTicks(currentTicks - _previousTicks);
@@ -188,6 +188,16 @@ namespace TASMod.Scripting
             GamePadInputQueue.Clear();
         }
 
+        public void ClearKeyboardMouseInputQueue()
+        {
+            KeyboardMouseInputQueue.Clear();
+        }
+
+        public void ClearLuaFunctions()
+        {
+            LuaFunctionRegistry.Clear();
+        }
+
         public void AddGamePadInput(int index, LuaTable tbl)
         {
             if (tbl != null)
@@ -211,10 +221,24 @@ namespace TASMod.Scripting
                     AnalogX = Convert.ToSingle(tbl["rx"]),
                     AnalogY = Convert.ToSingle(tbl["ry"])
                 };
-                GamePadInputQueue.PushGamePadInput(index, gState);
+                GamePadInputQueue.PushInput(index, gState);
             }
         }
 
+        public void AddKeyboardMouseInput(LuaTable tbl)
+        {
+            if (tbl != null)
+            {
+                ReadInputStates(
+                    tbl,
+                    out TASKeyboardState kstate,
+                    out TASMouseState mstate,
+                    out _,
+                    out _
+                );
+                KeyboardMouseInputQueue.PushInput(kstate, mstate);
+            }
+        }
         public static void ReadInputStates(
             LuaTable input,
             out TASKeyboardState kstate,
@@ -243,19 +267,21 @@ namespace TASMod.Scripting
                 }
             }
 
+            var lastMouse = Controller.LastFrameMouse();
             if (mouse != null)
             {
-                mstate = new TASMouseState
+                mstate = new TASMouseState(lastMouse);
+                if (mouse["X"] != null && mouse["Y"] != null)
                 {
-                    MouseX = Convert.ToInt32(mouse["X"]),
-                    MouseY = Convert.ToInt32(mouse["Y"]),
-                    LeftMouseClicked = Convert.ToBoolean(mouse["left"]),
-                    RightMouseClicked = Convert.ToBoolean(mouse["right"])
-                };
+                    mstate.MouseX = Convert.ToInt32(mouse["X"]);
+                    mstate.MouseY = Convert.ToInt32(mouse["Y"]);
+                }
+                mstate.LeftMouseClicked = Convert.ToBoolean(mouse["left"]);
+                mstate.RightMouseClicked = Convert.ToBoolean(mouse["right"]);
             }
             else
             {
-                mstate = new TASMouseState(Controller.LastFrameMouse(), false, false);
+                mstate = new TASMouseState(lastMouse, false, false);
             }
 
             gstate = GamePadInputQueue.GetNextInputs();
@@ -644,6 +670,73 @@ namespace TASMod.Scripting
         public void LoadGameByIndex(int index)
         {
             GameRunner.LoadInstance(GameRunner.instance.gameInstances[index], true);
+        }
+
+        private static List<T> TableToList<T>(LuaTable table, Func<object, T> convert, Action<object, Exception> onError = null)
+        {
+            var result = new List<T>();
+            if (table == null) return result;
+
+            foreach (var value in table.Values)
+            {
+                if (value == null) continue;
+                try
+                {
+                    result.Add(convert(value));
+                }
+                catch (Exception ex)
+                {
+                    onError?.Invoke(value, ex);
+                }
+            }
+
+            return result;
+        }
+
+        public List<string> TableToStringList(LuaTable table)
+        {
+            return TableToList(table, Convert.ToString, (value, ex) =>
+            {
+                Console.PushResult($"failed to convert value {value} to string: {ex.Message}");
+            });
+        }
+
+        public List<int> TableToIntList(LuaTable table)
+        {
+            return TableToList(table, Convert.ToInt32, (value, ex) =>
+            {
+                Console.PushResult($"failed to convert value {value} to int: {ex.Message}");
+            });
+        }
+
+        public List<Vector2> TableToVector2List(LuaTable table)
+        {
+            return TableToList(table, value =>
+            {
+                if (value is Vector2 vec)
+                {
+                    return vec;
+                }
+                else if (value is LuaTable vecTable && vecTable["X"] != null && vecTable["Y"] != null)
+                {
+                    try
+                    {
+                        float x = Convert.ToSingle(vecTable["X"]);
+                        float y = Convert.ToSingle(vecTable["Y"]);
+                        return new Vector2(x, y);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.PushResult($"failed to convert table {vecTable} to Vector2: {ex.Message}");
+                        return Vector2.Zero;
+                    }
+                }
+                else
+                {
+                    Console.PushResult($"value {value} is not a valid Vector2 table");
+                    return Vector2.Zero;
+                }
+            });
         }
     }
 }

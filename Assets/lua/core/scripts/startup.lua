@@ -1,4 +1,4 @@
--- script to startup a new game based on your character customization
+---script to startup a new game based on your character customization
 
 local clickables = require("core.clickables")
 local input = require("core.input")

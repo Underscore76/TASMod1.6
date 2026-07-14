@@ -41,6 +41,13 @@ namespace TASMod.Overlays
             var playerInfo = InstanceCurrentPlayer.Get(i);
             if (currentLocation.Active)
             {
+                if (currentLocation.Location is Farm farm)
+                {
+                    foreach (var animal in farm.animals.Values)
+                    {
+                        DrawRectGlobal(i, spriteBatch, animal.GetBoundingBox(), NPCColor, LineColor);
+                    }
+                }
                 foreach (NPC current in currentLocation.Characters)
                 {
                     DrawRectGlobal(i, spriteBatch, current.GetBoundingBox(), NPCColor, LineColor);

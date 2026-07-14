@@ -22,10 +22,11 @@ namespace TASMod.Automation
             gstate = null;
             var locationInfo = InstanceCurrentLocation.Get(index);
             var menuInfo = InstanceCurrentMenu.Get(index);
+            var eventInfo = InstanceCurrentEvent.Get(index);
             var playerInfo = InstanceCurrentPlayer.Get(index);
             var fadeInfo = InstanceScreenFade.Get(index);
 
-            if (!locationInfo.Active || menuInfo.Active)
+            if (!locationInfo.Active || menuInfo.Active || eventInfo.Active)
                 return false;
 
             if (fadeInfo.GlobalFade)

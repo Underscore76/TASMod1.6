@@ -1,0 +1,266 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>TAS Mod Lua Docs</title>
+    <link rel="stylesheet" href="../ldoc_new.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>TASMod 1.6</h1>
+
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Functions">Functions</a></li>
+</ul>
+
+
+<h2>Modules</h2>
+<ul class="nowrap">
+  <li><a href="../modules/aliases.html">aliases</a></li>
+  <li><a href="../modules/core.clickables.html">core.clickables</a></li>
+  <li><a href="../modules/core.collections.deque.html">core.collections.deque</a></li>
+  <li><a href="../modules/core.collections.stack.html">core.collections.stack</a></li>
+  <li><a href="../modules/core.common.html">core.common</a></li>
+  <li><a href="../modules/core.console.html">core.console</a></li>
+  <li><a href="../modules/core.coroutines.frame_funcs.html">core.coroutines.frame_funcs</a></li>
+  <li><a href="../modules/core.coroutines.keyboard_utils.html">core.coroutines.keyboard_utils</a></li>
+  <li><a href="../modules/core.coroutines.mouse_utils.html">core.coroutines.mouse_utils</a></li>
+  <li><a href="../modules/core.coroutines.nav.html">core.coroutines.nav</a></li>
+  <li><a href="../modules/core.engine.html">core.engine</a></li>
+  <li><strong>core.fileio</strong></li>
+  <li><a href="../modules/core.input.html">core.input</a></li>
+  <li><a href="../modules/core.input.gamepad.html">core.input.gamepad</a></li>
+  <li><a href="../modules/core.input.kbm.html">core.input.kbm</a></li>
+  <li><a href="../modules/core.inventory.html">core.inventory</a></li>
+  <li><a href="../modules/core.keybinds.html">core.keybinds</a></li>
+  <li><a href="../modules/core.lua_utils.html">core.lua_utils</a></li>
+  <li><a href="../modules/core.replay.html">core.replay</a></li>
+  <li><a href="../modules/core.scripts.newgame.html">core.scripts.newgame</a></li>
+  <li><a href="../modules/core.scripts.startup.html">core.scripts.startup</a></li>
+  <li><a href="../modules/core.utilities.frame_stack.html">core.utilities.frame_stack</a></li>
+  <li><a href="../modules/core.utilities.input_copy.html">core.utilities.input_copy</a></li>
+  <li><a href="../modules/core.utilities.tile_funcs.html">core.utilities.tile_funcs</a></li>
+  <li><a href="../modules/core.view.html">core.view</a></li>
+  <li><a href="../modules/prelaunch.html">prelaunch</a></li>
+</ul>
+<h2>Readme</h2>
+<ul class="nowrap">
+  <li><a href="../readme/README.md.html">README</a></li>
+</ul>
+<h2>Examples</h2>
+<ul class="nowrap">
+  <li><a href="../examples/boot.lua.html">boot.lua</a></li>
+  <li><a href="../examples/coroutine.basic.lua.html">coroutine.basic.lua</a></li>
+  <li><a href="../examples/coroutine.infiniteloop.lua.html">coroutine.infiniteloop.lua</a></li>
+  <li><a href="../examples/coroutine.nav.lua.html">coroutine.nav.lua</a></li>
+  <li><a href="../examples/coroutine.toggle.lua.html">coroutine.toggle.lua</a></li>
+  <li><a href="../examples/coroutine.watch.lua.html">coroutine.watch.lua</a></li>
+  <li><a href="../examples/create_char.lua.html">create_char.lua</a></li>
+  <li><a href="../examples/file_handling.lua.html">file_handling.lua</a></li>
+  <li><a href="../examples/init.lua.html">init.lua</a></li>
+  <li><a href="../examples/lua_overlay.lua.html">lua_overlay.lua</a></li>
+  <li><a href="../examples/newgame.lua.html">newgame.lua</a></li>
+  <li><a href="../examples/screenfade.lua.html">screenfade.lua</a></li>
+  <li><a href="../examples/use_keybinds.lua.html">use_keybinds.lua</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Module <code>core.fileio</code></h1>
+<p>fileio - utility functions for reading/writing files</p>
+<p>
+
+</p>
+
+
+<h2><a href="#Functions">Functions</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#exists">exists (name)</a></td>
+	<td class="summary">checks if file exists</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#read_file">read_file (fname)</a></td>
+	<td class="summary">reads lines from a passed file into a table array</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#write_file">write_file (fname, lines)</a></td>
+	<td class="summary">writes lines from a table array to a passed file</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#read_file_table">read_file_table (fname)</a></td>
+	<td class="summary">reads a file into a table of key-value pairs (simple number/string pairs, not nested)
+strings that represent numbers will be coerced to number type</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#write_file_table">write_file_table (fname, tab)</a></td>
+	<td class="summary">writes a table of key-value pairs to a file (simple number/string pairs, not nested)</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "exists"></a>
+    <strong>exists (name)</strong>
+    </dt>
+    <dd>
+    checks if file exists
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">name</span>
+         string the name of the file
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        boolean whether the file exists or not
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "read_file"></a>
+    <strong>read_file (fname)</strong>
+    </dt>
+    <dd>
+    reads lines from a passed file into a table array
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">fname</span>
+         string the filename to read from
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        table a table that is an array of the lines in the file
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "write_file"></a>
+    <strong>write_file (fname, lines)</strong>
+    </dt>
+    <dd>
+    writes lines from a table array to a passed file
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">fname</span>
+         string the filename to write to
+        </li>
+        <li><span class="parameter">lines</span>
+         table a table that is an array of the lines to write
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "read_file_table"></a>
+    <strong>read_file_table (fname)</strong>
+    </dt>
+    <dd>
+    reads a file into a table of key-value pairs (simple number/string pairs, not nested)
+strings that represent numbers will be coerced to number type
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">fname</span>
+         string the filename to read from
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        table a table of key-value pairs read from the file
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "write_file_table"></a>
+    <strong>write_file_table (fname, tab)</strong>
+    </dt>
+    <dd>
+    writes a table of key-value pairs to a file (simple number/string pairs, not nested)
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">fname</span>
+         string the filename to write to
+        </li>
+        <li><span class="parameter">tab</span>
+         table a table of key-value pairs to write
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/lunarmodules/LDoc">LDoc 1.5.0</a></i>
+<i style="float:right;">Last updated 2026-04-18 20:49:56 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>

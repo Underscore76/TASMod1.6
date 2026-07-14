@@ -10,6 +10,12 @@ namespace TASMod.Console.Commands
     {
         public override string Name => "newgame";
         public override string Description => "console menu for new save state creation";
+        public override string[] Usage =>
+            new string[]
+            {
+                string.Format("{0}: create a new save state with custom parameters", Name),
+                string.Format("{0} seed language prefix: create a new save state with given parameters", Name)
+            };
 
         public LocalizedContentManager.LanguageCode DefaultLanguage = LocalizedContentManager
             .LanguageCode
@@ -31,6 +37,30 @@ namespace TASMod.Console.Commands
 
         public override void Run(string[] tokens)
         {
+            if (tokens.Length == 3)
+            {
+                if (!Int32.TryParse(tokens[0], out Seed))
+                {
+                    Write("Seed {0} cannot be cast to integer type, please try again", tokens[0]);
+                    return;
+                }
+                else if (!Enum.TryParse(tokens[1], out Language))
+                {
+                    Write(
+                        "Language {0} not valid, (options: [en,ja,ru,zh,pt,es,de,th,fr,ko,it,tr,hu]) (default: {1})",
+                        tokens[1],
+                        DefaultLanguage
+                    );
+                    return;
+                }
+                else
+                {
+                    Prefix = tokens[2];
+                    CreateState();
+                    Write("New input created: {0}", Controller.State.Prefix);
+                    return;
+                }
+            }
             Seed = 0;
             Prefix = "";
             Subscribe();

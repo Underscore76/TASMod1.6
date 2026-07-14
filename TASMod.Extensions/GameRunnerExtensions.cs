@@ -1,12 +1,16 @@
 using System;
+using System.Diagnostics;
 using System.Reflection;
 using System.Threading;
 using HarmonyLib;
 using Microsoft.Xna.Framework;
 using StardewModdingAPI;
 using StardewValley;
+using TASMod.Inputs;
 using TASMod.Monogame.Framework;
 using TASMod.Networking;
+using TASMod.Recording;
+using TASMod.Scripting;
 using TASMod.Simulators.Fishing;
 using TASMod.System;
 using TASMod.Views;
@@ -142,6 +146,43 @@ namespace TASMod.Extensions
             runner.InvokeEndDraw();
             //ModEntry.Console.Log($"finished step. {gameTime.TotalGameTime}", LogLevel.Error);
             runner.EventLoop();
+        }
+
+        public static bool InCoroutineLoop = false;
+        public static double ApproximateFPS;
+        public static void RunCoroutine(this GameRunner runner)
+        {
+            InCoroutineLoop = true;
+
+            long windowStart = Stopwatch.GetTimestamp();
+            int windowFrames = 0;
+            try
+            {
+                while (KeyboardMouseInputQueue.HasCoroutine())
+                {
+                    ScriptInterface._instance.WaitPrefix();
+                    ScriptInterface._instance.StepLogic();
+                    ScriptInterface._instance.WaitPostfix();
+
+                    windowFrames++;
+
+                    long now = Stopwatch.GetTimestamp();
+                    double elapsedSec = (now - windowStart) / (double)Stopwatch.Frequency;
+
+                    if (elapsedSec >= 0.25)
+                    {
+                        double instantFps = windowFrames / elapsedSec;
+                        ApproximateFPS = instantFps;
+
+                        windowStart = now;
+                        windowFrames = 0;
+                    }
+                }
+            }
+            finally
+            {
+                InCoroutineLoop = false;
+            }
         }
 
         public static void RunFast(this GameRunner runner)

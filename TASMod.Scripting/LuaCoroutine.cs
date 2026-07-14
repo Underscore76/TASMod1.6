@@ -66,7 +66,7 @@ namespace TASMod.Scripting
                     if (output.Length > 1)
                     {
                         ModEntry.Console.Log(
-                            $"Error in coroutine '{Name}': {output[1]}",
+                            Constants.StripUsername($"Error in coroutine '{Name}': {output[1]}"),
                             StardewModdingAPI.LogLevel.Error
                         );
                     }

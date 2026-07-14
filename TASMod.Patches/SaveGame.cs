@@ -51,4 +51,30 @@ namespace TASMod.Patches
             return Constants.SavesPath;
         }
     }
+
+    public class SaveGame_FilterFileName : IPatch
+    {
+        public static string BaseKey = "SaveGame.FilterFileName";
+        public override string Name => BaseKey;
+
+        public override void Patch(Harmony harmony)
+        {
+            harmony.Patch(
+                original: AccessTools.Method(typeof(SaveGame), BaseKey.Split(".")[1]),
+                prefix: new HarmonyMethod(this.GetType(), nameof(this.Prefix)),
+                postfix: new HarmonyMethod(this.GetType(), nameof(this.Postfix))
+            );
+        }
+
+        public static bool Prefix()
+        {
+            return false;
+        }
+
+        public static void Postfix(ref string __result, string fileName)
+        {
+            ModEntry.Console.Log($"SaveGame.FilterFileName Postfix: {fileName} -> {__result}", StardewModdingAPI.LogLevel.Trace);
+            __result = fileName;
+        }
+    }
 }

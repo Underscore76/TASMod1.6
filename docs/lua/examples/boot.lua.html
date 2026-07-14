@@ -1,0 +1,155 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>TAS Mod Lua Docs</title>
+    <link rel="stylesheet" href="../ldoc_new.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>TASMod 1.6</h1>
+
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+
+
+<h2>Examples</h2>
+<ul class="nowrap">
+  <li><strong>boot.lua</strong></li>
+  <li><a href="../examples/coroutine.basic.lua.html">coroutine.basic.lua</a></li>
+  <li><a href="../examples/coroutine.infiniteloop.lua.html">coroutine.infiniteloop.lua</a></li>
+  <li><a href="../examples/coroutine.nav.lua.html">coroutine.nav.lua</a></li>
+  <li><a href="../examples/coroutine.toggle.lua.html">coroutine.toggle.lua</a></li>
+  <li><a href="../examples/coroutine.watch.lua.html">coroutine.watch.lua</a></li>
+  <li><a href="../examples/create_char.lua.html">create_char.lua</a></li>
+  <li><a href="../examples/file_handling.lua.html">file_handling.lua</a></li>
+  <li><a href="../examples/init.lua.html">init.lua</a></li>
+  <li><a href="../examples/lua_overlay.lua.html">lua_overlay.lua</a></li>
+  <li><a href="../examples/newgame.lua.html">newgame.lua</a></li>
+  <li><a href="../examples/screenfade.lua.html">screenfade.lua</a></li>
+  <li><a href="../examples/use_keybinds.lua.html">use_keybinds.lua</a></li>
+</ul>
+<h2>Modules</h2>
+<ul class="nowrap">
+  <li><a href="../modules/aliases.html">aliases</a></li>
+  <li><a href="../modules/core.clickables.html">core.clickables</a></li>
+  <li><a href="../modules/core.collections.deque.html">core.collections.deque</a></li>
+  <li><a href="../modules/core.collections.stack.html">core.collections.stack</a></li>
+  <li><a href="../modules/core.common.html">core.common</a></li>
+  <li><a href="../modules/core.console.html">core.console</a></li>
+  <li><a href="../modules/core.coroutines.frame_funcs.html">core.coroutines.frame_funcs</a></li>
+  <li><a href="../modules/core.coroutines.keyboard_utils.html">core.coroutines.keyboard_utils</a></li>
+  <li><a href="../modules/core.coroutines.mouse_utils.html">core.coroutines.mouse_utils</a></li>
+  <li><a href="../modules/core.coroutines.nav.html">core.coroutines.nav</a></li>
+  <li><a href="../modules/core.engine.html">core.engine</a></li>
+  <li><a href="../modules/core.fileio.html">core.fileio</a></li>
+  <li><a href="../modules/core.input.html">core.input</a></li>
+  <li><a href="../modules/core.input.gamepad.html">core.input.gamepad</a></li>
+  <li><a href="../modules/core.input.kbm.html">core.input.kbm</a></li>
+  <li><a href="../modules/core.inventory.html">core.inventory</a></li>
+  <li><a href="../modules/core.keybinds.html">core.keybinds</a></li>
+  <li><a href="../modules/core.lua_utils.html">core.lua_utils</a></li>
+  <li><a href="../modules/core.replay.html">core.replay</a></li>
+  <li><a href="../modules/core.scripts.newgame.html">core.scripts.newgame</a></li>
+  <li><a href="../modules/core.scripts.startup.html">core.scripts.startup</a></li>
+  <li><a href="../modules/core.utilities.frame_stack.html">core.utilities.frame_stack</a></li>
+  <li><a href="../modules/core.utilities.input_copy.html">core.utilities.input_copy</a></li>
+  <li><a href="../modules/core.utilities.tile_funcs.html">core.utilities.tile_funcs</a></li>
+  <li><a href="../modules/core.view.html">core.view</a></li>
+  <li><a href="../modules/prelaunch.html">prelaunch</a></li>
+</ul>
+<h2>Readme</h2>
+<ul class="nowrap">
+  <li><a href="../readme/README.md.html">README</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+    <h2>boot.lua</h2>
+<pre>
+<span class="comment">-- boot.lua: this maybe should be called post_startup.lua, this runs after the game has fully initialized and the lua engine is setup
+</span><span class="comment">-- the idea/my primary use cases have been around automating the game post launch to get a certain state
+</span>
+<span class="comment">-- This example runs a boot loop that finds a set of initial conditions that have really good first day spring onions.
+</span><span class="comment">-- The random state at game launch influences some pieces of the first day rng state/updates outside of the selection of
+</span><span class="comment">-- the actual game seed, so we both have the capability to manipulate that without impacting our selection of game seed.
+</span><span class="comment">-- Because this process requires a TON of resets, small memory leaks in the core game can lead it to an eventual crash and
+</span><span class="comment">-- so we run this in a loop where we capture the best seed/offset combination we find and then kill the instance and restart it to clear memory
+</span>
+<span class="keyword">local</span> fileio = <span class="global">require</span>(<span class="string">'core.fileio'</span>)
+
+<span class="keyword">local</span> file = Constants.ScriptsPath .. <span class="string">'/'</span> .. <span class="string">'FrameRNG.dat'</span>
+
+<span class="comment">-- write a default search setup if one doesn't exist
+</span><span class="keyword">if</span> <span class="keyword">not</span> fileio.<span class="function-name">exists</span>(file) <span class="keyword">then</span>
+    fileio.<span class="function-name">WriteFileTable</span>(file, {
+        iterations = <span class="number">100</span>, <span class="comment">-- how many seeds to test before killing the instance
+</span>        curr_seed = <span class="number">0</span>,    <span class="comment">-- the starting seed to test
+</span>        best_count = -<span class="number">1</span>,  <span class="comment">-- best number of spring onions found so far
+</span>        best_seed = -<span class="number">1</span>,   <span class="comment">-- the seed that resulted in the best count
+</span>    })
+<span class="keyword">end</span>
+
+<span class="keyword">local</span> search_setup = fileio.<span class="function-name">ReadFileTable</span>(file)
+
+<span class="keyword">function</span> <span class="function-name">forest_spring_onions</span>()
+    <span class="keyword">local</span> c = <span class="number">0</span>
+    <span class="keyword">for</span> _, v <span class="keyword">in</span> <span class="function-name">dict_items</span>(Game1.locations[<span class="number">21</span>].terrainFeatures) <span class="keyword">do</span>
+        <span class="keyword">if</span> v:<span class="function-name">GetType</span>().Name == <span class="string">"HoeDirt"</span> <span class="keyword">then</span>
+            c = c + <span class="number">1</span>
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+    <span class="keyword">return</span> c
+<span class="keyword">end</span>
+
+<span class="function-name">bfload</span>(<span class="string">'after_day1_new_day'</span>) <span class="comment">-- blocking fast load a file that is just past the point of day 1 update/where spring onions are generated.
+</span><span class="function-name">fs_push</span>()                    <span class="comment">-- store the current frame
+</span>
+<span class="keyword">for</span> i = <span class="number">1</span>, search_setup[<span class="string">'iterations'</span>] <span class="keyword">do</span>
+    Controller.State.Frame0RandomSeed = search_setup[<span class="string">'curr_seed'</span>]
+    <span class="function-name">brw</span>() <span class="comment">-- reset to the stored frame, but with the new startup seed
+</span>    <span class="keyword">local</span> c = <span class="function-name">forest_spring_onions</span>()
+    <span class="keyword">if</span> c &gt; search_setup[<span class="string">'best_count'</span>] <span class="keyword">then</span>
+        search_setup[<span class="string">'best_count'</span>] = c
+        search_setup[<span class="string">'best_seed'</span>] = search_setup[<span class="string">'curr_seed'</span>]
+    <span class="keyword">end</span>
+    <span class="function-name">printf</span>(<span class="string">"Seed: %d =&gt; %d onions\tBest: %d onions on seed %d"</span>,
+        search_setup[<span class="string">'curr_seed'</span>], c,
+        search_setup[<span class="string">'best_count'</span>], search_setup[<span class="string">'best_seed'</span>])
+    search_setup[<span class="string">'curr_seed'</span>] = search_setup[<span class="string">'curr_seed'</span>] + <span class="number">1</span>
+    fileio.<span class="function-name">WriteFileTable</span>(file, search_setup)
+<span class="keyword">end</span>
+interface:<span class="function-name">Kill</span>() <span class="comment">-- kill the instance to clear memory and allow us to restart fresh with the next set of seeds</span></pre>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/lunarmodules/LDoc">LDoc 1.5.0</a></i>
+<i style="float:right;">Last updated 2026-04-18 20:49:56 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>

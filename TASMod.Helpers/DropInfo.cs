@@ -13,7 +13,7 @@ namespace TASMod.Helpers
 {
     public class DropInfo
     {
-        public static string ObjectName(string index)
+        public static string ObjectName(string index, bool return_unknown = false)
         {
             try
             {
@@ -21,7 +21,14 @@ namespace TASMod.Helpers
             }
             catch (Exception)
             {
-                return "unknown";
+                if (return_unknown)
+                {
+                    return "unknown";
+                }
+                else
+                {
+                    return index;
+                }
             }
         }
     }

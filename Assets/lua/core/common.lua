@@ -62,14 +62,14 @@ function current_frame()
 end
 
 ---returns the current game1 random
----@return Random @current game1 random
+---@return Random current game1 random
 function game1_random()
     return interface:GetGame1Random()
 end
 
 ---copies the random object
 ---@param random Random
----@return Random @copied random object
+---@return Random copied random object
 function copy_random(random)
     return interface:CopyRandom(random)
 end
@@ -89,14 +89,26 @@ function pgcf()
     frame_stack.print()
 end
 
+---peek the top of the global frame stack
+---@return number|nil top frame number on the stack
+function fs_peek()
+    return frame_stack.last()
+end
+
 ---push a specific frame to the global frame stack
-function push(f)
+function fs_push(f)
     frame_stack.push(f)
+end
+
+---get the frame stack items
+---@return table table of frame numbers in the stack
+function fs_items()
+    return frame_stack.stack.data
 end
 
 ---pop a frame from the global frame stack
 ---@return number|nil popped frame number
-function pop()
+function fs_pop()
     return frame_stack.pop()
 end
 
@@ -114,11 +126,11 @@ end
 
 ---clear the global frame stack
 function frame_stack_clear()
-    frame_stack._X = {}
+    frame_stack.clear()
 end
 
 ---gets the current real time
----@return System.DateTime @current real time
+---@return DateTimeOffset current real time
 function real_time()
     return DateTimeOffset.FromUnixTimeSeconds(os.time()):ToLocalTime()
 end

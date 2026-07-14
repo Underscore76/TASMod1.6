@@ -1,0 +1,66 @@
+---@meta
+
+---@class Keys
+---@field A number
+---@field B number
+---@field C number
+---@field D number
+---@field E number
+---@field F number
+---@field G number
+---@field H number
+---@field I number
+---@field J number
+---@field K number
+---@field L number
+---@field M number
+---@field N number
+---@field O number
+---@field P number
+---@field Q number
+---@field R number
+---@field S number
+---@field T number
+---@field U number
+---@field V number
+---@field W number
+---@field X number
+---@field Y number
+---@field Z number
+---@field D0 number
+---@field D1 number
+---@field D2 number
+---@field D3 number
+---@field D4 number
+---@field D5 number
+---@field D6 number
+---@field D7 number
+---@field D8 number
+---@field D9 number
+---@field OemMinus number
+---@field OemPlus number
+---@field Left number
+---@field Up number
+---@field Right number
+---@field Down number
+---@field Enter number
+---@field Escape number
+---@field Space number
+---@field Delete number
+---@field LeftControl number
+---@field LeftShift number
+---@field RightShift number
+---@field Tab number
+Keys = {}
+
+
+---@class MouseState
+---@field X number
+---@field Y number
+---@field LeftMouseClicked boolean
+---@field RightMouseClicked boolean
+MouseState = {}
+
+---@class Mouse
+---@field GetState fun():MouseState
+Mouse = {}
